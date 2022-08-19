@@ -1,0 +1,2 @@
+
+-DCATKIN_DEVEL_PREFIX=/home/ethan/Workset/Self-driving/ROS/devel -DCMAKE_INSTALL_PREFIX=/home/ethan/Workset/Self-driving/ROS/install -G Unix Makefiles
