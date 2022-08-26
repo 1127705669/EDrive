@@ -1,0 +1,8 @@
+prefix=/home/ethan/Workset/EDrive/EROS/devel
+
+Name: node
+Description: Description of node
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

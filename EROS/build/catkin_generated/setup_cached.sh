@@ -8,6 +8,8 @@
 
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/ethan/Workset/EDrive/EROS/devel:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/ethan/Workset/EDrive/EROS/devel/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/ethan/Workset/EDrive/EROS/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD='/home/ethan/Workset/EDrive/EROS/build'
 export ROSLISP_PACKAGE_DIRECTORIES='/home/ethan/Workset/EDrive/EROS/devel/share/common-lisp'
 export ROS_PACKAGE_PATH="/home/ethan/Workset/EDrive/EROS/src:$ROS_PACKAGE_PATH"
