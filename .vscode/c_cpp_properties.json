@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/opt/ros/melodic/include/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

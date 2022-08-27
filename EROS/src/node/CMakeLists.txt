@@ -118,6 +118,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  /opt/ros/melodic/include
 )
 
 ## Declare a C++ library
