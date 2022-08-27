@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="base" type="base" name="base" output="screen"/>
+</launch>
