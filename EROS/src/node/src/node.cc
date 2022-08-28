@@ -3,7 +3,7 @@
 
 // #include "EROS/src/node/include/node/node.h"
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
     std::cout << "EDrive" << std::endl;
     return 0;
