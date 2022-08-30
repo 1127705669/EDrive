@@ -2,15 +2,12 @@
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#pragma once
+#include "modules/planning/planner/public_road/public_road_planner.h"
 
-#include "modules/planning/planning_component.h"
-
-namespace EDrve {
+namespace apollo {
 namespace planning {
 
-class PlanningComponent final
-    : public 
 
-} // planning
-} // EDrve
+
+}
+}
