@@ -6,6 +6,8 @@
 
 #include <string>
 
+#include "modules/common/data/error_code.h"
+
 namespace EDrive {
 namespace common {
 

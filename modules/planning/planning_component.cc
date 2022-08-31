@@ -4,13 +4,17 @@
 
 #pragma once
 
-#include "modules/planning_component.h"
+#include "EROS/src/component/component.h"
+#include "modules/planning/planning_component.h"
 
 namespace EDrve {
 namespace planning {
 
 class PlanningComponent final
+    : public EROS
     : public 
+
+};
 
 } // planning
 } // EDrve
