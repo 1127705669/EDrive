@@ -131,8 +131,10 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/ethan/Workset/EDrive/EROS/build/gtest/cmake_install.cmake")
-  include("/home/ethan/Workset/EDrive/EROS/build/base/cmake_install.cmake")
-  include("/home/ethan/Workset/EDrive/EROS/build/node/cmake_install.cmake")
+  include("/home/ethan/Workset/EDrive/EROS/build/control/cmake_install.cmake")
+  include("/home/ethan/Workset/EDrive/EROS/build/localization/cmake_install.cmake")
+  include("/home/ethan/Workset/EDrive/EROS/build/planning/cmake_install.cmake")
+  include("/home/ethan/Workset/EDrive/EROS/build/prediction/cmake_install.cmake")
 
 endif()
 

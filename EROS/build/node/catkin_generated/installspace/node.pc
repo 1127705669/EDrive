@@ -1,8 +1,0 @@
-prefix=/home/ethan/Workset/EDrive/EROS/install
-
-Name: node
-Description: Description of node
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

@@ -1,0 +1,8 @@
+prefix=/home/ethan/Workset/EDrive/EROS/devel
+
+Name: prediction
+Description: Description of prediction
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

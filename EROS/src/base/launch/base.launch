@@ -1,7 +1,0 @@
-<launch>
-
-  <group ns="base">
-    <node pkg="base" type="base" name="base" output="screen"/>
-  </group>
-
-</launch>

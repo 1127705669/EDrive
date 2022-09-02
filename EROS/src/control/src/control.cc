@@ -2,16 +2,15 @@
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include <iostream>
-#include <unistd.h>
-
 #include "ros/ros.h"
-#include "app/EDrive.h"
+#include "EROS/src/control/src/control.h"
 
+namespace EDrive {
+namespace control {
 
-// int main(int argc, char *argv[])
-// {
-//     execlp("roslaunch", "roslaunch", "EROS","EROS.launch", NULL);
-//     std::cout << "EDrive" << std::endl;
-//     return 0;
-// }
+// Planning::~Planning() { Stop(); }
+
+std::string Control::Name() const { return "control"; }
+
+} // control
+} // EDrive

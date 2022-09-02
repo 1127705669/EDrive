@@ -284,14 +284,14 @@ _gtest_INCLUDES:FILEPATH=/usr/include/gtest/gtest.h
 //Path to a file.
 _gtest_SOURCES:FILEPATH=/usr/src/gtest/src/gtest.cc
 
-//Value Computed by CMake
-base_BINARY_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/build/base
-
-//Value Computed by CMake
-base_SOURCE_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/src/base
-
 //The directory containing a CMake configuration file for catkin.
 catkin_DIR:PATH=/opt/ros/melodic/share/catkin/cmake
+
+//Value Computed by CMake
+control_BINARY_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/build/control
+
+//Value Computed by CMake
+control_SOURCE_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/src/control
 
 //The directory containing a CMake configuration file for cpp_common.
 cpp_common_DIR:PATH=/opt/ros/melodic/share/cpp_common/cmake
@@ -348,14 +348,26 @@ gtest_main_LIB_DEPENDS:STATIC=general;-lpthread;general;gtest;
 //Path to a library.
 lib:FILEPATH=/opt/ros/melodic/lib/libxmlrpcpp.so
 
+//Value Computed by CMake
+localization_BINARY_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/build/localization
+
+//Value Computed by CMake
+localization_SOURCE_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/src/localization
+
 //The directory containing a CMake configuration file for message_runtime.
 message_runtime_DIR:PATH=/opt/ros/melodic/share/message_runtime/cmake
 
 //Value Computed by CMake
-node_BINARY_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/build/node
+planning_BINARY_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/build/planning
 
 //Value Computed by CMake
-node_SOURCE_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/src/node
+planning_SOURCE_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/src/planning
+
+//Value Computed by CMake
+prediction_BINARY_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/build/prediction
+
+//Value Computed by CMake
+prediction_SOURCE_DIR:STATIC=/home/ethan/Workset/EDrive/EROS/src/prediction
 
 //The directory containing a CMake configuration file for rosconsole.
 rosconsole_DIR:PATH=/opt/ros/melodic/share/rosconsole/cmake
@@ -494,7 +506,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

@@ -5,22 +5,20 @@
 #pragma once
 
 #include <string>
+#include "app/EDrive.h"
 
-namespace EDrve {
-namespace planning {
+namespace EDrive {
+namespace prediction {
 
-class PlanningComponent final
-    : public EROS::Component<prediction::PredictionObstacles>{
+class Prediction : public EDrive::common::EDriveApp {
+ public:
+//   Planning() = default;
+//   virtual ~Planning();
 
-public:
-  PlanningComponent() = default;
+  std::string Name() const override;
 
-  ~PlanningComponent() = default;
-
-public:
-    bool Init() override;
-
-
+//   void Stop() override;
 };
+
 } // planning
-} // EDrve
+} // EDrive
