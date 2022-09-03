@@ -12,5 +12,13 @@ namespace localization {
 
 std::string Localization::Name() const { return "localization"; }
 
+EDrive::common::Status Localization::Init(){
+
+}
+
+EDrive::common::Status Localization::Start(){
+    
+}
+
 } // localization
 } // EDrive

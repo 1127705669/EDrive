@@ -12,5 +12,13 @@ namespace planning {
 
 std::string Planning::Name() const { return "planning"; }
 
+EDrive::common::Status Planning::Init(){
+
+}
+
+EDrive::common::Status Planning::Start(){
+    
+}
+
 } // planning
 } // EDrive

@@ -17,6 +17,10 @@ class Localization : public EDrive::common::EDriveApp {
 
   std::string Name() const override;
 
+  EDrive::common::Status Init() override;
+
+  EDrive::common::Status Start() override;
+
 //   void Stop() override;
 };
 

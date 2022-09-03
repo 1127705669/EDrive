@@ -5,26 +5,24 @@
 #pragma once
 
 #include <string>
+#include "modules/common/data/error_code.h"
 
 namespace EDrive {
-namespace EROS {
-
-enum
-{
-
-}E;
+namespace common {
 
 class Status {
+ public:
+  explicit Status() {}
+  
+  ~Status() = default;
 
-    explicit Status() {}
-    
-    ~Status() = default;
+  static Status OK() { return Status(); }
 
-    static Status OK() { return Status(); }
+  bool ok() const { return code_ == ErrorCode::OK; }
 
-    bool ok() const { return code_ == ErrorCode::OK; }
-
+ private:
+  ErrorCode code_;
 };
 
-} // EROS
+} // common
 } // EDrive

@@ -5,6 +5,9 @@
 #ifndef EDRIVE_APP_EDRIVE_H_
 #define EDRIVE_APP_EDRIVE_H_
 
+#include "ros/ros.h"
+#include "modules/common/status/status.h"
+
 namespace EDrive {
 namespace common {
 
@@ -15,6 +18,14 @@ class EDriveApp {
 
   // virtual ~EDriveApp() = default;
   // virtual void Stop() = 0;
+
+ private:
+
+ protected:
+ 
+  virtual EDrive::common::Status Init() = 0;
+  virtual EDrive::common::Status Start() = 0;
+
 };
 
 } // common

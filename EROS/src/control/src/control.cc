@@ -12,5 +12,13 @@ namespace control {
 
 std::string Control::Name() const { return "control"; }
 
+EDrive::common::Status Control::Init(){
+
+}
+
+EDrive::common::Status Control::Start(){
+    
+}
+
 } // control
 } // EDrive

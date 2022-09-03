@@ -12,5 +12,13 @@ namespace prediction {
 
 std::string Prediction::Name() const { return "prediction"; }
 
+EDrive::common::Status Prediction::Init(){
+
+}
+
+EDrive::common::Status Prediction::Start(){
+    
+}
+
 } // prediction
 } // EDrive
