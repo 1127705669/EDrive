@@ -20,5 +20,9 @@ EDrive::common::Status Planning::Start(){
     
 }
 
+void Planning::Stop() {
+  
+}
+
 } // planning
 } // EDrive

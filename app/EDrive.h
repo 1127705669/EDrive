@@ -22,9 +22,10 @@ class EDriveApp {
  private:
 
  protected:
- 
+
   virtual EDrive::common::Status Init() = 0;
   virtual EDrive::common::Status Start() = 0;
+  virtual void Stop() = 0;
 
 };
 

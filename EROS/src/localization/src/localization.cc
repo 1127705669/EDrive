@@ -20,5 +20,9 @@ EDrive::common::Status Localization::Start(){
     
 }
 
+void Localization::Stop() {
+  
+}
+
 } // localization
 } // EDrive

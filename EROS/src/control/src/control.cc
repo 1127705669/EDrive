@@ -20,5 +20,9 @@ EDrive::common::Status Control::Start(){
     
 }
 
+void Control::Stop() {
+  
+}
+
 } // control
 } // EDrive

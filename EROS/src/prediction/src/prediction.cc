@@ -20,5 +20,9 @@ EDrive::common::Status Prediction::Start(){
     
 }
 
+void Prediction::Stop() {
+  
+}
+
 } // prediction
 } // EDrive

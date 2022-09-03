@@ -21,7 +21,7 @@ class Prediction : public EDrive::common::EDriveApp {
 
   EDrive::common::Status Start() override;
 
-//   void Stop() override;
+  void Stop() override;
 };
 
 } // prediction

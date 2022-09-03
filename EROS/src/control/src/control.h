@@ -16,12 +16,13 @@ class Control : public EDrive::common::EDriveApp {
 //   virtual ~Planning();
 
   std::string Name() const override;
-  
+
   EDrive::common::Status Init() override;
 
   EDrive::common::Status Start() override;
 
-//   void Stop() override;
+  void Stop() override;
+
 };
 
 } // control
