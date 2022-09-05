@@ -1,0 +1,7 @@
+<launch>
+
+  <group ns="prediction">
+    <node name="prediction" pkg="prediction" type="prediction" output="screen"/>
+  </group>
+
+</launch>

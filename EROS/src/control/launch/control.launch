@@ -1,0 +1,7 @@
+<launch>
+
+  <group ns="control">
+    <node name="control" pkg="control" type="control" output="screen"/>
+  </group>
+
+</launch>

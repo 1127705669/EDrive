@@ -1,0 +1,7 @@
+<launch>
+
+  <group ns="localization">
+    <node name="localization" pkg="localization" type="localization" output="screen"/>
+  </group>
+
+</launch>

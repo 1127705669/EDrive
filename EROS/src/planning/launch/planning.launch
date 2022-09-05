@@ -1,0 +1,7 @@
+<launch>
+
+  <group ns="planning">
+    <node name="planning" pkg="planning" type="planning" output="screen"/>
+  </group>
+
+</launch>
