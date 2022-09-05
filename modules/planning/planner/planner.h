@@ -14,16 +14,25 @@ namespace planning {
 
 class Planner {
  public:
-    Planner() = delete;
+  Planner() = delete;
 
 //  explicit Planner(const ) :
 
- virtual ~Planner() = default;
+  virtual ~Planner() = default;
+ 
+  virtual EDrive::common::Status Init(const PlanningConfig& config) = 0;
+ 
+  virtual apollo::common::Status Plan() = 0;
+ 
+ protected:
 
 };
 
 class PlannerWithReferenceLine : public Planner {
  public:
+  PlannerWithReferenceLine() = delete;
+ 
+  virtual ~PlannerWithReferenceLine() = default;
 
 };
 
