@@ -20,9 +20,9 @@ class Planner {
 
   virtual ~Planner() = default;
  
-  virtual EDrive::common::Status Init(const PlanningConfig& config) = 0;
+  virtual EDrive::common::Status Init() = 0;
  
-  virtual apollo::common::Status Plan() = 0;
+  virtual EDrive::common::Status Plan() = 0;
  
  protected:
 
