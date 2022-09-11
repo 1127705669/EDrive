@@ -531,6 +531,19 @@ prediction/fast:
 	$(MAKE) -f prediction/CMakeFiles/prediction.dir/build.make prediction/CMakeFiles/prediction.dir/build
 .PHONY : prediction/fast
 
+#=============================================================================
+# Target rules for targets named routing
+
+# Build rule for target.
+routing: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 routing
+.PHONY : routing
+
+# fast build rule for target.
+routing/fast:
+	$(MAKE) -f routing/CMakeFiles/routing.dir/build.make routing/CMakeFiles/routing.dir/build
+.PHONY : routing/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -572,6 +585,7 @@ help:
 	@echo "... localization"
 	@echo "... planning"
 	@echo "... prediction"
+	@echo "... routing"
 .PHONY : help
 
 

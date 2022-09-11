@@ -82,3 +82,11 @@
 /home/ethan/Workset/EDrive/EROS/build/prediction/CMakeFiles/prediction.dir
 /home/ethan/Workset/EDrive/EROS/build/prediction/CMakeFiles/rebuild_cache.dir
 /home/ethan/Workset/EDrive/EROS/build/prediction/CMakeFiles/install.dir
+/home/ethan/Workset/EDrive/EROS/build/routing/CMakeFiles/install/strip.dir
+/home/ethan/Workset/EDrive/EROS/build/routing/CMakeFiles/install/local.dir
+/home/ethan/Workset/EDrive/EROS/build/routing/CMakeFiles/test.dir
+/home/ethan/Workset/EDrive/EROS/build/routing/CMakeFiles/list_install_components.dir
+/home/ethan/Workset/EDrive/EROS/build/routing/CMakeFiles/edit_cache.dir
+/home/ethan/Workset/EDrive/EROS/build/routing/CMakeFiles/routing.dir
+/home/ethan/Workset/EDrive/EROS/build/routing/CMakeFiles/rebuild_cache.dir
+/home/ethan/Workset/EDrive/EROS/build/routing/CMakeFiles/install.dir

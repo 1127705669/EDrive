@@ -1120,6 +1120,61 @@ clean: prediction/CMakeFiles/prediction.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Directory level rules for directory routing
+
+# Convenience name for "all" pass in the directory.
+routing/all: routing/CMakeFiles/routing.dir/all
+
+.PHONY : routing/all
+
+# Convenience name for "clean" pass in the directory.
+routing/clean: routing/CMakeFiles/routing.dir/clean
+
+.PHONY : routing/clean
+
+# Convenience name for "preinstall" pass in the directory.
+routing/preinstall:
+
+.PHONY : routing/preinstall
+
+#=============================================================================
+# Target rules for target routing/CMakeFiles/routing.dir
+
+# All Build rule for target.
+routing/CMakeFiles/routing.dir/all:
+	$(MAKE) -f routing/CMakeFiles/routing.dir/build.make routing/CMakeFiles/routing.dir/depend
+	$(MAKE) -f routing/CMakeFiles/routing.dir/build.make routing/CMakeFiles/routing.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ethan/Workset/EDrive/EROS/build/CMakeFiles --progress-num=28,29,30,31 "Built target routing"
+.PHONY : routing/CMakeFiles/routing.dir/all
+
+# Include target in all.
+all: routing/CMakeFiles/routing.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+routing/CMakeFiles/routing.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ethan/Workset/EDrive/EROS/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 routing/CMakeFiles/routing.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ethan/Workset/EDrive/EROS/build/CMakeFiles 0
+.PHONY : routing/CMakeFiles/routing.dir/rule
+
+# Convenience name for target.
+routing: routing/CMakeFiles/routing.dir/rule
+
+.PHONY : routing
+
+# clean rule for target.
+routing/CMakeFiles/routing.dir/clean:
+	$(MAKE) -f routing/CMakeFiles/routing.dir/build.make routing/CMakeFiles/routing.dir/clean
+.PHONY : routing/CMakeFiles/routing.dir/clean
+
+# clean rule for target.
+clean: routing/CMakeFiles/routing.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
 # Special targets to cleanup operation of make.
 
 # Special rule to run CMake to check the build system integrity.
