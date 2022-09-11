@@ -1,2 +1,2 @@
-control:localization:planning:prediction:routing
+control:localization:perception:planning:prediction:routing
 -DCATKIN_DEVEL_PREFIX=/home/ethan/Workset/EDrive/EROS/devel -DCMAKE_INSTALL_PREFIX=/home/ethan/Workset/EDrive/EROS/install -G Unix Makefiles

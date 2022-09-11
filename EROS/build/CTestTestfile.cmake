@@ -7,6 +7,7 @@
 subdirs("gtest")
 subdirs("control")
 subdirs("localization")
+subdirs("perception")
 subdirs("planning")
 subdirs("prediction")
 subdirs("routing")

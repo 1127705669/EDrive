@@ -66,6 +66,14 @@
 /home/ethan/Workset/EDrive/EROS/build/localization/CMakeFiles/edit_cache.dir
 /home/ethan/Workset/EDrive/EROS/build/localization/CMakeFiles/rebuild_cache.dir
 /home/ethan/Workset/EDrive/EROS/build/localization/CMakeFiles/install.dir
+/home/ethan/Workset/EDrive/EROS/build/perception/CMakeFiles/install/strip.dir
+/home/ethan/Workset/EDrive/EROS/build/perception/CMakeFiles/install/local.dir
+/home/ethan/Workset/EDrive/EROS/build/perception/CMakeFiles/test.dir
+/home/ethan/Workset/EDrive/EROS/build/perception/CMakeFiles/list_install_components.dir
+/home/ethan/Workset/EDrive/EROS/build/perception/CMakeFiles/perception.dir
+/home/ethan/Workset/EDrive/EROS/build/perception/CMakeFiles/edit_cache.dir
+/home/ethan/Workset/EDrive/EROS/build/perception/CMakeFiles/rebuild_cache.dir
+/home/ethan/Workset/EDrive/EROS/build/perception/CMakeFiles/install.dir
 /home/ethan/Workset/EDrive/EROS/build/planning/CMakeFiles/install/strip.dir
 /home/ethan/Workset/EDrive/EROS/build/planning/CMakeFiles/install/local.dir
 /home/ethan/Workset/EDrive/EROS/build/planning/CMakeFiles/test.dir

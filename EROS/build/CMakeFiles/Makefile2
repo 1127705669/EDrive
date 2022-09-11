@@ -1010,6 +1010,61 @@ clean: localization/CMakeFiles/localization.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Directory level rules for directory perception
+
+# Convenience name for "all" pass in the directory.
+perception/all: perception/CMakeFiles/perception.dir/all
+
+.PHONY : perception/all
+
+# Convenience name for "clean" pass in the directory.
+perception/clean: perception/CMakeFiles/perception.dir/clean
+
+.PHONY : perception/clean
+
+# Convenience name for "preinstall" pass in the directory.
+perception/preinstall:
+
+.PHONY : perception/preinstall
+
+#=============================================================================
+# Target rules for target perception/CMakeFiles/perception.dir
+
+# All Build rule for target.
+perception/CMakeFiles/perception.dir/all:
+	$(MAKE) -f perception/CMakeFiles/perception.dir/build.make perception/CMakeFiles/perception.dir/depend
+	$(MAKE) -f perception/CMakeFiles/perception.dir/build.make perception/CMakeFiles/perception.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ethan/Workset/EDrive/EROS/build/CMakeFiles --progress-num=20,21,22,23 "Built target perception"
+.PHONY : perception/CMakeFiles/perception.dir/all
+
+# Include target in all.
+all: perception/CMakeFiles/perception.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+perception/CMakeFiles/perception.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ethan/Workset/EDrive/EROS/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 perception/CMakeFiles/perception.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ethan/Workset/EDrive/EROS/build/CMakeFiles 0
+.PHONY : perception/CMakeFiles/perception.dir/rule
+
+# Convenience name for target.
+perception: perception/CMakeFiles/perception.dir/rule
+
+.PHONY : perception
+
+# clean rule for target.
+perception/CMakeFiles/perception.dir/clean:
+	$(MAKE) -f perception/CMakeFiles/perception.dir/build.make perception/CMakeFiles/perception.dir/clean
+.PHONY : perception/CMakeFiles/perception.dir/clean
+
+# clean rule for target.
+clean: perception/CMakeFiles/perception.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
 # Directory level rules for directory planning
 
 # Convenience name for "all" pass in the directory.
@@ -1034,7 +1089,7 @@ planning/preinstall:
 planning/CMakeFiles/planning.dir/all:
 	$(MAKE) -f planning/CMakeFiles/planning.dir/build.make planning/CMakeFiles/planning.dir/depend
 	$(MAKE) -f planning/CMakeFiles/planning.dir/build.make planning/CMakeFiles/planning.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ethan/Workset/EDrive/EROS/build/CMakeFiles --progress-num=20,21,22,23 "Built target planning"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ethan/Workset/EDrive/EROS/build/CMakeFiles --progress-num=24,25,26,27 "Built target planning"
 .PHONY : planning/CMakeFiles/planning.dir/all
 
 # Include target in all.
@@ -1089,7 +1144,7 @@ prediction/preinstall:
 prediction/CMakeFiles/prediction.dir/all:
 	$(MAKE) -f prediction/CMakeFiles/prediction.dir/build.make prediction/CMakeFiles/prediction.dir/depend
 	$(MAKE) -f prediction/CMakeFiles/prediction.dir/build.make prediction/CMakeFiles/prediction.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ethan/Workset/EDrive/EROS/build/CMakeFiles --progress-num=24,25,26,27 "Built target prediction"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ethan/Workset/EDrive/EROS/build/CMakeFiles --progress-num=28,29,30,31 "Built target prediction"
 .PHONY : prediction/CMakeFiles/prediction.dir/all
 
 # Include target in all.
@@ -1144,7 +1199,7 @@ routing/preinstall:
 routing/CMakeFiles/routing.dir/all:
 	$(MAKE) -f routing/CMakeFiles/routing.dir/build.make routing/CMakeFiles/routing.dir/depend
 	$(MAKE) -f routing/CMakeFiles/routing.dir/build.make routing/CMakeFiles/routing.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ethan/Workset/EDrive/EROS/build/CMakeFiles --progress-num=28,29,30,31 "Built target routing"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ethan/Workset/EDrive/EROS/build/CMakeFiles --progress-num=32,33,34,35 "Built target routing"
 .PHONY : routing/CMakeFiles/routing.dir/all
 
 # Include target in all.

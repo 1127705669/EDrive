@@ -506,6 +506,19 @@ localization/fast:
 .PHONY : localization/fast
 
 #=============================================================================
+# Target rules for targets named perception
+
+# Build rule for target.
+perception: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 perception
+.PHONY : perception
+
+# fast build rule for target.
+perception/fast:
+	$(MAKE) -f perception/CMakeFiles/perception.dir/build.make perception/CMakeFiles/perception.dir/build
+.PHONY : perception/fast
+
+#=============================================================================
 # Target rules for targets named planning
 
 # Build rule for target.
@@ -583,6 +596,7 @@ help:
 	@echo "... std_msgs_generate_messages_py"
 	@echo "... control"
 	@echo "... localization"
+	@echo "... perception"
 	@echo "... planning"
 	@echo "... prediction"
 	@echo "... routing"
