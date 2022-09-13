@@ -1,0 +1,22 @@
+#from ubuntu 18.04
+
+
+FROM ubuntu:18.04
+FROM ros:melodic
+FROM nvidia/cuda:10.2-devel-ubuntu18.04
+FROM nvidia/driver:460.73.01-ubuntu18.04
+
+LABEL name=ethan email=<1127705669@qq.com>
+
+# RUN mkdir home/Workset
+# RUN git clone git@github.com:1127705669/EDrive.git
+
+# ENV WORKPATH /home/Workset:${WORKPATH}
+
+# WORKDIR ${WORKPATH}
+
+# RUN git clone git@github.com:1127705669/EDrive.git
+
+# ARG CUDA_LITE
+# ARG CUDNN_VERSION
+# ARG TENSORRT_VERSION
