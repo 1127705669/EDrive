@@ -16,6 +16,8 @@ class EDriveApp {
 
   virtual std::string Name() const = 0;
 
+  virtual int Spin();
+
   // virtual ~EDriveApp() = default;
   // virtual void Stop() = 0;
 
@@ -36,6 +38,7 @@ class EDriveApp {
   int main(int argc, char *argv[]) {                           \
     APP edrive_app_;                                           \
     ros::init(argc, argv, edrive_app_.Name());                 \
+    edrive_app_.Spin();                                        \
     return 0;                                                  \
   }                                                            \
 

@@ -23,6 +23,11 @@ class Control : public EDrive::common::EDriveApp {
 
   void Stop() override;
 
+  virtual ~Control() = default;
+
+ private:
+  
+
 };
 
 } // control

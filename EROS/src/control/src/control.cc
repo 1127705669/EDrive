@@ -14,6 +14,7 @@ std::string Control::Name() const { return "control"; }
 
 EDrive::common::Status Control::Init(){
 
+  return EDrive::common::Status::OK();
 }
 
 EDrive::common::Status Control::Start(){
