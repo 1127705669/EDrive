@@ -1,8 +1,0 @@
-prefix=/home/ethan/Workset/EDrive/EROS/devel
-
-Name: localization
-Description: Description of localization
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
