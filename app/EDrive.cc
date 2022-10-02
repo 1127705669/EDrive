@@ -14,6 +14,17 @@ namespace common {
 int EDrive::common::EDriveApp::Spin() {
 
   auto status = Init();
+  if (!status.ok()) {
+    ROS_INFO(" Init failed: ");
+    return -1;
+  }
+
+  status = Start();
+  if (!status.ok()) {
+    ROS_INFO(" Start failed: ");
+    return -1;
+  }
+
   ros::spin();
 
   return 0;
