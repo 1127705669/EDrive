@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/data/error_code.h"
 #include "modules/control/controller/controller.h"
 
 namespace EDrive {
@@ -59,7 +60,9 @@ class LonController : public Controller {
    */
   std::string Name() const override;
  protected:
-  
+
+ private:
+  bool controller_initialized_ = false;
 };
 
 } // control

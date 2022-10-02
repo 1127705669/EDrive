@@ -8,11 +8,11 @@
 namespace EDrive {
 namespace control {
 
-class LonController : public Controller {
- public:
- 
+using EDrive::common::Status;
 
- protected:
+constexpr double GRA_ACC = 9.8;
+
+Status LonController::Init() {
 
 };
 
