@@ -8,17 +8,19 @@
 namespace EDrive {
 namespace control {
 
+using EDrive::common::Status;
+
 // Planning::~Planning() { Stop(); }
 
 std::string Control::Name() const { return "control"; }
 
-EDrive::common::Status Control::Init(){
+Status Control::Init(){
 
-  return EDrive::common::Status::OK();
+  return Status::OK();
 }
 
-EDrive::common::Status Control::Start(){
-    
+Status Control::Start(){
+  return Status::OK();
 }
 
 void Control::Stop() {
