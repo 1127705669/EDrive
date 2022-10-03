@@ -7,8 +7,8 @@
 #include "modules/control/proto/pid_conf.pb.h"
 
 /**
- * @namespace apollo::control
- * @brief apollo::control
+ * @namespace EDrive::control
+ * @brief EDrive::control
  */
 namespace EDrive {
 namespace control {
