@@ -13,5 +13,9 @@ void PIDController::Init(const PidConf &pid_conf) {
 
 }
 
+void PIDController::Reset() {
+
+}
+
 } // control
 } // EDrive

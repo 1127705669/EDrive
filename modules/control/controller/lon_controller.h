@@ -60,8 +60,10 @@ class LonController : public Controller {
    */
   std::string Name() const override;
  protected:
+  void ComputeLongitudinalErrors();
 
  private:
+  std::string name_;
   bool controller_initialized_ = false;
 };
 

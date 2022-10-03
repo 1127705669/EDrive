@@ -12,9 +12,31 @@ using EDrive::common::Status;
 
 constexpr double GRA_ACC = 9.8;
 
+LonController::LonController() {
+
+}
+
 Status LonController::Init() {
 
-};
+}
+
+void LonController::Stop() {
+
+}
+
+Status LonController::ComputeControlCommand() {
+
+}
+
+Status LonController::Reset() {
+
+}
+
+std::string LonController::Name() const { return name_; }
+
+void LonController::ComputeLongitudinalErrors() {
+    
+}
 
 } // control
 } // EDrive
