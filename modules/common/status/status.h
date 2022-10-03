@@ -12,9 +12,10 @@ namespace common {
 
 class Status {
  public:
-  explicit Status() {}
   
-  ~Status() = default;
+  Status() : code_(ErrorCode::OK), msg_() {}
+  // explicit Status() {}
+  // ~Status() = default;
 
   static Status OK() { return Status(); }
 
@@ -22,6 +23,7 @@ class Status {
 
  private:
   ErrorCode code_;
+  std::string msg_;
 };
 
 } // common
