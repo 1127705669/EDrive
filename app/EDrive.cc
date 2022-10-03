@@ -27,6 +27,11 @@ int EDrive::common::EDriveApp::Spin() {
 
   ros::spin();
 
+  ros::waitForShutdown();
+  Stop();
+
+  ROS_INFO(" exited. ");
+
   return 0;
 }
 
