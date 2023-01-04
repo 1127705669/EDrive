@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/control/src/control.h"
+#include "control.h"
 
 namespace EDrive {
 namespace control {
@@ -14,13 +14,13 @@ using EDrive::common::Status;
 
 std::string Control::Name() const { return "control"; }
 
-Status Control::Init(){
+EDrive::Result_state Control::Init(){
 
-  return Status::OK();
+  return State_Ok;
 }
 
-Status Control::Start(){
-  return Status::OK();
+EDrive::Result_state Control::Start(){
+  return State_Ok;
 }
 
 void Control::Stop() {

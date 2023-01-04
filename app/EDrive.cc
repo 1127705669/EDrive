@@ -7,6 +7,7 @@
 
 #include "ros/ros.h"
 #include "app/EDrive.h"
+#include "app/state.h"
 
 namespace EDrive {
 namespace common {
@@ -14,13 +15,13 @@ namespace common {
 int EDrive::common::EDriveApp::Spin() {
 
   auto status = Init();
-  if (!status.ok()) {
+  if (State_Ok != status) {
     ROS_INFO(" Init failed: ");
     return -1;
   }
 
   status = Start();
-  if (!status.ok()) {
+  if (State_Ok != status) {
     ROS_INFO(" Start failed: ");
     return -1;
   }

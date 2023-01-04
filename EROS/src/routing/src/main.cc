@@ -4,7 +4,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/routing/src/routing.h"
+#include "routing.h"
 #include "app/EDrive.h"
 
 EDRIVE_MAIN(EDrive::routing::Routing);

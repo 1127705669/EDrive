@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/localization/src/localization.h"
+#include "localization.h"
 
 namespace EDrive {
 namespace localization {
@@ -12,12 +12,12 @@ namespace localization {
 
 std::string Localization::Name() const { return "localization"; }
 
-EDrive::common::Status Localization::Init(){
-
+EDrive::Result_state Localization::Init(){
+  return State_Ok;
 }
 
-EDrive::common::Status Localization::Start(){
-    
+EDrive::Result_state Localization::Start(){
+  return State_Ok;
 }
 
 void Localization::Stop() {

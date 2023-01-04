@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/opt/ros/melodic/include/**",
-                "/home/ethan/Workset/EDrive/**"
+                "/opt/ros/noetic/include/**",
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

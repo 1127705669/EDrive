@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/planning/src/planning.h"
+#include "planning.h"
 
 namespace EDrive {
 namespace planning {
@@ -12,12 +12,12 @@ namespace planning {
 
 std::string Planning::Name() const { return "planning"; }
 
-EDrive::common::Status Planning::Init(){
-
+EDrive::Result_state Planning::Init(){
+  return State_Ok;
 }
 
-EDrive::common::Status Planning::Start(){
-    
+EDrive::Result_state Planning::Start(){
+  return State_Ok;
 }
 
 void Planning::Stop() {

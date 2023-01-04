@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/routing/src/routing.h"
+#include "routing.h"
 
 namespace EDrive {
 namespace routing {
@@ -12,12 +12,12 @@ namespace routing {
 
 std::string Routing::Name() const { return "routing"; }
 
-EDrive::common::Status Routing::Init(){
-
+EDrive::Result_state Routing::Init(){
+  return State_Ok;
 }
 
-EDrive::common::Status Routing::Start(){
-    
+EDrive::Result_state Routing::Start(){
+  return State_Ok;
 }
 
 void Routing::Stop() {

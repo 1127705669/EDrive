@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/prediction/src/prediction.h"
+#include "prediction.h"
 
 namespace EDrive {
 namespace prediction {
@@ -12,12 +12,12 @@ namespace prediction {
 
 std::string Prediction::Name() const { return "prediction"; }
 
-EDrive::common::Status Prediction::Init(){
-
+EDrive::Result_state Prediction::Init(){
+  return State_Ok;
 }
 
-EDrive::common::Status Prediction::Start(){
-    
+EDrive::Result_state Prediction::Start(){
+  return State_Ok;
 }
 
 void Prediction::Stop() {

@@ -4,7 +4,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/control/src/control.h"
+#include "control.h"
 #include "app/EDrive.h"
 
 EDRIVE_MAIN(EDrive::control::Control);

@@ -6,23 +6,24 @@
 
 #include <string>
 #include "app/EDrive.h"
+#include "app/state.h"
 
 namespace EDrive {
-namespace routing {
+namespace localization {
 
-class Routing : public EDrive::common::EDriveApp {
+class Localization : public EDrive::common::EDriveApp {
  public:
 //   Planning() = default;
 //   virtual ~Planning();
 
   std::string Name() const override;
 
-  EDrive::common::Status Init() override;
+  EDrive::Result_state Init() override;
 
-  EDrive::common::Status Start() override;
+  EDrive::Result_state Start() override;
 
   void Stop() override;
 };
 
-} // routing
+} // localization
 } // EDrive

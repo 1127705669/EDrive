@@ -6,6 +6,7 @@
 
 #include <string>
 #include "app/EDrive.h"
+#include "app/state.h"
 
 namespace EDrive {
 namespace prediction {
@@ -17,9 +18,9 @@ class Prediction : public EDrive::common::EDriveApp {
 
   std::string Name() const override;
 
-  EDrive::common::Status Init() override;
+  EDrive::Result_state Init() override;
 
-  EDrive::common::Status Start() override;
+  EDrive::Result_state Start() override;
 
   void Stop() override;
 };

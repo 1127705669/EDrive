@@ -6,29 +6,24 @@
 
 #include <string>
 #include "app/EDrive.h"
+#include "app/state.h"
 
 namespace EDrive {
-namespace control {
+namespace perception {
 
-class Control : public EDrive::common::EDriveApp {
+class Perception : public EDrive::common::EDriveApp {
  public:
 //   Planning() = default;
 //   virtual ~Planning();
 
   std::string Name() const override;
 
-  EDrive::common::Status Init() override;
+  EDrive::Result_state Init() override;
 
-  EDrive::common::Status Start() override;
+  EDrive::Result_state Start() override;
 
   void Stop() override;
-
-  virtual ~Control() = default;
-
- private:
-  
-
 };
 
-} // control
+} // perception
 } // EDrive

@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/perception/src/perception.h"
+#include "perception.h"
 
 namespace EDrive {
 namespace perception {
@@ -12,12 +12,12 @@ namespace perception {
 
 std::string Perception::Name() const { return "perception"; }
 
-EDrive::common::Status Perception::Init(){
-
+EDrive::Result_state Perception::Init(){
+  return State_Ok;
 }
 
-EDrive::common::Status Perception::Start(){
-    
+EDrive::Result_state Perception::Start(){
+  return State_Ok;
 }
 
 void Perception::Stop() {

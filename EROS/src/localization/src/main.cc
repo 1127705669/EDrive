@@ -4,7 +4,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/localization/src/localization.h"
+#include "localization.h"
 #include "app/EDrive.h"
 
 EDRIVE_MAIN(EDrive::localization::Localization);

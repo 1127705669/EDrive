@@ -4,7 +4,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/planning/src/planning.h"
+#include "planning.h"
 #include "app/EDrive.h"
 
 EDRIVE_MAIN(EDrive::planning::Planning);

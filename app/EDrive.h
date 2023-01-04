@@ -7,6 +7,7 @@
 
 #include "ros/ros.h"
 #include "modules/common/status/status.h"
+#include "app/state.h"
 
 namespace EDrive {
 namespace common {
@@ -25,8 +26,8 @@ class EDriveApp {
 
  protected:
 
-  virtual EDrive::common::Status Init() = 0;
-  virtual EDrive::common::Status Start() = 0;
+  virtual EDrive::Result_state Init() = 0;
+  virtual EDrive::Result_state Start() = 0;
   virtual void Stop() = 0;
 
 };

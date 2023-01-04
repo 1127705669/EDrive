@@ -4,7 +4,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
-#include "EROS/src/prediction/src/prediction.h"
+#include "prediction.h"
 #include "app/EDrive.h"
 
 EDRIVE_MAIN(EDrive::prediction::Prediction);
