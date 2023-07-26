@@ -27,7 +27,12 @@ class Control : public EDrive::common::EDriveApp {
   virtual ~Control() = default;
 
  private:
+
+ // Watch dog timer
+  void OnTimer(const ros::TimerEvent &);
   
+  ros::Timer timer_;
+  const float control_period = 0.01;
 
 };
 

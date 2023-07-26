@@ -69,6 +69,7 @@
         "cinttypes": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "*.ipp": "cpp"
     }
 }

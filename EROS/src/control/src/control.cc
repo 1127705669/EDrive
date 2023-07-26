@@ -3,6 +3,9 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
+
+#include "app/adapters/adapter_manager.h"
+
 #include "control.h"
 
 namespace EDrive {
@@ -15,16 +18,25 @@ using EDrive::common::Status;
 std::string Control::Name() const { return "control"; }
 
 EDrive::Result_state Control::Init(){
-
   return State_Ok;
 }
 
 EDrive::Result_state Control::Start(){
+  static ros::NodeHandle nh;
+  timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(control_period), 
+                                                                &Control::OnTimer,
+                                                                this, nh);
+  // ros::spin();
   return State_Ok;
 }
 
 void Control::Stop() {
   
+}
+
+void Control::OnTimer(const ros::TimerEvent &) {
+  ros::Time begin = ros::Time::now();
+  ROS_INFO("10");
 }
 
 } // control
