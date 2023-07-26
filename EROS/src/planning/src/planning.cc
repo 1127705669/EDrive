@@ -3,6 +3,7 @@
  *****************************************************************************/
 
 #include "ros/ros.h"
+#include "app/adapters/adapter_manager.h"
 #include "planning.h"
 
 namespace EDrive {
@@ -17,11 +18,19 @@ EDrive::Result_state Planning::Init(){
 }
 
 EDrive::Result_state Planning::Start(){
+  timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(planning_period), 
+                                                                &Planning::OnTimer,
+                                                                this);
   return State_Ok;
 }
 
 void Planning::Stop() {
   
+}
+
+void Planning::OnTimer(const ros::TimerEvent &) {
+  ros::Time begin = ros::Time::now();
+  ROS_INFO("10");
 }
 
 } // planning

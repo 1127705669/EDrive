@@ -23,6 +23,12 @@ class Planning : public EDrive::common::EDriveApp {
   EDrive::Result_state Start() override;
 
   void Stop() override;
+
+ private:
+  // Watch dog timer
+  void OnTimer(const ros::TimerEvent &);
+  const double planning_period = 0.1;
+  ros::Timer timer_;
 };
 
 } // planning

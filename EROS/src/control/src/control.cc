@@ -22,11 +22,10 @@ EDrive::Result_state Control::Init(){
 }
 
 EDrive::Result_state Control::Start(){
-  static ros::NodeHandle nh;
+  
   timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(control_period), 
                                                                 &Control::OnTimer,
-                                                                this, nh);
-  // ros::spin();
+                                                                this);
   return State_Ok;
 }
 

@@ -29,8 +29,9 @@ class AdapterManager
   template <class T>
   static ros::Timer CreateTimer(ros::Duration period,
                                 void (T::*callback)(const ros::TimerEvent &),
-                                T *obj,ros::NodeHandle &nh, bool oneshot = false,
+                                T *obj, bool oneshot = false,
                                 bool autostart = true) {
+    static ros::NodeHandle nh;
     return nh.createTimer(period, callback, obj, oneshot, autostart);
   }
  private:
