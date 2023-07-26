@@ -19,14 +19,27 @@ int EDrive::common::EDriveApp::Spin() {
     ROS_INFO(" Init failed: ");
     return -1;
   }
+  ROS_INFO("init ok");
+
+  std::unique_ptr<ros::AsyncSpinner> spinner;
+  if (callback_thread_num_ > 1) {
+    spinner = std::unique_ptr<ros::AsyncSpinner>(
+        new ros::AsyncSpinner(callback_thread_num_));
+  }
 
   status = Start();
   if (State_Ok != status) {
     ROS_INFO(" Start failed: ");
-    return -1;
+    return -2;
   }
 
-  ros::spin();
+  ROS_INFO("start ok");
+
+  if (spinner) {
+    spinner->start();
+  } else {
+    ros::spin();
+  }
 
   ros::waitForShutdown();
   Stop();
