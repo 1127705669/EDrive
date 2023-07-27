@@ -43,7 +43,6 @@ void LonController::ComputeLongitudinalErrors() {
   double s_dot_matched = 0.0;
   double d_matched = 0.0;
   double d_dot_matched = 0.0;
-  
 }
 
 } // namespace control

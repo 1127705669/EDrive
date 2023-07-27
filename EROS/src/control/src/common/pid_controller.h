@@ -27,10 +27,10 @@ class PIDController {
   //  */
   // void SetPID();
 
-  // /**
-  //  * @brief reset variables for pid controller
-  //  */
-  // void Reset();
+  /**
+   * @brief reset variables for pid controller
+   */
+  void Reset();
 
   // /**
   //  * @brief compute control value based on the error

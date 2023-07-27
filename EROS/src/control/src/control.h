@@ -5,11 +5,16 @@
 #pragma once
 
 #include <string>
+#include <ros/ros.h>
+
+#include <control/ControlCommand.h>
 
 #include "app/EDrive.h"
 #include "app/state.h"
 
 #include "EROS/src/control/src/controller/controller_agent.h"
+
+namespace control_msg = control;
 
 namespace EDrive {
 namespace control {
@@ -36,7 +41,7 @@ class Control : public EDrive::common::EDriveApp {
 
   void SendCmd();
 
-  Result_state ProduceControlCommand();
+  Result_state ProduceControlCommand(control_msg::ControlCommand controlcommand_);
   
   ros::Timer timer_;
   const float control_period = 0.01;
