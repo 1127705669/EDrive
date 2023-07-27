@@ -10,9 +10,8 @@
 #include <control/ControlCommand.h>
 
 #include "app/EDrive.h"
-#include "app/state.h"
 
-#include "EROS/src/control/src/controller/controller_agent.h"
+#include "controller/controller_agent.h"
 
 namespace control_msg = control;
 

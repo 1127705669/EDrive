@@ -4,13 +4,17 @@
 
 #pragma once
 
-#include "ros/ros.h"
+#include <ros/ros.h>
+
 #include "controller.h"
+
+namespace control_msg = control;
 
 namespace EDrive {
 namespace control {
 
 using EDrive::Result_state;
+
 
 /**
  * @class ControllerAgent
@@ -26,7 +30,7 @@ class ControllerAgent {
    */
   Result_state Init();
 
-  Result_state ComputeControlCommand();
+  Result_state ComputeControlCommand(control_msg::ControlCommand controlcommand_);
  private:
   std::vector<std::unique_ptr<Controller>> controller_list_;
 };

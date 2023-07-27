@@ -2,6 +2,7 @@
  * Copyright 2023 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
+#include <ros/ros.h>
 #include "lon_controller.h"
 
 namespace EDrive {
@@ -25,7 +26,7 @@ Result_state LonController::Init() {
 
 std::string LonController::Name() const { return name_; }
 
-Result_state LonController::ComputeControlCommand() {
+Result_state LonController::ComputeControlCommand(control_msg::ControlCommand controlcommand_) {
   ComputeLongitudinalErrors();
   return State_Ok;
 }

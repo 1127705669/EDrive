@@ -2,8 +2,6 @@
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "ros/ros.h"
-
 #include "app/adapters/adapter_manager.h"
 
 #include "control.h"
@@ -37,7 +35,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
 }
 
 Result_state Control::ProduceControlCommand(control_msg::ControlCommand controlcommand_) {
-  if(State_Ok != controller_agent_.ComputeControlCommand()) {
+  if(State_Ok != controller_agent_.ComputeControlCommand(controlcommand_)) {
     ROS_INFO("controller agent compute control command failed, stopping...");
   }
   return State_Ok;

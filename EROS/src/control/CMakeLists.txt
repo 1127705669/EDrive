@@ -123,6 +123,7 @@ include
   ../
   ../../
   ../../../
+  src/
 )
 
 ## Declare a C++ library
@@ -148,6 +149,7 @@ add_executable(control
               src/controller/lon_controller.cc
               )
 
+add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use

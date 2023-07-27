@@ -4,11 +4,8 @@
 
 #pragma once
 
-#include "app/state.h"
+#include "common/pid_controller.h"
 
-#include "ros/ros.h"
-
-#include "EROS/src/control/src/common/pid_controller.h"
 #include "controller.h"
 
 namespace EDrive {
@@ -49,7 +46,7 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Result_state ComputeControlCommand() override;
+  Result_state ComputeControlCommand(control_msg::ControlCommand controlcommand_) override;
 
   /**
    * @brief reset Controller
