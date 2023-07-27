@@ -27,7 +27,8 @@ class ControllerAgent {
   Result_state Init();
 
   Result_state ComputeControlCommand();
-
+ private:
+  std::vector<std::unique_ptr<Controller>> controller_list_;
 };
 
 } // namespace control

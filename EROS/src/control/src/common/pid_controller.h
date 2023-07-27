@@ -20,44 +20,44 @@ class PIDController {
    */
   void Init();
 
-  /**
-   * @brief set pid controller coefficients for the proportional,
-   * integral, and derivative
-   * @param pid_conf configuration for pid controller
-   */
-  void SetPID();
+  // /**
+  //  * @brief set pid controller coefficients for the proportional,
+  //  * integral, and derivative
+  //  * @param pid_conf configuration for pid controller
+  //  */
+  // void SetPID();
 
-  /**
-   * @brief reset variables for pid controller
-   */
-  void Reset();
+  // /**
+  //  * @brief reset variables for pid controller
+  //  */
+  // void Reset();
 
-  /**
-   * @brief compute control value based on the error
-   * @param error error value, the difference between
-   * a desired value and a measured value
-   * @param dt sampling time interval
-   * @return control value based on PID terms
-   */
-  virtual double Control(const double error, const double dt);
+  // /**
+  //  * @brief compute control value based on the error
+  //  * @param error error value, the difference between
+  //  * a desired value and a measured value
+  //  * @param dt sampling time interval
+  //  * @return control value based on PID terms
+  //  */
+  // virtual double Control(const double error, const double dt);
 
-  /**
-   * @brief get saturation status
-   * @return saturation status
-   */
-  int IntegratorSaturationStatus() const;
+  // /**
+  //  * @brief get saturation status
+  //  * @return saturation status
+  //  */
+  // int IntegratorSaturationStatus() const;
 
-  /**
-   * @brief get status that if integrator is hold
-   * @return if integrator is hold return true
-   */
-  bool IntegratorHold() const;
+  // /**
+  //  * @brief get status that if integrator is hold
+  //  * @return if integrator is hold return true
+  //  */
+  // bool IntegratorHold() const;
 
-  /**
-   * @brief set whether to hold integrator component at its current value.
-   * @param hold
-   */
-  void SetIntegratorHold(bool hold);
+  // /**
+  //  * @brief set whether to hold integrator component at its current value.
+  //  * @param hold
+  //  */
+  // void SetIntegratorHold(bool hold);
 
  protected:
   double kp_ = 0.0;

@@ -67,11 +67,16 @@ class LonController : public Controller {
    * @brief stop controller
    */
   void Stop() override;
- private:
 
-  const std::string name_ = "LON_CONTROLLER";
+ protected:
+  void ComputeLongitudinalErrors();
+
+ private:
+  std::string name_;
   PIDController speed_pid_controller_;
   PIDController station_pid_controller_;
+
+ 
 };
 
 } // namespace control

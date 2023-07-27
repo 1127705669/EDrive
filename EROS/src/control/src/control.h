@@ -34,6 +34,8 @@ class Control : public EDrive::common::EDriveApp {
  // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
+  void SendCmd();
+
   Result_state ProduceControlCommand();
   
   ros::Timer timer_;

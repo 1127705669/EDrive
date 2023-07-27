@@ -46,5 +46,9 @@ void Control::Stop() {
 
 }
 
+void Control::SendCmd() {
+  
+}
+
 } // namespace control
 } // namespace EDrive
