@@ -141,6 +141,7 @@ add_executable(control
               src/control.cc 
               ../../../app/EDrive.cc
               ../../../app/adapters/adapter_manager.cc
+              src/controller/controller_agent.cc
               )
 
 ## Rename C++ executable without prefix

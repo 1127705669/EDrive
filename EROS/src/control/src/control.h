@@ -5,22 +5,25 @@
 #pragma once
 
 #include <string>
+
 #include "app/EDrive.h"
 #include "app/state.h"
+
+#include "EROS/src/control/src/controller/controller_agent.h"
 
 namespace EDrive {
 namespace control {
 
+using EDrive::Result_state;
+
 class Control : public EDrive::common::EDriveApp {
  public:
-//   Planning() = default;
-//   virtual ~Planning();
 
   std::string Name() const override;
 
-  EDrive::Result_state Init() override;
+  Result_state Init() override;
 
-  EDrive::Result_state Start() override;
+  Result_state Start() override;
 
   void Stop() override;
 
@@ -30,11 +33,15 @@ class Control : public EDrive::common::EDriveApp {
 
  // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
+
+  Result_state ProduceControlCommand();
   
   ros::Timer timer_;
   const float control_period = 0.01;
-
+  ros::Time init_time_;
+  ControllerAgent controller_agent_;
+  
 };
 
-} // control
-} // EDrive
+} // namespace control
+} // namespace EDrive
