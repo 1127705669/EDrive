@@ -5,6 +5,7 @@
 #pragma once
 
 #include "common/pid_controller.h"
+#include "common/trajectory_analyzer.h"
 
 #include "controller.h"
 
@@ -66,14 +67,16 @@ class LonController : public Controller {
   void Stop() override;
 
  protected:
-  void ComputeLongitudinalErrors();
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory_analyzer);
 
  private:
   std::string name_;
   PIDController speed_pid_controller_;
   PIDController station_pid_controller_;
+  bool controller_initialized_ = false;
 
- 
+  std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
+
 };
 
 } // namespace control

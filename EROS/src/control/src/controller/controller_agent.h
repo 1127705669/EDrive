@@ -15,7 +15,6 @@ namespace control {
 
 using EDrive::Result_state;
 
-
 /**
  * @class ControllerAgent
  *

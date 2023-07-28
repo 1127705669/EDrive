@@ -52,6 +52,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   ControlCommand.msg
+  PathPoint.msg
+  TrajectoryPoint.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -147,6 +149,7 @@ add_executable(control
               src/controller/controller_agent.cc
               src/common/pid_controller.cc
               src/controller/lon_controller.cc
+              src/common/trajectory_analyzer.cc
               )
 
 add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
