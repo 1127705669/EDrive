@@ -2,8 +2,8 @@
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "ros/ros.h"
-#include "app/adapters/adapter_manager.h"
+#include <ros/ros.h>
+#include "common/src/adapters/adapter_manager.h"
 #include "planning.h"
 
 namespace EDrive {

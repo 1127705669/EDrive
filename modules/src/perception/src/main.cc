@@ -5,6 +5,6 @@
 
 #include "ros/ros.h"
 #include "perception.h"
-#include "app/EDrive.h"
+#include "common/src/EDrive.h"
 
 EDRIVE_MAIN(EDrive::perception::Perception);

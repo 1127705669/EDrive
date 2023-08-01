@@ -5,6 +5,6 @@
 
 #include "ros/ros.h"
 #include "routing.h"
-#include "app/EDrive.h"
+#include "common/src/EDrive.h"
 
 EDRIVE_MAIN(EDrive::routing::Routing);

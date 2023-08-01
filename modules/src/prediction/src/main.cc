@@ -5,6 +5,6 @@
 
 #include "ros/ros.h"
 #include "prediction.h"
-#include "app/EDrive.h"
+#include "common/src/EDrive.h"
 
 EDRIVE_MAIN(EDrive::prediction::Prediction);

@@ -5,6 +5,6 @@
 
 #include "ros/ros.h"
 #include "viewer.h"
-#include "app/EDrive.h"
+#include "common/src/EDrive.h"
 
 EDRIVE_MAIN(EDrive::viewer::Viewer);

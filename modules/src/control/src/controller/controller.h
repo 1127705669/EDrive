@@ -6,7 +6,7 @@
 
 #include <cmath>
 #include <string>
-#include "app/state.h"
+#include "common/src/state.h"
 
 // ros message
 #include <control/ControlCommand.h>

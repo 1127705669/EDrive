@@ -2,7 +2,7 @@
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "app/adapters/adapter_manager.h"
+#include "common/src/adapters/adapter_manager.h"
 
 #include "control.h"
 

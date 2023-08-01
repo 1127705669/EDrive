@@ -5,8 +5,8 @@
 #pragma once
 
 #include <string>
-#include "app/EDrive.h"
-#include "app/state.h"
+#include "common/src/EDrive.h"
+#include "common/src/state.h"
 
 namespace EDrive {
 namespace routing {

@@ -9,7 +9,7 @@
 
 #include <control/ControlCommand.h>
 
-#include "app/EDrive.h"
+#include "common/src/EDrive.h"
 
 #include "controller/controller_agent.h"
 

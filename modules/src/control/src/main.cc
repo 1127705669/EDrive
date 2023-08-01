@@ -6,6 +6,6 @@
 #include <ros/ros.h>
 
 #include "control.h"
-#include "app/EDrive.h"
+#include "common/src/EDrive.h"
 
 EDRIVE_MAIN(EDrive::control::Control);

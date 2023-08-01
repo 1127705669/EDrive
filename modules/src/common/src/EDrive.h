@@ -7,7 +7,7 @@
 
 #include <ros/ros.h>
 
-#include "app/state.h"
+#include "common/src/state.h"
 
 namespace EDrive {
 namespace common {
