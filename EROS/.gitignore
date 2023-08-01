@@ -1,2 +1,4 @@
 /devel
 /build
+**/*pb.cc
+**/*pb.h
