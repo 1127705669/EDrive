@@ -27,8 +27,7 @@ Result_state LonController::Init() {
 std::string LonController::Name() const { return name_; }
 
 Result_state LonController::ComputeControlCommand(control_msg::ControlCommand controlcommand_) {
-  // ComputeLongitudinalErrors(trajectory_analyzer_.get());
-  ROS_INFO("1");
+  ComputeLongitudinalErrors(trajectory_analyzer_.get());
   return State_Ok;
 }
 
