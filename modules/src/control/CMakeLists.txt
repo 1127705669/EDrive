@@ -24,8 +24,8 @@ LIST(APPEND PROTO_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/proto)
 
 file(GLOB_RECURSE proto_files_control ${CMAKE_CURRENT_SOURCE_DIR}/proto/*.proto)
 
-# set(MESSAGE_SRC "")
-# set(MESSAGE_HDRS "")
+set(MESSAGE_SRC "")
+set(MESSAGE_HDRS "")
 
 foreach(msg ${proto_files_control})
         get_filename_component(FIL_WE ${msg} NAME_WE)
