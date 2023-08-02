@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.common.adapter;
+package EDrive.common.adapter;
 
 // Property of a certain Input/Output that will be used by a module.
 message AdapterConfig {

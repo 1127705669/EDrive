@@ -7,7 +7,8 @@
                 "/opt/ros/noetic/include/**",
                 "${workspaceFolder}/EROS/devel/include/**",
                 "${workspaceFolder}/EROS/src/**",
-                "${workspaceFolder}/EROS/src"
+                "${workspaceFolder}/EROS/src",
+                "${workspaceFolder}/modules/src"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

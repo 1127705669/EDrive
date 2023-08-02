@@ -10,8 +10,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "ros/ros.h"
+#include <ros/ros.h>
 
+#include "common/src/adapters/adapter.h"
 #include "common/src/macro.h"
 #include "common/src/adapters/proto/adapter_config.pb.h"
 
