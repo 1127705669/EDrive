@@ -1,9 +1,0 @@
-syntax = "proto2";
-
-package EDrive.control;
-
-message PidConf {
-  optional double kp = 3;
-  optional double ki = 4;
-  optional double kd = 5;
-}
