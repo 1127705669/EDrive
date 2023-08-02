@@ -16,43 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
 )
 
-## Generate Protocol Buffer message
-## set protocol buffer output address
-SET(PROTO_META_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto)
-
-LIST(APPEND PROTO_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/proto)
-
-file(GLOB_RECURSE proto_files_control ${CMAKE_CURRENT_SOURCE_DIR}/proto/*.proto)
-
-set(MESSAGE_SRC "")
-set(MESSAGE_HDRS "")
-
-foreach(msg ${proto_files_control})
-        get_filename_component(FIL_WE ${msg} NAME_WE)
-        list(APPEND MESSAGE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/proto/${FIL_WE}.pb.cc")
-        list(APPEND MESSAGE_HDRS "${CMAKE_CURRENT_SOURCE_DIR}/proto/${FIL_WE}.pb.h")
-
-        add_custom_command(
-          OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/proto/${FIL_WE}.pb.cc"
-                 "${CMAKE_CURRENT_SOURCE_DIR}/proto/${FIL_WE}.pb.h"
-          COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-          ARGS --cpp_out  ${PROTO_META_BASE_DIR}
-            -I ${CMAKE_CURRENT_SOURCE_DIR}/proto
-            ${msg}
-          DEPENDS ${msg}
-          COMMENT "Running C++ protocol buffer compiler on ${msg}"
-          VERBATIM
-                          )
-endforeach()
-
-set_source_files_properties(${MESSAGE_SRC} ${MESSAGE_HDRS} PROPERTIES GENERATED TRUE)
-
-add_custom_target(generate_message ALL
-                DEPENDS ${MESSAGE_SRC} ${MESSAGE_HDRS}
-                COMMENT "generate Protocol Buffer target"
-                VERBATIM
-                )
-
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
