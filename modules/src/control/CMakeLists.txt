@@ -16,6 +16,16 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
 )
 
+find_library(EDrive_app_lib EDrive_app $PATH ${CMAKE_SOURCE_DIR}/common/lib)
+if(NOT EDrive_app_lib)
+    message(FATAL_ERROR "EDrive_app not found.")
+endif()
+
+find_library(adapter_lib adapter $PATH ${CMAKE_SOURCE_DIR}/common/lib)
+if(NOT adapter_lib)
+    message(FATAL_ERROR "adapter not found.")
+endif()
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -145,8 +155,6 @@ include
 add_executable(control 
               src/main.cc 
               src/control.cc 
-              ../common/src/EDrive.cc
-              ../common/src/adapters/adapter_manager.cc
               src/controller/controller_agent.cc
               src/common/pid_controller.cc
               src/controller/lon_controller.cc
@@ -167,6 +175,8 @@ add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_T
 ## Specify libraries to link a library or executable target against
 target_link_libraries(control
   ${catkin_LIBRARIES}
+  ${EDrive_app_lib}
+  ${adapter_lib}
 )
 
 #############
