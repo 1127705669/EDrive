@@ -7,8 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
 
-find_library(ADAPTERS_DEPEND_LIBS adapter_proto PATH ${CMAKE_SOURCE_DIR}/common/lib)
-
 include_directories(
 include
   ${catkin_INCLUDE_DIRS}
@@ -21,8 +19,4 @@ set(ADAPTER_SRC
 
 add_library(adapters SHARED ${ADAPTER_SRC})
 
-set_target_properties(adapters PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/common/lib
-)
-
-# target_link_libraries(adapters PRIVATE ${MY_SHARED_LIBRARY})
+target_link_libraries(adapters adapter_proto)

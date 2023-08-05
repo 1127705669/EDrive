@@ -48,7 +48,3 @@ set(ADAPTER_PROTO_SRC
 )
 
 add_library(adapter_proto SHARED ${ADAPTER_PROTO_SRC})
-
-set_target_properties(adapter_proto PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/common/lib
-)
