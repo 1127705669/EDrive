@@ -4,6 +4,8 @@ project(common)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/adapters)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -115,14 +117,24 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+include
   ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/common.cpp
 # )
+set(EDRIVE_APP
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/EDrive.cc
+)
+
+add_library(EDrive_app SHARED ${EDRIVE_APP})
+
+set_target_properties(EDrive_app PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/common/lib
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

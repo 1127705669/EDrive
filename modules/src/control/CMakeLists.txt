@@ -4,10 +4,12 @@ project(control)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(Protobuf REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
@@ -143,15 +145,15 @@ include
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(control 
-              src/main.cc 
-              src/control.cc 
-              ../common/src/EDrive.cc
-              ../common/src/adapters/adapter_manager.cc
-              src/controller/controller_agent.cc
-              src/common/pid_controller.cc
-              src/controller/lon_controller.cc
-              src/common/trajectory_analyzer.cc
-              )
+  src/main.cc 
+  src/control.cc 
+  ../common/src/EDrive.cc
+  ../common/src/adapters/adapter_manager.cc
+  src/controller/controller_agent.cc
+  src/common/pid_controller.cc
+  src/controller/lon_controller.cc
+  src/common/trajectory_analyzer.cc
+)
 
 add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Rename C++ executable without prefix
