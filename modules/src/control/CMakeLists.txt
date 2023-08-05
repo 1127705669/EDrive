@@ -111,7 +111,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES control
+  LIBRARIES control_proto
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
@@ -147,7 +147,7 @@ include
 add_executable(control 
   src/main.cc 
   src/control.cc 
-  ../common/src/adapters/adapter_manager.cc
+  # ../common/src/adapters/adapter_manager.cc
   src/controller/controller_agent.cc
   src/common/pid_controller.cc
   src/controller/lon_controller.cc
@@ -169,6 +169,7 @@ add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_T
 target_link_libraries(control
   ${catkin_LIBRARIES}
   EDrive_app
+  adapters
 )
 
 #############
