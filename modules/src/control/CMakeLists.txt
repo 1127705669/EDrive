@@ -147,7 +147,6 @@ include
 add_executable(control 
   src/main.cc 
   src/control.cc 
-  ../common/src/EDrive.cc
   ../common/src/adapters/adapter_manager.cc
   src/controller/controller_agent.cc
   src/common/pid_controller.cc
@@ -169,6 +168,7 @@ add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_T
 ## Specify libraries to link a library or executable target against
 target_link_libraries(control
   ${catkin_LIBRARIES}
+  EDrive_app
 )
 
 #############
