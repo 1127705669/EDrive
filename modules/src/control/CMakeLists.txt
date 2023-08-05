@@ -147,7 +147,6 @@ include
 add_executable(control 
   src/main.cc 
   src/control.cc 
-  # ../common/src/adapters/adapter_manager.cc
   src/controller/controller_agent.cc
   src/common/pid_controller.cc
   src/controller/lon_controller.cc
