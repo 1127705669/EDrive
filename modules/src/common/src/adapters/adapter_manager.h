@@ -63,7 +63,7 @@ class AdapterManager
    * provided configuration.
    * @param configs the adapter manager configuration proto.
    */
-  // static void Init(const AdapterManagerConfig &configs);
+  static void Init(const AdapterManagerConfig &configs);
 
   /**
    * @brief Resets the \class AdapterManager so that it could be
@@ -106,6 +106,7 @@ class AdapterManager
 
   /// The following code registered all the adapters of interest.
   REGISTER_ADAPTER(ControlCommand);
+  DECLARE_SINGLETON(AdapterManager);
 };
 
 } // adapter

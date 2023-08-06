@@ -48,3 +48,5 @@ set(ADAPTER_PROTO_SRC
 )
 
 add_library(adapter_proto SHARED ${ADAPTER_PROTO_SRC})
+
+target_link_libraries(adapter_proto PRIVATE ${PROTOBUF_LIBRARIES})

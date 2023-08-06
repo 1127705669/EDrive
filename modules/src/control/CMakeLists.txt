@@ -124,6 +124,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 include
+  ${CMAKE_SOURCE_DIR}
   ${catkin_INCLUDE_DIRS}
   ../
   ../../
@@ -166,6 +167,7 @@ add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_T
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(control
+  ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
   EDrive_app
   adapters
