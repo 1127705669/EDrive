@@ -10,6 +10,7 @@ namespace EDrive {
 namespace control {
 
 using EDrive::Result_state;
+using EDrive::common::adapter::AdapterManager;
 
 std::string Control::Name() const { return "control"; }
 
@@ -17,6 +18,8 @@ Result_state Control::Init(){
   if(State_Ok != controller_agent_.Init()) {
     ROS_INFO("controller agent init failed, stopping...");
   }
+  AdapterManager::Init("control");
+
   return State_Ok;
 }
 

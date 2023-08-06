@@ -26,36 +26,6 @@ class AdapterBase {
    * @brief returns the topic name that this adapter listens to.
    */
   virtual const std::string& topic_name() const = 0;
-
-    /**
-   * @brief Create a view of data up to the call time for the user.
-   */
-  virtual void Observe() = 0;
-
-  /**
-   * @brief returns TRUE if the observing queue is empty.
-   */
-  virtual bool Empty() const = 0;
-
-  /**
-   * @brief returns TRUE if the adapter has received any message.
-   */
-  virtual bool HasReceived() const = 0;
-
-  /**
-   * @brief Gets message delay.
-   */
-  virtual double GetDelaySec() const = 0;
-
-  /**
-   * @brief Clear the data received so far.
-   */
-  virtual void ClearData() = 0;
-
-  /**
-   * @brief Dumps the latest received data to file.
-   */
-  virtual bool DumpLatestMessage() = 0;
 };
 
 } // namespace adapter
