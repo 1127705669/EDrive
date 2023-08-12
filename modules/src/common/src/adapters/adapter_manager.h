@@ -30,6 +30,7 @@ namespace adapter{
  public:                                                                       \
   static void Enable##name(const std::string &topic_name,                      \
                            const AdapterConfig &config) {                      \
+    ROS_INFO("Enable");                                                        \
 }                                                                              \
 
 /**
