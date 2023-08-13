@@ -18,7 +18,8 @@ Result_state Control::Init(){
   if(State_Ok != controller_agent_.Init()) {
     ROS_INFO("controller agent init failed, stopping...");
   }
-  AdapterManager::Init("control");
+  std::string control_name = "/home/ethan/workset/EDrive/modules/src/control/conf/adapter.conf";
+  AdapterManager::Init(control_name);
 
   return State_Ok;
 }
