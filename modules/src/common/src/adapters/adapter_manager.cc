@@ -3,6 +3,14 @@
  *****************************************************************************/
 
 #include <ros/ros.h>
+
+#include <fstream>
+#include <iostream>
+#include <fcntl.h>
+
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/text_format.h"
+
 #include "common/src/adapters/adapter_manager.h"
 
 namespace EDrive {
@@ -12,19 +20,37 @@ namespace adapter {
 AdapterManager::AdapterManager() {}
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {
-  // Parse config file
+  using google::protobuf::TextFormat;
+  using google::protobuf::io::FileInputStream;
+  using google::protobuf::io::ZeroCopyInputStream;
+
   AdapterManagerConfig configs;
-  configs.add_config();
+  int file_descriptor = open(adapter_config_filename.c_str(), O_RDONLY);
+  if (file_descriptor < 0) {
+    ROS_ERROR("Failed to open file in text mode.");
+  }
+
+  ZeroCopyInputStream *input = new FileInputStream(file_descriptor);
+  bool success = TextFormat::Parse(input, &configs);
+  if (!success) {
+    ROS_ERROR("Failed to parse file as text proto.");
+  }
+  delete input;
+  close(file_descriptor);
+  
   Init(configs);
 }
 
 void AdapterManager::Init(const AdapterManagerConfig &configs) {
-  ROS_INFO("adapter manager init");
 
   for (const auto &config : configs.config()) {
     switch (config.type()) {
       case AdapterConfig::CONTROL_COMMAND:
-        EnableControlCommand("CONTROL", config);
+        EnableControlCommand("control", config);
+        break;
+      case AdapterConfig::PLANNING_TRAJECTORY:
+        ROS_INFO("planning");
+        // EnableControlCommand("planning", config);
         break;
       default:
         ROS_INFO("Unknown adapter config type!");
