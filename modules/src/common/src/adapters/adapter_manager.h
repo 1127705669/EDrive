@@ -110,8 +110,8 @@ class AdapterManager
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
                                 bool autostart = true) {
-    static ros::NodeHandle nh;
-    return nh.createTimer(period, callback, obj, oneshot, autostart);
+    return instance()->node_handle_->createTimer(period, callback, obj,
+                                                   oneshot, autostart);
   }
 
  private:
