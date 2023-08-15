@@ -7,7 +7,7 @@
 #include "common/pid_controller.h"
 #include "common/trajectory_analyzer.h"
 
-#include "controller.h"
+#include "control/src/controller/controller.h"
 
 namespace EDrive {
 namespace control {

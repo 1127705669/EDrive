@@ -2,9 +2,9 @@
  * Copyright 2023 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "lon_controller.h"
+#include "control/src/controller/lon_controller.h"
 
-#include "controller_agent.h"
+#include "control/src/controller/controller_agent.h"
 
 namespace EDrive {
 namespace control {

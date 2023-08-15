@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 #include <ros/ros.h>
-#include "lon_controller.h"
+#include "control/src/controller/lon_controller.h"
 
 namespace EDrive {
 namespace control {
