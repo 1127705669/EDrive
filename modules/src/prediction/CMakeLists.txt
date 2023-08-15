@@ -140,7 +140,6 @@ include
 add_executable(prediction 
   src/main.cc 
   src/prediction.cc 
-  ../common/src/EDrive.cc
 )
 
 ## Rename C++ executable without prefix
@@ -156,6 +155,8 @@ add_executable(prediction
 ## Specify libraries to link a library or executable target against
 target_link_libraries(prediction
   ${catkin_LIBRARIES}
+  EDrive_app
+  adapters
 )
 
 #############

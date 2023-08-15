@@ -140,7 +140,6 @@ include
 add_executable(routing 
   src/main.cc 
   src/routing.cc 
-  ../common/src/EDrive.cc
 )
 
 ## Rename C++ executable without prefix
@@ -156,6 +155,8 @@ add_executable(routing
 ## Specify libraries to link a library or executable target against
 target_link_libraries(routing
   ${catkin_LIBRARIES}
+  EDrive_app
+  adapters
 )
 
 #############
