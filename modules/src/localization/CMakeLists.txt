@@ -140,8 +140,7 @@ include
 add_executable(localization 
   src/main.cc  
   src/localization.cc 
-  ../common/src/EDrive.cc
-  )
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,6 +155,8 @@ add_executable(localization
 ## Specify libraries to link a library or executable target against
 target_link_libraries(localization
   ${catkin_LIBRARIES}
+  EDrive_app
+  adapters
 )
 
 #############

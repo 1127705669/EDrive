@@ -4,16 +4,21 @@
 
 #include <ros/ros.h>
 #include "common/src/adapters/adapter_manager.h"
-#include "planning.h"
+#include "planning/src/planning.h"
 
 namespace EDrive {
 namespace planning {
+
+using EDrive::Result_state;
+using EDrive::common::adapter::AdapterManager;
 
 // Planning::~Planning() { Stop(); }
 
 std::string Planning::Name() const { return "planning"; }
 
 EDrive::Result_state Planning::Init(){
+  std::string planning_name = "/home/ethan/workset/EDrive/modules/src/control/conf/adapter.conf";
+  AdapterManager::Init(planning_name);
   return State_Ok;
 }
 

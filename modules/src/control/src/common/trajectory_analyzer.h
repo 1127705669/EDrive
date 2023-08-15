@@ -7,11 +7,6 @@
 #include <vector>
 #include <ros/ros.h>
 
-#include <control/PathPoint.h>
-#include <control/TrajectoryPoint.h>
-
-namespace control_msg = control;
-
 namespace EDrive {
 namespace control {
 
@@ -39,7 +34,7 @@ class TrajectoryAnalyzer {
    * @return a point on trajectory, the point may be a point of trajectory
    * or interpolated by two adjacent points of trajectory
    */
-  control_msg::PathPoint QueryMatchedPathPoint(const double x, const double y) const;
+  void QueryMatchedPathPoint(const double x, const double y) const;
 
   /**
    * @brief convert a position with theta and speed to trajectory frame,
@@ -55,12 +50,11 @@ class TrajectoryAnalyzer {
    * @param ptr_d_dot lateral speed
    */
   void ToTrajectoryFrame(const double x, const double y, const double theta,
-                         const double v, const control_msg::PathPoint &matched_point,
                          double *ptr_s, double *ptr_s_dot, double *ptr_d,
                          double *ptr_d_dot) const;
 
  private:
-  std::vector<control_msg::TrajectoryPoint> trajectory_points_;
+  // std::vector<control_msg::TrajectoryPoint> trajectory_points_;
 };
 
 } // namespace control

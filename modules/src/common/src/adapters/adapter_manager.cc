@@ -19,6 +19,8 @@ namespace adapter {
 
 AdapterManager::AdapterManager() {}
 
+bool AdapterManager::Initialized() { return instance()->initialized_; }
+
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   using google::protobuf::TextFormat;
   using google::protobuf::io::FileInputStream;
@@ -42,6 +44,14 @@ void AdapterManager::Init(const std::string &adapter_config_filename) {
 }
 
 void AdapterManager::Init(const AdapterManagerConfig &configs) {
+  if (Initialized()) {
+    return;
+  }
+
+  instance()->initialized_ = true;
+  if (configs.is_ros()) {
+    instance()->node_handle_.reset(new ros::NodeHandle());
+  }
 
   for (const auto &config : configs.config()) {
     switch (config.type()) {

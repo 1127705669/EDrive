@@ -7,7 +7,7 @@
 #include "common/pid_controller.h"
 #include "common/trajectory_analyzer.h"
 
-#include "controller.h"
+#include "control/src/controller/controller.h"
 
 namespace EDrive {
 namespace control {
@@ -47,7 +47,7 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Result_state ComputeControlCommand(control_msg::ControlCommand controlcommand_) override;
+  Result_state ComputeControlCommand() override;
 
   /**
    * @brief reset Controller

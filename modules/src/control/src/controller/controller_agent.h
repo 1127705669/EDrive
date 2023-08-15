@@ -6,9 +6,7 @@
 
 #include <ros/ros.h>
 
-#include "controller.h"
-
-namespace control_msg = control;
+#include "control/src/controller/controller.h"
 
 namespace EDrive {
 namespace control {
@@ -29,7 +27,7 @@ class ControllerAgent {
    */
   Result_state Init();
 
-  Result_state ComputeControlCommand(control_msg::ControlCommand controlcommand_);
+  Result_state ComputeControlCommand();
  private:
   std::vector<std::unique_ptr<Controller>> controller_list_;
 };

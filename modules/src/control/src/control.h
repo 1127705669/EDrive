@@ -7,13 +7,11 @@
 #include <string>
 #include <ros/ros.h>
 
-#include <control/ControlCommand.h>
+#include "control/proto/control_cmd.pb.h"
 
 #include "common/src/EDrive.h"
 
 #include "controller/controller_agent.h"
-
-namespace control_msg = control;
 
 namespace EDrive {
 namespace control {
@@ -40,7 +38,7 @@ class Control : public EDrive::common::EDriveApp {
 
   void SendCmd();
 
-  Result_state ProduceControlCommand(control_msg::ControlCommand controlcommand_);
+  Result_state ProduceControlCommand();
   
   ros::Timer timer_;
   const float control_period = 0.01;
