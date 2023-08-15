@@ -47,7 +47,7 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Result_state ComputeControlCommand(control_msg::ControlCommand controlcommand_) override;
+  Result_state ComputeControlCommand() override;
 
   /**
    * @brief reset Controller

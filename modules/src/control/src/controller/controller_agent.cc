@@ -19,10 +19,10 @@ Result_state ControllerAgent::Init() {
   return State_Ok;
 }
 
-Result_state ControllerAgent::ComputeControlCommand(control_msg::ControlCommand controlcommand_) {
+Result_state ControllerAgent::ComputeControlCommand() {
   for (auto &controller : controller_list_) {
     ros::Time start_timestamp = ros::Time::now();
-    controller->ComputeControlCommand(controlcommand_);
+    controller->ComputeControlCommand();
     ros::Time end_timestamp = ros::Time::now();
   }
   return State_Ok;

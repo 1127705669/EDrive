@@ -52,12 +52,12 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  ControlCommand.msg
-  PathPoint.msg
-  TrajectoryPoint.msg
-)
+# add_message_files(
+#   FILES
+#   ControlCommand.msg
+#   PathPoint.msg
+#   TrajectoryPoint.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -74,11 +74,11 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+#   geometry_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

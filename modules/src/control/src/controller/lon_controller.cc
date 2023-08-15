@@ -26,7 +26,7 @@ Result_state LonController::Init() {
 
 std::string LonController::Name() const { return name_; }
 
-Result_state LonController::ComputeControlCommand(control_msg::ControlCommand controlcommand_) {
+Result_state LonController::ComputeControlCommand() {
   // ComputeLongitudinalErrors(trajectory_analyzer_.get());
   ROS_INFO("1");
   return State_Ok;
@@ -48,7 +48,6 @@ void LonController::ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajecto
 
   double x;
   double y;
-  auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(x,y);
 }
 
 } // namespace control

@@ -9,9 +9,7 @@
 #include "common/src/state.h"
 
 // ros message
-#include <control/ControlCommand.h>
-
-namespace control_msg = control;
+#include "control/proto/control_cmd.pb.h"
 
 /**
  * @namespace EDrive::control
@@ -55,7 +53,7 @@ class Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  virtual Result_state ComputeControlCommand(control_msg::ControlCommand controlcommand_) = 0;
+  virtual Result_state ComputeControlCommand() = 0;
 
   /**
    * @brief reset Controller

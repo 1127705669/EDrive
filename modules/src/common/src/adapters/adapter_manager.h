@@ -15,10 +15,11 @@
 #include "common/src/adapters/adapter.h"
 #include "common/src/macro.h"
 #include "common/src/adapters/proto/adapter_config.pb.h"
+#include "common/src/adapters/message_adapters.h"
 
 namespace EDrive {
 namespace common {
-namespace adapter{
+namespace adapter {
 
 /// Macro to prepare all the necessary adapter functions when adding a
 /// new input/output. For example when you want to listen to
@@ -30,8 +31,27 @@ namespace adapter{
  public:                                                                       \
   static void Enable##name(const std::string &topic_name,                      \
                            const AdapterConfig &config) {                      \
-    ROS_INFO("Enable");                                                        \
-}                                                                              \
+    if(config.message_history_limit() <= 0){                                   \
+      ROS_ERROR("Message history limit must be greater than 0");               \
+    }                                                                          \
+    instance()->InternalEnable##name(topic_name, config);                      \
+  }                                                                            \
+ private:                                                                      \
+  std::unique_ptr<name##Adapter> name##_;                                      \
+  ros::Publisher name##publisher_;                                             \
+  ros::Subscriber name##subscriber_;                                           \
+  AdapterConfig name##config_;                                                 \
+                                                                               \
+  void InternalEnable##name(const std::string &topic_name,                     \
+                            const AdapterConfig &config) {                     \
+                                                                               \
+    if (config.mode() != AdapterConfig::PUBLISH_ONLY) {                        \
+    ROS_INFO("debug_!publish");                                                \
+    }                                                                          \
+    if (config.mode() != AdapterConfig::RECEIVE_ONLY) {                        \
+    ROS_INFO("debug_!recieve");                                                \
+    }                                                                          \
+  }                                                                            \
 
 /**
  * @class AdapterManager

@@ -5,9 +5,9 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/opt/ros/noetic/include/**",
-                "${workspaceFolder}/EROS/devel/include/**",
-                "${workspaceFolder}/EROS/src/**",
-                "${workspaceFolder}/EROS/src",
+                "${workspaceFolder}/modules/devel/include/**",
+                "${workspaceFolder}/modules/src/**",
+                "${workspaceFolder}/modules/src",
                 "${workspaceFolder}/modules/src"
             ],
             "defines": [],
