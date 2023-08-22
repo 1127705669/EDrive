@@ -51,13 +51,24 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
+set(CONTROL_CMD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/msg/control_cmd)
+file(GLOB CONTROL_CMD RELATIVE ${CONTROL_CMD_PATH} ${CONTROL_CMD_PATH}/*.msg)
+
+set(PID_CONF_PATH ${CMAKE_CURRENT_SOURCE_DIR}/msg/pid_conf)
+file(GLOB PID_CONF RELATIVE ${PID_CONF_PATH} ${PID_CONF_PATH}/*.msg)
+
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   ControlCommand.msg
-#   PathPoint.msg
-#   TrajectoryPoint.msg
-# )
+add_message_files(
+  DIRECTORY msg/control_cmd
+  FILES
+  ${CONTROL_CMD}
+)
+
+add_message_files(
+  DIRECTORY msg/pid_conf
+  FILES
+  ${PID_CONF}
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -74,11 +85,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-#   geometry_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -111,8 +122,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-  LIBRARIES control_proto
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+  LIBRARIES control_proto control
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
 
