@@ -51,24 +51,22 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-set(CONTROL_CMD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/msg/control_cmd)
-file(GLOB CONTROL_CMD RELATIVE ${CONTROL_CMD_PATH} ${CONTROL_CMD_PATH}/*.msg)
+file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
 
-set(PID_CONF_PATH ${CMAKE_CURRENT_SOURCE_DIR}/msg/pid_conf)
-file(GLOB PID_CONF RELATIVE ${PID_CONF_PATH} ${PID_CONF_PATH}/*.msg)
+foreach(MSG_FOLDER ${MSG_FOLDERS})
+  message("-Found msg folder: ${MSG_FOLDER}")
+  file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
 
-## Generate messages in the 'msg' folder
-add_message_files(
-  DIRECTORY msg/control_cmd
-  FILES
-  ${CONTROL_CMD}
-)
+  foreach(MSG_FILE ${MSG_FILES})
+    message("--Found msg file: ${MSG_FILE}")
+  endforeach()
+  add_message_files(
+    DIRECTORY msg/${MSG_FOLDER}
+    FILES
+    ${MSG_FILES}
+  )
 
-add_message_files(
-  DIRECTORY msg/pid_conf
-  FILES
-  ${PID_CONF}
-)
+endforeach()
 
 ## Generate services in the 'srv' folder
 # add_service_files(
