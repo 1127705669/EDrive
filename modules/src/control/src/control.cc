@@ -6,6 +6,8 @@
 
 #include "control/src/control.h"
 
+namespace rosmsg = control;
+
 namespace EDrive {
 namespace control {
 
