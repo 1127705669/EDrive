@@ -36,6 +36,9 @@ namespace adapter {
     }                                                                          \
     instance()->InternalEnable##name(topic_name, config);                      \
   }                                                                            \
+  static void Publish##name(const name##Adapter::DataType &data) {             \
+    instance()->InternalPublish##name(data);                                   \
+  }                                                                            \
  private:                                                                      \
   std::unique_ptr<name##Adapter> name##_;                                      \
   ros::Publisher name##publisher_;                                             \
@@ -50,7 +53,13 @@ namespace adapter {
     }                                                                          \
     if (config.mode() != AdapterConfig::RECEIVE_ONLY) {                        \
     ROS_INFO("debug_!recieve");                                                \
+    name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(       \
+          topic_name, config.message_history_limit(), config.latch());         \
     }                                                                          \
+  }                                                                            \
+  void InternalPublish##name(const name##Adapter::DataType &data) {            \
+    /* Only publish ROS msg if node handle is initialized. */                  \
+        name##publisher_.publish(data);                                        \
   }                                                                            \
 
 /**

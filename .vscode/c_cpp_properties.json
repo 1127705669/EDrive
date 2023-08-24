@@ -7,7 +7,6 @@
                 "/opt/ros/noetic/include/**",
                 "${workspaceFolder}/modules/devel/include",
                 "${workspaceFolder}/modules/src/**",
-                "${workspaceFolder}/modules/src",
                 "${workspaceFolder}/modules/src"
             ],
             "defines": [],

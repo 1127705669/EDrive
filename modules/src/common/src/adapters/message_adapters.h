@@ -18,7 +18,7 @@ namespace EDrive {
 namespace common {
 namespace adapter {
 
-using ControlCommandAdapter = Adapter<control::ControlCommand>;
+using ControlCommandAdapter = Adapter<::control::ControlCommand>;
 
 } // namespace adapter
 } // namespace common
