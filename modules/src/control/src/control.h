@@ -7,11 +7,13 @@
 #include <string>
 #include <ros/ros.h>
 
-#include "control/proto/control_cmd.pb.h"
+// #include "control/proto/control_cmd.pb.h"
 
 #include "common/src/EDrive.h"
 
 #include "controller/controller_agent.h"
+
+#include "control/ControlCommand.h"
 
 namespace EDrive {
 namespace control {
@@ -36,9 +38,9 @@ class Control : public EDrive::common::EDriveApp {
  // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
-  void SendCmd();
+  void SendCmd(::control::ControlCommand *control_command);
 
-  Result_state ProduceControlCommand();
+  Result_state ProduceControlCommand(::control::ControlCommand *control_command);
   
   ros::Timer timer_;
   const float control_period = 0.01;

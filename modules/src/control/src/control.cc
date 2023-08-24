@@ -6,8 +6,6 @@
 
 #include "control/src/control.h"
 
-// namespace rosmsg = control;
-
 namespace EDrive {
 namespace control {
 
@@ -35,11 +33,13 @@ Result_state Control::Start(){
 
 void Control::OnTimer(const ros::TimerEvent &) {
   ros::Time start_timestamp = ros::Time::now();
-  Result_state status = ProduceControlCommand();
+  ::control::ControlCommand control_command;
+  Result_state status = ProduceControlCommand(&control_command);
   ros::Time end_timestamp = ros::Time::now();
+  SendCmd(&control_command);
 }
 
-Result_state Control::ProduceControlCommand() {
+Result_state Control::ProduceControlCommand(::control::ControlCommand *control_command) {
   if(State_Ok != controller_agent_.ComputeControlCommand()) {
     ROS_INFO("controller agent compute control command failed, stopping...");
   }
@@ -50,8 +50,8 @@ void Control::Stop() {
 
 }
 
-void Control::SendCmd() {
-  
+void Control::SendCmd(::control::ControlCommand *control_command) {
+  AdapterManager::PublishControlCommand(*control_command);
 }
 
 } // namespace control
