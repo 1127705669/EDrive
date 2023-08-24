@@ -4,15 +4,17 @@ project(common)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/adapters)
-
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  control
+  planning
 )
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/adapters)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -132,7 +134,7 @@ add_library(EDrive_app SHARED ${EDRIVE_APP})
 catkin_package(
 #  INCLUDE_DIRS include
  LIBRARIES EDrive_app adapters adapter_proto
- CATKIN_DEPENDS roscpp std_msgs
+ CATKIN_DEPENDS roscpp std_msgs control planning
 #  DEPENDS system_lib
 )
 

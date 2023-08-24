@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "control/proto/control_cmd.pb.h"
+// #include "control/proto/control_cmd.pb.h"
 #include "common/src/adapters/adapter.h"
+#include "control/ControlCommand.h"
 
 /**
  * @file message_adapters.h
