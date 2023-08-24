@@ -104,8 +104,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-  LIBRARIES planning
-  CATKIN_DEPENDS roscpp rospy std_msgs
+  # LIBRARIES planning
+  # CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
 
@@ -136,10 +136,10 @@ include
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(planning 
-  src/main.cc 
-  src/planning.cc 
-)
+# add_executable(planning 
+#   src/main.cc 
+#   src/planning.cc 
+# )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -152,11 +152,11 @@ add_executable(planning
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(planning
-  ${catkin_LIBRARIES}
-  EDrive_app
-  adapters
-)
+# target_link_libraries(planning
+#   ${catkin_LIBRARIES}
+#   EDrive_app
+#   adapters
+# )
 
 #############
 ## Install ##
