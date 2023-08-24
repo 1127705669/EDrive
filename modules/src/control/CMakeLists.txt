@@ -120,7 +120,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-  LIBRARIES control_proto control
+  LIBRARIES control_proto control control_lib
   CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
@@ -142,9 +142,13 @@ include
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/control.cpp
-# )
+add_library(control_lib
+  src/control.cc
+  src/controller/controller_agent.cc
+  src/common/pid_controller.cc
+  src/controller/lon_controller.cc
+  src/common/trajectory_analyzer.cc
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -155,12 +159,7 @@ include
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(control 
-  src/main.cc 
-  src/control.cc 
-  src/controller/controller_agent.cc
-  src/common/pid_controller.cc
-  src/controller/lon_controller.cc
-  src/common/trajectory_analyzer.cc
+  src/main.cc
 )
 
 add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -176,6 +175,12 @@ add_dependencies(control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_T
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(control
+  ${catkin_LIBRARIES}
+  EDrive_app
+  control_lib
+)
+
+target_link_libraries(control_lib
   ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
   EDrive_app
