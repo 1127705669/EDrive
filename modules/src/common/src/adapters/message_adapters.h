@@ -7,6 +7,7 @@
 // #include "control/proto/control_cmd.pb.h"
 #include "common/src/adapters/adapter.h"
 #include "control/ControlCommand.h"
+#include "planning/ADCTrajectory.h"
 
 /**
  * @file message_adapters.h
@@ -19,6 +20,7 @@ namespace common {
 namespace adapter {
 
 using ControlCommandAdapter = Adapter<::control::ControlCommand>;
+using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 
 } // namespace adapter
 } // namespace common
