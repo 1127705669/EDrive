@@ -17,7 +17,7 @@ using EDrive::common::adapter::AdapterManager;
 std::string Planning::Name() const { return "planning"; }
 
 EDrive::Result_state Planning::Init(){
-  std::string planning_name = "/home/ethan/workset/EDrive/modules/src/control/conf/adapter.conf";
+  std::string planning_name = "/home/ethan/workset/EDrive/modules/src/planning/conf/adapter.conf";
   AdapterManager::Init(planning_name);
   return State_Ok;
 }
