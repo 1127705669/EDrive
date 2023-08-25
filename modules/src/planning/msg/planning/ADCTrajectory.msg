@@ -1,0 +1,2 @@
+float64 total_path_length
+float64 total_path_time
