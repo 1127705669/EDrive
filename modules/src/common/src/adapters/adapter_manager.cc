@@ -59,8 +59,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableControlCommand("control", config);
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
-        ROS_INFO("planning");
-        // EnableControlCommand("planning", config);
+        EnablePlanning("planning", config);
         break;
       default:
         ROS_INFO("Unknown adapter config type!");
