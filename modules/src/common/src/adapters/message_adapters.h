@@ -7,6 +7,7 @@
 // #include "control/proto/control_cmd.pb.h"
 #include "common/src/adapters/adapter.h"
 #include "control/ControlCommand.h"
+#include "control/CarlaEgoVehicleControl.h"
 #include "planning/ADCTrajectory.h"
 
 /**
@@ -19,7 +20,7 @@ namespace EDrive {
 namespace common {
 namespace adapter {
 
-using ControlCommandAdapter = Adapter<::control::ControlCommand>;
+using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 
 } // namespace adapter

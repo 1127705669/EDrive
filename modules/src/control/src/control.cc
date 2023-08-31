@@ -33,13 +33,13 @@ Result_state Control::Start(){
 
 void Control::OnTimer(const ros::TimerEvent &) {
   ros::Time start_timestamp = ros::Time::now();
-  ::control::ControlCommand control_command;
+  ::control::CarlaEgoVehicleControl control_command;
   Result_state status = ProduceControlCommand(&control_command);
   ros::Time end_timestamp = ros::Time::now();
   SendCmd(&control_command);
 }
 
-Result_state Control::ProduceControlCommand(::control::ControlCommand *control_command) {
+Result_state Control::ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command) {
   if(State_Ok != controller_agent_.ComputeControlCommand()) {
     ROS_INFO("controller agent compute control command failed, stopping...");
   }
@@ -50,7 +50,7 @@ void Control::Stop() {
 
 }
 
-void Control::SendCmd(::control::ControlCommand *control_command) {
+void Control::SendCmd(::control::CarlaEgoVehicleControl *control_command) {
   AdapterManager::PublishControlCommand(*control_command);
 }
 

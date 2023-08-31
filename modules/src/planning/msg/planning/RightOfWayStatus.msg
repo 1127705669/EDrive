@@ -1,0 +1,2 @@
+int8 UNPROTECTED = 0
+int8 PROTECTED = 1
