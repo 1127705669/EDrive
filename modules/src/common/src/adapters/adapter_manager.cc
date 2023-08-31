@@ -56,7 +56,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
   for (const auto &config : configs.config()) {
     switch (config.type()) {
       case AdapterConfig::CONTROL_COMMAND:
-        EnableControlCommand("control", config);
+        EnableControlCommand("/carla/ego_vehicle/vehicle_control_cmd", config);
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning("planning", config);

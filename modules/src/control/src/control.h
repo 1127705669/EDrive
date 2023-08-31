@@ -15,6 +15,8 @@
 
 #include "control/ControlCommand.h"
 
+#include "control/CarlaEgoVehicleControl.h"
+
 namespace EDrive {
 namespace control {
 
@@ -38,9 +40,9 @@ class Control : public EDrive::common::EDriveApp {
  // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
-  void SendCmd(::control::ControlCommand *control_command);
+  void SendCmd(::control::CarlaEgoVehicleControl *control_command);
 
-  Result_state ProduceControlCommand(::control::ControlCommand *control_command);
+  Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
   
   ros::Timer timer_;
   const float control_period = 0.01;
