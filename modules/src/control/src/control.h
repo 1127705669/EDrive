@@ -17,6 +17,8 @@
 
 #include "control/CarlaEgoVehicleControl.h"
 
+#include "control/proto/control_conf.pb.h"
+
 namespace EDrive {
 namespace control {
 
@@ -45,10 +47,11 @@ class Control : public EDrive::common::EDriveApp {
   Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
   
   ros::Timer timer_;
-  const float control_period = 0.01;
   ros::Time init_time_;
   ControllerAgent controller_agent_;
-  const std::string adapter_conf_ = "/home/ethan/workset/EDrive/modules/src/control/conf/adapter.conf";
+  ControlConf control_conf_;
+  const std::string adapter_conf_file = "/home/ethan/workset/EDrive/modules/src/control/conf/adapter.conf";
+  const std::string control_conf_file = "/home/ethan/workset/EDrive/modules/src/control/conf/control.conf";
   
 };
 

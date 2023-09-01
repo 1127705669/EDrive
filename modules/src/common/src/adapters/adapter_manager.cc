@@ -25,7 +25,7 @@ bool AdapterManager::Initialized() { return instance()->initialized_; }
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   AdapterManagerConfig configs;
   
- EDrive::common::util::GetProtoFromASIIFile(adapter_config_filename, &configs);
+  EDrive::common::util::GetProtoFromASIIFile(adapter_config_filename, &configs);
   
   AdapterManager::Init(configs);
 }
