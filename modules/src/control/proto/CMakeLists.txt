@@ -5,7 +5,8 @@ find_package(Protobuf REQUIRED)
 
 ## Generate Protocol Buffer message
 ## set protocol buffer output address
-SET(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(PROTOBUF_IMPORT_DIRS "${CMAKE_SOURCE_DIR}")
 
 file(GLOB_RECURSE proto_files ${CMAKE_CURRENT_SOURCE_DIR}/*.proto)
 
@@ -22,6 +23,7 @@ foreach(proto_file ${proto_files})
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
     ARGS --cpp_out  ${PROTO_DIR}
       -I ${PROTO_DIR}
+      -I ${PROTOBUF_IMPORT_DIRS} 
       ${proto_file}
     DEPENDS ${proto_file}
     COMMENT "Running C++ protocol buffer compiler on ${proto_file}"
