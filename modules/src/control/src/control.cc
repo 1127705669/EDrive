@@ -32,7 +32,7 @@ Result_state Control::Init(){
 }
 
 Result_state Control::Start(){
-  timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(control_period), 
+  timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(control_conf_.control_period()), 
                                                                 &Control::OnTimer,
                                                                 this);
   ROS_INFO("Control init done!");
