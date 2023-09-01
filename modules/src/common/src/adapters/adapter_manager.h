@@ -49,11 +49,11 @@ namespace adapter {
                             const AdapterConfig &config) {                     \
                                                                                \
     if (config.mode() != AdapterConfig::PUBLISH_ONLY) {                        \
-    ROS_INFO("debug_!publish");                                                \
+      ROS_INFO("    registering subscriber: %s", topic_name.c_str());               \
     }                                                                          \
     if (config.mode() != AdapterConfig::RECEIVE_ONLY) {                        \
-    ROS_INFO("debug_!recieve");                                                \
-    name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(       \
+      ROS_INFO("    registering publisher: %s", topic_name.c_str());               \
+      name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
           topic_name, config.message_history_limit(), config.latch());         \
     }                                                                          \
   }                                                                            \
