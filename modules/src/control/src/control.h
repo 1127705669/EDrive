@@ -48,6 +48,7 @@ class Control : public EDrive::common::EDriveApp {
   const float control_period = 0.01;
   ros::Time init_time_;
   ControllerAgent controller_agent_;
+  const std::string adapter_conf_ = "/home/ethan/workset/EDrive/modules/src/control/conf/adapter.conf";
   
 };
 

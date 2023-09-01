@@ -35,7 +35,6 @@ void Planning::Stop() {
 
 void Planning::OnTimer(const ros::TimerEvent &) {
   ros::Time begin = ros::Time::now();
-  ROS_INFO("10");
 }
 
 } // planning

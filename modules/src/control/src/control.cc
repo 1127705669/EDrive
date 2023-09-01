@@ -15,11 +15,15 @@ using EDrive::common::adapter::AdapterManager;
 std::string Control::Name() const { return "control"; }
 
 Result_state Control::Init(){
+  ROS_INFO("Control init, starting...");
+
+  ROS_INFO("  registering node: %s", Name().c_str());
+  AdapterManager::Init(adapter_conf_);
+
+  ROS_INFO("  controller init, start...");
   if(State_Ok != controller_agent_.Init()) {
-    ROS_INFO("controller agent init failed, stopping...");
+    ROS_ERROR("    controller agent init failed, stopping...");
   }
-  std::string control_name = "/home/ethan/workset/EDrive/modules/src/control/conf/adapter.conf";
-  AdapterManager::Init(control_name);
 
   return State_Ok;
 }
@@ -28,6 +32,8 @@ Result_state Control::Start(){
   timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(control_period), 
                                                                 &Control::OnTimer,
                                                                 this);
+  ROS_INFO("Control init done!");
+  ROS_INFO("Control started");
   return State_Ok;
 }
 
