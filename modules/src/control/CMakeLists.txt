@@ -183,6 +183,7 @@ target_link_libraries(control
 target_link_libraries(control_lib
   ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
+  control_proto
   EDrive_app
   adapters
 )

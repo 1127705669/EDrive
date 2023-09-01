@@ -6,6 +6,8 @@
 
 #include "control/src/control.h"
 
+#include "common/src/util/file.h"
+
 namespace EDrive {
 namespace control {
 
@@ -18,8 +20,9 @@ Result_state Control::Init(){
   ROS_INFO("Control init, starting...");
 
   ROS_INFO("  registering node: %s", Name().c_str());
-  AdapterManager::Init(adapter_conf_);
+  AdapterManager::Init(adapter_conf_file);
 
+  EDrive::common::util::GetProtoFromASIIFile(control_conf_file, &control_conf_);
   ROS_INFO("  controller init, start...");
   if(State_Ok != controller_agent_.Init()) {
     ROS_ERROR("    controller agent init failed, stopping...");

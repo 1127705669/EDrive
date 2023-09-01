@@ -47,6 +47,9 @@ include
 
 set(ADAPTER_PROTO_SRC 
   control_cmd.pb.cc
+  control_conf.pb.cc
+  lon_controller_conf.pb.cc
+  pid_conf.pb.cc
 )
 
 add_library(control_proto SHARED ${ADAPTER_PROTO_SRC})
