@@ -7,6 +7,7 @@
 #include <ros/ros.h>
 
 #include "control/src/controller/controller.h"
+#include "control/proto/control_conf.pb.h"
 
 namespace EDrive {
 namespace control {
@@ -25,10 +26,18 @@ class ControllerAgent {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Result_state Init();
+  Result_state Init(const ControlConf *control_conf_);
 
   Result_state ComputeControlCommand();
+
  private:
+  /**
+   * @brief
+   * Register new controllers. If you need to add a new type of controller,
+   * You should first register your controller in this function.
+   */
+  void RegisterControllers(const ControlConf *control_conf);
+
   std::vector<std::unique_ptr<Controller>> controller_list_;
 };
 
