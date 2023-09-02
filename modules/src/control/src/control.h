@@ -50,8 +50,10 @@ class Control : public EDrive::common::EDriveApp {
   ros::Time init_time_;
   ControllerAgent controller_agent_;
   ControlConf control_conf_;
-  const std::string adapter_conf_file = "/home/ethan/workset/EDrive/modules/src/control/conf/adapter.conf";
-  const std::string control_conf_file = "/home/ethan/workset/EDrive/modules/src/control/conf/control.conf";
+
+  std::string root_path;
+  std::string adapter_conf_file = "/src/control/conf/adapter.conf";
+  std::string control_conf_file = "/src/control/conf/control.conf";
   
 };
 
