@@ -4,8 +4,6 @@ project(control)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
-
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -17,6 +15,10 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   geometry_msgs
 )
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/common)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/controller)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -144,10 +146,6 @@ include
 ## Declare a C++ library
 add_library(control_lib
   src/control.cc
-  src/controller/controller_agent.cc
-  src/common/pid_controller.cc
-  src/controller/lon_controller.cc
-  src/common/trajectory_analyzer.cc
 )
 
 ## Add cmake target dependencies of the library
@@ -183,6 +181,7 @@ target_link_libraries(control
 target_link_libraries(control_lib
   ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
+  controller
   control_proto
   EDrive_app
   adapters

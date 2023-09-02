@@ -12,7 +12,7 @@
 #include "google/protobuf/text_format.h"
 
 #include "common/src/adapters/adapter_manager.h"
-#include  "common/src/util/file.h"
+#include "common/src/util/file.h"
 
 namespace EDrive {
 namespace common {

@@ -2,7 +2,7 @@
  * Copyright 2023 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "common/trajectory_analyzer.h"
+#include "control/src/common/trajectory_analyzer.h"
 
 namespace EDrive {
 namespace control {
