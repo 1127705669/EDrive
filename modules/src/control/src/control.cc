@@ -19,6 +19,10 @@ std::string Control::Name() const { return "control"; }
 Result_state Control::Init(){
   ROS_INFO("Control init, starting...");
 
+  root_path = EDrive::common::util::GetRootPath();
+  adapter_conf_file = root_path + adapter_conf_file;
+  control_conf_file = root_path + control_conf_file;
+
   ROS_INFO("  registering node: %s", Name().c_str());
   AdapterManager::Init(adapter_conf_file);
 

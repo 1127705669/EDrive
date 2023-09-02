@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
@@ -16,6 +17,18 @@
 namespace EDrive {
 namespace common {
 namespace util {
+
+std::string GetRootPath() {
+  std::string ret_value;
+  char buffer[FILENAME_MAX];
+    
+  if (getcwd(buffer, sizeof(buffer)) == nullptr) {
+    ROS_ERROR("Cannot get root path!");
+  }
+  ret_value = buffer;
+
+  return ret_value;
+}
 
 template  <typename MessageType>
 void GetProtoFromASIIFile(const std::string &adapter_config_filename, MessageType *message ) {
