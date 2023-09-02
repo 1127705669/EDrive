@@ -4,8 +4,6 @@ project(control)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
-
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -17,6 +15,10 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   geometry_msgs
 )
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/common)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/controller)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -54,11 +56,11 @@ find_package(catkin REQUIRED COMPONENTS
 file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
 
 foreach(MSG_FOLDER ${MSG_FOLDERS})
-  message("-Found msg folder: ${MSG_FOLDER}")
+  message("Found msg folder: ${MSG_FOLDER}")
   file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
 
   foreach(MSG_FILE ${MSG_FILES})
-    message("--Found msg file: ${MSG_FILE}")
+    message(" Found msg file: ${MSG_FILE}")
   endforeach()
   add_message_files(
     DIRECTORY msg/${MSG_FOLDER}
@@ -86,28 +88,7 @@ endforeach()
 generate_messages(
   DEPENDENCIES
   std_msgs
-  geometry_msgs
 )
-
-################################################
-## Declare ROS dynamic reconfigure parameters ##
-################################################
-
-## To declare and build dynamic reconfigure parameters within this
-## package, follow these steps:
-## * In the file package.xml:
-##   * add a build_depend and a exec_depend tag for "dynamic_reconfigure"
-## * In this file (CMakeLists.txt):
-##   * add "dynamic_reconfigure" to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * uncomment the "generate_dynamic_reconfigure_options" section below
-##     and list every .cfg file to be processed
-
-## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
 
 ###################################
 ## catkin specific configuration ##
@@ -120,7 +101,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-  LIBRARIES control_proto control control_lib
+  LIBRARIES control_proto
   CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
@@ -133,21 +114,14 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 include
-  ${CMAKE_SOURCE_DIR}
   ${catkin_INCLUDE_DIRS}
-  ../
-  ../../
-  ../../../
-  src/
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 ## Declare a C++ library
 add_library(control_lib
   src/control.cc
-  src/controller/controller_agent.cc
-  src/common/pid_controller.cc
-  src/controller/lon_controller.cc
-  src/common/trajectory_analyzer.cc
 )
 
 ## Add cmake target dependencies of the library
@@ -183,62 +157,8 @@ target_link_libraries(control
 target_link_libraries(control_lib
   ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
+  controller
   control_proto
   EDrive_app
   adapters
 )
-
-#############
-## Install ##
-#############
-
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# catkin_install_python(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark executables for installation
-## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-# install(TARGETS ${PROJECT_NAME}_node
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark libraries for installation
-## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-# install(TARGETS ${PROJECT_NAME}
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-# )
-
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
-
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_control.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)

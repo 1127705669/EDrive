@@ -51,11 +51,11 @@ find_package(catkin REQUIRED COMPONENTS
 file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
 
 foreach(MSG_FOLDER ${MSG_FOLDERS})
-  message("-Found msg folder: ${MSG_FOLDER}")
+  message("Found msg folder: ${MSG_FOLDER}")
   file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
 
   foreach(MSG_FILE ${MSG_FILES})
-    message("--Found msg file: ${MSG_FILE}")
+    message(" Found msg file: ${MSG_FILE}")
   endforeach()
   add_message_files(
     DIRECTORY msg/${MSG_FOLDER}
