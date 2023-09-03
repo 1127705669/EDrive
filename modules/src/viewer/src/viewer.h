@@ -1,7 +1,11 @@
 /******************************************************************************
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
-
+/**
+ * @file viewer.h
+ *
+ * @brief Declaration of the class Viewer.
+ */
 #pragma once
 
 #include <string>
@@ -13,8 +17,6 @@ namespace viewer {
 
 class Viewer : public EDrive::common::EDriveApp {
  public:
-//   Planning() = default;
-//   virtual ~Planning();
 
   std::string Name() const override;
 
@@ -25,5 +27,5 @@ class Viewer : public EDrive::common::EDriveApp {
   void Stop() override;
 };
 
-} // viewer
-} // EDrive
+} // namespace viewer
+} // namespace EDrive

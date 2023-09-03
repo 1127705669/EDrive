@@ -35,3 +35,5 @@ set(TARJECTORY_ANALYZER_SRC
 add_library(trajectory_analyzer SHARED 
   ${TARJECTORY_ANALYZER_SRC}
 )
+
+add_dependencies(trajectory_analyzer ${PROJECT_NAME}_generate_messages_cpp)
