@@ -11,8 +11,14 @@
 namespace EDrive {
 namespace control {
 
-void PIDController::Init() {
-  ROS_INFO("pid controller init...");
+double PIDController::Control(const double error, const double dt) {
+  double output = 0;
+
+  return output;
+}
+
+void PIDController::Init(const PidConf &pid_conf) {
+  SetPID(pid_conf);
 }
 
 void PIDController::Reset() {
@@ -22,6 +28,13 @@ void PIDController::Reset() {
   first_hit_ = true;
   integrator_saturation_status_ = 0;
   output_saturation_status_ = 0;
+}
+
+void PIDController::SetPID(const PidConf &pid_conf) {
+  kp_ = pid_conf.kp();
+  ki_ = pid_conf.ki();
+  kd_ = pid_conf.kd();
+  kaw_ = pid_conf.kaw();
 }
 
 } // namespace control

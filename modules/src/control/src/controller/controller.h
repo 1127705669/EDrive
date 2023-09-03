@@ -8,8 +8,9 @@
 #include <string>
 #include "common/src/state.h"
 
-// ros message
 #include "control/proto/control_cmd.pb.h"
+#include "control/proto/control_conf.pb.h"
+#include "control/CarlaEgoVehicleControl.h"
 
 /**
  * @namespace EDrive::control
@@ -42,7 +43,7 @@ class Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  virtual Result_state Init() = 0;
+  virtual Result_state Init(const ControlConf *control_conf) = 0;
 
   /**
    * @brief compute control command based on current vehicle status
@@ -53,7 +54,7 @@ class Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  virtual Result_state ComputeControlCommand() = 0;
+  virtual Result_state ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command) = 0;
 
   /**
    * @brief reset Controller

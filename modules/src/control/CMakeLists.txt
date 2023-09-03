@@ -16,10 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
 )
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/common)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/controller)
-
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -89,6 +85,10 @@ generate_messages(
   DEPENDENCIES
   std_msgs
 )
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/common)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/controller)
 
 ###################################
 ## catkin specific configuration ##

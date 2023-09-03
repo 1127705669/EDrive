@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "control/proto/pid_conf.pb.h"
+
 namespace EDrive {
 namespace control {
 
@@ -18,28 +20,28 @@ class PIDController {
    * @brief initialize pid controller
    * @param pid_conf configuration for pid controller
    */
-  void Init();
+  void Init(const PidConf &pid_conf);
 
-  // /**
-  //  * @brief set pid controller coefficients for the proportional,
-  //  * integral, and derivative
-  //  * @param pid_conf configuration for pid controller
-  //  */
-  // void SetPID();
+  /**
+   * @brief set pid controller coefficients for the proportional,
+   * integral, and derivative
+   * @param pid_conf configuration for pid controller
+   */
+  void SetPID(const PidConf &pid_conf);
 
   /**
    * @brief reset variables for pid controller
    */
   void Reset();
 
-  // /**
-  //  * @brief compute control value based on the error
-  //  * @param error error value, the difference between
-  //  * a desired value and a measured value
-  //  * @param dt sampling time interval
-  //  * @return control value based on PID terms
-  //  */
-  // virtual double Control(const double error, const double dt);
+  /**
+   * @brief compute control value based on the error
+   * @param error error value, the difference between
+   * a desired value and a measured value
+   * @param dt sampling time interval
+   * @return control value based on PID terms
+   */
+  virtual double Control(const double error, const double dt);
 
   // /**
   //  * @brief get saturation status
