@@ -15,8 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
 )
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/adapters)
-
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -93,6 +91,9 @@ generate_messages(
   DEPENDENCIES
   std_msgs
 )
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/adapters)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/vehicle_state)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
