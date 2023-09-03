@@ -9,6 +9,8 @@
 
 #include "control/src/controller/controller.h"
 
+#include "planning/ADCTrajectory.h"
+
 namespace EDrive {
 namespace control {
 
@@ -75,6 +77,7 @@ class LonController : public Controller {
   PIDController station_pid_controller_;
   bool controller_initialized_ = false;
   const ControlConf *control_conf_ = nullptr;
+  const planning::ADCTrajectory *trajectory_message_ = nullptr;
 
   std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
 

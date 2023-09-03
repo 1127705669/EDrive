@@ -42,6 +42,17 @@ Result_state LonController::Init(const ControlConf *control_conf) {
 std::string LonController::Name() const { return name_; }
 
 Result_state LonController::ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command) {
+  if (trajectory_analyzer_ == nullptr) {
+    trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory_message_));
+  }
+  
+  const LonControllerConf &lon_controller_conf =
+      control_conf_->lon_controller_conf();
+
+  double brake_cmd = 0.0;
+  double throttle_cmd = 0.0;
+  double ts = lon_controller_conf.ts();
+
   ComputeLongitudinalErrors(trajectory_analyzer_.get());
   return State_Ok;
 }

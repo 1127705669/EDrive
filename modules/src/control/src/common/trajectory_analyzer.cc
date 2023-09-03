@@ -7,6 +7,10 @@
 namespace EDrive {
 namespace control {
 
+TrajectoryAnalyzer::TrajectoryAnalyzer(
+    const planning::ADCTrajectory *planning_published_trajectory) {
+}
+
 // Squared distance from the point to (x, y).
 double PointDistanceSquare(const double x,
                            const double y) {
