@@ -34,14 +34,14 @@ class PIDController {
    */
   void Reset();
 
-  // /**
-  //  * @brief compute control value based on the error
-  //  * @param error error value, the difference between
-  //  * a desired value and a measured value
-  //  * @param dt sampling time interval
-  //  * @return control value based on PID terms
-  //  */
-  // virtual double Control(const double error, const double dt);
+  /**
+   * @brief compute control value based on the error
+   * @param error error value, the difference between
+   * a desired value and a measured value
+   * @param dt sampling time interval
+   * @return control value based on PID terms
+   */
+  virtual double Control(const double error, const double dt);
 
   // /**
   //  * @brief get saturation status

@@ -10,6 +10,7 @@
 
 #include "control/proto/control_cmd.pb.h"
 #include "control/proto/control_conf.pb.h"
+#include "control/CarlaEgoVehicleControl.h"
 
 /**
  * @namespace EDrive::control
@@ -53,7 +54,7 @@ class Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  virtual Result_state ComputeControlCommand() = 0;
+  virtual Result_state ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command) = 0;
 
   /**
    * @brief reset Controller

@@ -18,6 +18,9 @@ void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
       case ControlConf::LON_CONTROLLER:
         controller_list_.emplace_back(std::move(new LonController()));
         break;
+      case ControlConf::LAT_CONTROLLER:
+        ROS_WARN("    Lat controller not deployed yet");
+        break;
       default:
         ROS_ERROR("    Unknown active controller type: ");
     }
@@ -34,10 +37,10 @@ Result_state ControllerAgent::Init(const ControlConf *control_conf_) {
   return State_Ok;
 }
 
-Result_state ControllerAgent::ComputeControlCommand() {
+Result_state ControllerAgent::ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command) {
   for (auto &controller : controller_list_) {
     ros::Time start_timestamp = ros::Time::now();
-    controller->ComputeControlCommand();
+    controller->ComputeControlCommand(control_command);
     ros::Time end_timestamp = ros::Time::now();
   }
   return State_Ok;

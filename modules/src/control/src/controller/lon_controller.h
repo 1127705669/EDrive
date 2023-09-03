@@ -47,7 +47,7 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Result_state ComputeControlCommand() override;
+  Result_state ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command) override;
 
   /**
    * @brief reset Controller

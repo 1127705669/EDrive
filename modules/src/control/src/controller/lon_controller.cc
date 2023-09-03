@@ -31,7 +31,9 @@ Result_state LonController::Init(const ControlConf *control_conf) {
   const LonControllerConf &lon_controller_conf =
       control_conf_->lon_controller_conf();
 
+  ROS_INFO("      station pid controller init, staring...");
   station_pid_controller_.Init(lon_controller_conf.station_pid_conf());
+  ROS_INFO("      speed pid controller init, staring...");
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
   
   return State_Ok;
@@ -39,8 +41,8 @@ Result_state LonController::Init(const ControlConf *control_conf) {
 
 std::string LonController::Name() const { return name_; }
 
-Result_state LonController::ComputeControlCommand() {
-  // ComputeLongitudinalErrors(trajectory_analyzer_.get());
+Result_state LonController::ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command) {
+  ComputeLongitudinalErrors(trajectory_analyzer_.get());
   return State_Ok;
 }
 
