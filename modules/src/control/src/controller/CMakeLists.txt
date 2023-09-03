@@ -41,6 +41,7 @@ add_library(lon_controller SHARED ${LON_CONTROLLER_SRC})
 target_link_libraries(lon_controller 
   pid_controller
   trajectory_analyzer
+  vehicle_state_provider
 )
 
 ###################################

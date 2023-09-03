@@ -4,6 +4,8 @@
 
 #include "control/src/common/trajectory_analyzer.h"
 
+using EDrive::common::PathPoint;
+
 namespace EDrive {
 namespace control {
 
@@ -18,8 +20,10 @@ double PointDistanceSquare(const double x,
   return 0;
 }
 
-void TrajectoryAnalyzer::QueryMatchedPathPoint(const double x, 
+PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x, 
                                                const double y) const {
+  PathPoint p;
+  return p;
 }
 
 } // namespace control

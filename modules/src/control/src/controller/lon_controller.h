@@ -6,6 +6,7 @@
 
 #include "control/src/common/pid_controller.h"
 #include "control/src/common/trajectory_analyzer.h"
+#include "common/src/vehicle_state/vehicle_state_provider.h"
 
 #include "control/src/controller/controller.h"
 

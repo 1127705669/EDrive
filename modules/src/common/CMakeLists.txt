@@ -92,6 +92,7 @@ generate_messages(
   std_msgs
 )
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/proto)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/adapters)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/vehicle_state)
 
