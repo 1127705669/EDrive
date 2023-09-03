@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "control/proto/pid_conf.pb.h"
+
 namespace EDrive {
 namespace control {
 
@@ -18,14 +20,14 @@ class PIDController {
    * @brief initialize pid controller
    * @param pid_conf configuration for pid controller
    */
-  void Init();
+  void Init(const PidConf &pid_conf);
 
-  // /**
-  //  * @brief set pid controller coefficients for the proportional,
-  //  * integral, and derivative
-  //  * @param pid_conf configuration for pid controller
-  //  */
-  // void SetPID();
+  /**
+   * @brief set pid controller coefficients for the proportional,
+   * integral, and derivative
+   * @param pid_conf configuration for pid controller
+   */
+  void SetPID(const PidConf &pid_conf);
 
   /**
    * @brief reset variables for pid controller

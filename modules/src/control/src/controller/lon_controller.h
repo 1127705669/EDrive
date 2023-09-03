@@ -36,7 +36,7 @@ class LonController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Result_state Init() override;
+  Result_state Init(const ControlConf *control_conf) override;
 
    /**
    * @brief compute control command based on current vehicle status
@@ -74,6 +74,7 @@ class LonController : public Controller {
   PIDController speed_pid_controller_;
   PIDController station_pid_controller_;
   bool controller_initialized_ = false;
+  const ControlConf *control_conf_ = nullptr;
 
   std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
 

@@ -11,9 +11,9 @@
 namespace EDrive {
 namespace control {
 
-void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
+void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
   ROS_INFO("    Only Lon controllers as of now");
-  for (auto active_controller : control_conf->active_controllers()) {
+  for (auto active_controller : control_conf_->active_controllers()) {
     switch (active_controller) {
       case ControlConf::LON_CONTROLLER:
         controller_list_.emplace_back(std::move(new LonController()));
@@ -27,7 +27,7 @@ void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
 Result_state ControllerAgent::Init(const ControlConf *control_conf_) {
   RegisterControllers(control_conf_);
   for(auto &controller : controller_list_) {
-    if (controller == NULL || EDrive::State_Ok != controller->Init()) {
+    if (controller == NULL || EDrive::State_Ok != controller->Init(control_conf_)) {
       ROS_ERROR("    controller init failed!");
     }
   }

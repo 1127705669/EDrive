@@ -20,7 +20,20 @@ LonController::~LonController() {
   
 }
 
-Result_state LonController::Init() {
+Result_state LonController::Init(const ControlConf *control_conf) {
+  control_conf_ = control_conf;
+  if (control_conf_ == nullptr) {
+    controller_initialized_ = false;
+    ROS_ERROR("get_longitudinal_param() nullptr");
+    return State_Failed;
+  }
+
+  const LonControllerConf &lon_controller_conf =
+      control_conf_->lon_controller_conf();
+
+  station_pid_controller_.Init(lon_controller_conf.station_pid_conf());
+  speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
+  
   return State_Ok;
 }
 
