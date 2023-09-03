@@ -37,3 +37,9 @@ add_library(trajectory_analyzer SHARED
 )
 
 add_dependencies(trajectory_analyzer ${PROJECT_NAME}_generate_messages_cpp)
+
+target_link_libraries(trajectory_analyzer
+  ${PROTOBUF_LIBRARIES}
+  ${catkin_LIBRARIES}
+  common_proto
+)

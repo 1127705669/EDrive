@@ -5,6 +5,8 @@
 #include <ros/ros.h>
 #include "control/src/controller/lon_controller.h"
 
+using EDrive::common::VehicleStateProvider;
+
 namespace EDrive {
 namespace control {
 
@@ -73,6 +75,9 @@ void LonController::ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajecto
 
   double x;
   double y;
+  auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
+      VehicleStateProvider::instance()->x(),
+      VehicleStateProvider::instance()->y());
 }
 
 } // namespace control

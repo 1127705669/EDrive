@@ -7,6 +7,9 @@
 #include <vector>
 #include <ros/ros.h>
 
+#include "common/src/vehicle_state/vehicle_state_provider.h"
+
+#include "common/src/proto/pnc_point.pb.h"
 #include "planning/ADCTrajectory.h"
 
 namespace EDrive {
@@ -44,7 +47,7 @@ class TrajectoryAnalyzer {
    * @return a point on trajectory, the point may be a point of trajectory
    * or interpolated by two adjacent points of trajectory
    */
-  void QueryMatchedPathPoint(const double x, const double y) const;
+  common::PathPoint QueryMatchedPathPoint(const double x, const double y) const;
 
   /**
    * @brief convert a position with theta and speed to trajectory frame,
