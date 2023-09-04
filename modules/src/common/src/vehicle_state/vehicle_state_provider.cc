@@ -23,5 +23,11 @@ double VehicleStateProvider::yaw() const { return vehicle_state_.yaw(); }
 
 double VehicleStateProvider::heading() const { return vehicle_state_.heading(); }
 
+double VehicleStateProvider::linear_velocity() const { return vehicle_state_.linear_velocity(); }
+
+double VehicleStateProvider::angular_velocity() const { return vehicle_state_.angular_velocity(); }
+
+double VehicleStateProvider::linear_acceleration() const { return vehicle_state_.linear_acceleration(); }
+
 } // namespace common
 } // namespace EDrive

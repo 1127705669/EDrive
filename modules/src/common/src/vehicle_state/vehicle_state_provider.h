@@ -72,6 +72,24 @@ class VehicleStateProvider {
    */
   double heading() const;
 
+  /**
+   * @brief Get the vehicle's linear velocity.
+   * @return The vehicle's linear velocity.
+   */
+  double linear_velocity() const;
+
+  /**
+   * @brief Get the vehicle's angular velocity.
+   * @return The vehicle's angular velocity.
+   */
+  double angular_velocity() const;
+
+  /**
+   * @brief Get the vehicle's linear acceleration.
+   * @return The vehicle's linear acceleration.
+   */
+  double linear_acceleration() const;
+
  private:
   common::VehicleState vehicle_state_;
   DECLARE_SINGLETON(VehicleStateProvider);
