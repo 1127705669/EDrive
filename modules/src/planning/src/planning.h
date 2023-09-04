@@ -7,6 +7,7 @@
 #include <string>
 #include "common/src/EDrive.h"
 #include "common/src/state.h"
+#include "planning/ADCTrajectory.h"
 
 namespace EDrive {
 namespace planning {

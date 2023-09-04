@@ -50,6 +50,9 @@ namespace adapter {
                                                                                \
     if (config.mode() != AdapterConfig::PUBLISH_ONLY) {                        \
       ROS_INFO("    registering subscriber: %s", topic_name.c_str());          \
+      name##subscriber_ =                                                      \
+          node_handle_->subscribe(topic_name, config.message_history_limit(),  \
+                                  &name##Adapter::RosCallback, name##_.get()); \
     }                                                                          \
     if (config.mode() != AdapterConfig::RECEIVE_ONLY) {                        \
       ROS_INFO("    registering publisher: %s", topic_name.c_str());           \
