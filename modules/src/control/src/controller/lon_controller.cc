@@ -78,6 +78,13 @@ void LonController::ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajecto
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
       VehicleStateProvider::instance()->x(),
       VehicleStateProvider::instance()->y());
+
+  trajectory_analyzer->ToTrajectoryFrame(
+      VehicleStateProvider::instance()->x(),
+      VehicleStateProvider::instance()->y(),
+      VehicleStateProvider::instance()->heading(),
+      VehicleStateProvider::instance()->linear_velocity(), matched_point,
+      &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
 }
 
 } // namespace control

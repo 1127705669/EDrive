@@ -154,7 +154,7 @@ add_library(EDrive_app SHARED ${EDRIVE_APP})
 catkin_package(
 #  INCLUDE_DIRS include
  LIBRARIES EDrive_app adapters adapter_proto
- CATKIN_DEPENDS roscpp std_msgs control planning
+ CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
 )
 

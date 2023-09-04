@@ -63,11 +63,12 @@ class TrajectoryAnalyzer {
    * @param ptr_d_dot lateral speed
    */
   void ToTrajectoryFrame(const double x, const double y, const double theta,
+                         const double v, const common::PathPoint &matched_point,
                          double *ptr_s, double *ptr_s_dot, double *ptr_d,
                          double *ptr_d_dot) const;
 
  private:
-  // std::vector<control_msg::TrajectoryPoint> trajectory_points_;
+  std::vector<common::TrajectoryPoint> trajectory_points_;
 };
 
 } // namespace control

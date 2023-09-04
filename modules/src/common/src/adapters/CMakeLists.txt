@@ -5,8 +5,6 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  control
-  planning
 )
 
 include_directories(
