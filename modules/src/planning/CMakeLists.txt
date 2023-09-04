@@ -90,6 +90,7 @@ endforeach()
 generate_messages(
   DEPENDENCIES
   std_msgs
+  common
 )
 
 ################################################

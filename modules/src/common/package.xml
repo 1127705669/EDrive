@@ -54,8 +54,6 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>geometry_msgs</build_depend>
-  <build_depend>planning</build_depend>
-  <build_depend>control</build_depend>
 
   <build_export_depend>message_generation</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
@@ -67,8 +65,6 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>planning</exec_depend>
-  <exec_depend>control</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

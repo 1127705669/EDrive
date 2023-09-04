@@ -3,7 +3,7 @@
  float64 total_path_time # in seconds
 
 #   # path data + speed data
-#  TrajectoryPoint trajectory_point
+ common/TrajectoryPoint trajectory_point
 
 #  EStop estop
 
