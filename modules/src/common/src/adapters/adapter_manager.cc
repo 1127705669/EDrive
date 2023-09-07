@@ -20,6 +20,12 @@ namespace adapter {
 
 AdapterManager::AdapterManager() {}
 
+void AdapterManager::Observe() {
+  for (const auto observe : instance()->observers_) {
+    observe();
+  }
+}
+
 bool AdapterManager::Initialized() { return instance()->initialized_; }
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {

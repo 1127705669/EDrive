@@ -35,7 +35,20 @@ Result_state Control::Init(){
   return State_Ok;
 }
 
+Result_state Control::CheckInput() {
+  AdapterManager::Observe();
+  auto trajectory_adapter = AdapterManager::GetPlanning();
+  trajectory_ = trajectory_adapter->GetLatestObserved();
+  return State_Ok;
+}
+
 Result_state Control::Start(){
+  // set initial vehicle state by cmd
+  // need to sleep, because advertised channel is not ready immediately
+  // simple test shows a short delay of 80 ms or so
+  ROS_INFO("Control resetting vehicle state, sleeping for 1000 ms ...");
+  ros::Duration(1.0).sleep();
+
   timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(control_conf_.control_period()), 
                                                                 &Control::OnTimer,
                                                                 this);
@@ -45,9 +58,11 @@ Result_state Control::Start(){
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {
+  Result_state status = CheckInput();
+
   ros::Time start_timestamp = ros::Time::now();
   ::control::CarlaEgoVehicleControl control_command;
-  Result_state status = ProduceControlCommand(&control_command);
+  status = ProduceControlCommand(&control_command);
   ros::Time end_timestamp = ros::Time::now();
   SendCmd(&control_command);
 }
