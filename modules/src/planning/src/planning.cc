@@ -34,9 +34,8 @@ void Planning::RunOnce() {
   
   state = RegisterPlanners();
 
-  ADCTrajectory* trajectory_pb;
-  trajectory_pb->total_path_length = 10.0;
-  PublishPlanningPb(trajectory_pb);
+  ADCTrajectory trajectory_pb;
+  PublishPlanningPb(&trajectory_pb);
 }
 
 Result_state Planning::Init(){
