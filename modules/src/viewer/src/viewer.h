@@ -12,6 +12,8 @@
 #include "common/src/EDrive.h"
 #include "common/src/state.h"
 
+#include "planning/ADCTrajectory.h"
+
 namespace EDrive {
 namespace viewer {
 
@@ -25,6 +27,20 @@ class Viewer : public EDrive::common::EDriveApp {
   EDrive::Result_state Start() override;
 
   void Stop() override;
+
+ private:
+  // Watch dog timer
+  void OnTimer(const ros::TimerEvent &);
+
+  EDrive::Result_state CheckInput();
+
+  ros::Timer timer_;
+  const double viewer_period = 0.01;
+  planning::ADCTrajectory trajectory_;
+
+  std::string root_path;
+  std::string adapter_conf_file = "/src/viewer/conf/adapter.conf";
+  std::string viewer_conf_file = "/src/viewer/conf/viewer.conf";
 };
 
 } // namespace viewer

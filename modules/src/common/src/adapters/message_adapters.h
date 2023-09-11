@@ -9,6 +9,7 @@
 #include "control/ControlCommand.h"
 #include "control/CarlaEgoVehicleControl.h"
 #include "planning/ADCTrajectory.h"
+#include "viewer/VisualizingData.h"
 
 /**
  * @file message_adapters.h
@@ -22,6 +23,7 @@ namespace adapter {
 
 using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
+using ViewerAdapter = Adapter<::viewer::VisualizingData>;
 
 } // namespace adapter
 } // namespace common
