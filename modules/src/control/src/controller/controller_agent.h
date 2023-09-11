@@ -10,6 +10,8 @@
 #include "control/proto/control_conf.pb.h"
 #include "control/CarlaEgoVehicleControl.h"
 
+#include "planning/ADCTrajectory.h"
+
 namespace EDrive {
 namespace control {
 
@@ -29,7 +31,7 @@ class ControllerAgent {
    */
   Result_state Init(const ControlConf *control_conf_);
 
-  Result_state ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command);
+  Result_state ComputeControlCommand(const ::planning::ADCTrajectory *trajectory,::control::CarlaEgoVehicleControl *control_command);
 
  private:
   /**

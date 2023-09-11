@@ -32,9 +32,12 @@ namespace adapter {
   static void Enable##name(const std::string &topic_name,                      \
                            const AdapterConfig &config) {                      \
     if(config.message_history_limit() <= 0){                                   \
-      ROS_ERROR("Message history limit must be greater than 0");               \
+      ROS_ERROR("    Message history limit must be greater than 0");           \
     }                                                                          \
     instance()->InternalEnable##name(topic_name, config);                      \
+  }                                                                            \
+  static name##Adapter *Get##name() {                                          \
+    return instance()->InternalGet##name();                                    \
   }                                                                            \
   static void Publish##name(const name##Adapter::DataType &data) {             \
     instance()->InternalPublish##name(data);                                   \
@@ -45,9 +48,11 @@ namespace adapter {
   ros::Subscriber name##subscriber_;                                           \
   AdapterConfig name##config_;                                                 \
                                                                                \
+  name##Adapter *InternalGet##name() { return name##_.get(); }                 \
   void InternalEnable##name(const std::string &topic_name,                     \
                             const AdapterConfig &config) {                     \
-                                                                               \
+    name##_.reset(                                                             \
+        new name##Adapter(#name, topic_name, config.message_history_limit())); \
     if (config.mode() != AdapterConfig::PUBLISH_ONLY) {                        \
       ROS_INFO("    registering subscriber: %s", topic_name.c_str());          \
       name##subscriber_ =                                                      \
@@ -59,6 +64,8 @@ namespace adapter {
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
                topic_name, config.message_history_limit(), config.latch());    \
     }                                                                          \
+    observers_.push_back([this]() { name##_->Observe(); });                    \
+    name##config_ = config;                                                    \
   }                                                                            \
   void InternalPublish##name(const name##Adapter::DataType &data) {            \
     /* Only publish ROS msg if node handle is initialized. */                  \

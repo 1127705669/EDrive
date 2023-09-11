@@ -9,7 +9,6 @@
 
 #include "common/src/vehicle_state/vehicle_state_provider.h"
 
-#include "common/src/proto/pnc_point.pb.h"
 #include "planning/ADCTrajectory.h"
 
 namespace EDrive {
@@ -47,7 +46,7 @@ class TrajectoryAnalyzer {
    * @return a point on trajectory, the point may be a point of trajectory
    * or interpolated by two adjacent points of trajectory
    */
-  common::PathPoint QueryMatchedPathPoint(const double x, const double y) const;
+  ::common::PathPoint QueryMatchedPathPoint(const double x, const double y) const;
 
   /**
    * @brief convert a position with theta and speed to trajectory frame,
@@ -63,12 +62,12 @@ class TrajectoryAnalyzer {
    * @param ptr_d_dot lateral speed
    */
   void ToTrajectoryFrame(const double x, const double y, const double theta,
-                         const double v, const common::PathPoint &matched_point,
+                         const double v, const ::common::PathPoint &matched_point,
                          double *ptr_s, double *ptr_s_dot, double *ptr_d,
                          double *ptr_d_dot) const;
 
  private:
-  std::vector<common::TrajectoryPoint> trajectory_points_;
+  std::vector<::common::TrajectoryPoint> trajectory_points_;
 };
 
 } // namespace control

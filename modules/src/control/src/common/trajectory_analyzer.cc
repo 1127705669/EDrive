@@ -4,27 +4,26 @@
 
 #include "control/src/common/trajectory_analyzer.h"
 
-using EDrive::common::PathPoint;
-using EDrive::common::TrajectoryPoint;
+using ::common::PathPoint;
+using ::common::TrajectoryPoint;
 
 namespace EDrive {
 namespace control {
 
-TrajectoryAnalyzer::TrajectoryAnalyzer(
-    const planning::ADCTrajectory *planning_published_trajectory) {
+TrajectoryAnalyzer::TrajectoryAnalyzer(const planning::ADCTrajectory *planning_published_trajectory) {
 
-  // for (int i = 0; i < planning_published_trajectory->trajectory_point_size();
-  //      ++i) {
-  //   trajectory_points_.push_back(
-  //       planning_published_trajectory->trajectory_point(i));
-  // }
+  for (int i = 0; i < planning_published_trajectory->trajectory_point.size();
+       ++i) {
+    trajectory_points_.push_back(
+        planning_published_trajectory->trajectory_point[i]);
+  }
 }
 
 // Squared distance from the point to (x, y).
 double PointDistanceSquare(const TrajectoryPoint &point, const double x,
                            const double y) {
-  const double dx = point.path_point().x() - x;
-  const double dy = point.path_point().y() - y;
+  const double dx = point.path_point.x - x;
+  const double dy = point.path_point.y - y;
   return dx * dx + dy * dy;
 }
 
@@ -46,18 +45,18 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
 
 PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
                                                const double y) const {
-  // double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
-  // size_t index_min = 0;
+  double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
+  size_t index_min = 0;
 
-  // for (size_t i = 1; i < trajectory_points_.size(); ++i) {
-  //   double d_temp = PointDistanceSquare(trajectory_points_[i], x, y);
-  //   if (d_temp < d_min) {
-  //     d_min = d_temp;
-  //     index_min = i;
-  //   }
-  // }
-  PathPoint p;
-  return p;
+  for (size_t i = 1; i < trajectory_points_.size(); ++i) {
+    double d_temp = PointDistanceSquare(trajectory_points_[i], x, y);
+    if (d_temp < d_min) {
+      d_min = d_temp;
+      index_min = i;
+    }
+  }
+
+  return trajectory_points_[index_min].path_point;
 }
 
 } // namespace control

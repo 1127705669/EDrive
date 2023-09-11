@@ -19,6 +19,8 @@
 
 #include "control/proto/control_conf.pb.h"
 
+#include "planning/ADCTrajectory.h"
+
 namespace EDrive {
 namespace control {
 
@@ -42,6 +44,8 @@ class Control : public EDrive::common::EDriveApp {
  // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
+  EDrive::Result_state CheckInput();
+
   void SendCmd(::control::CarlaEgoVehicleControl *control_command);
 
   Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
@@ -50,6 +54,7 @@ class Control : public EDrive::common::EDriveApp {
   ros::Time init_time_;
   ControllerAgent controller_agent_;
   ControlConf control_conf_;
+  planning::ADCTrajectory trajectory_;
 
   std::string root_path;
   std::string adapter_conf_file = "/src/control/conf/adapter.conf";
