@@ -68,7 +68,7 @@ void Control::OnTimer(const ros::TimerEvent &) {
 }
 
 Result_state Control::ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command) {
-  if(State_Ok != controller_agent_.ComputeControlCommand(control_command)) {
+  if(State_Ok != controller_agent_.ComputeControlCommand(&trajectory_, control_command)) {
     ROS_INFO("controller agent compute control command failed, stopping...");
   }
   return State_Ok;

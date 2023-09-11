@@ -10,8 +10,8 @@ namespace EDrive {
 namespace planning {
 
 using EDrive::Result_state;
-using ::planning::ADCTrajectory;
 using EDrive::common::adapter::AdapterManager;
+using ::planning::ADCTrajectory;
 
 Planning::~Planning() { Stop(); }
 
@@ -35,6 +35,12 @@ void Planning::RunOnce() {
   state = RegisterPlanners();
 
   ADCTrajectory trajectory_pb;
+  
+  for(int i = 0; i < 180; i++) {
+    ::common::TrajectoryPoint trajectory_point_;
+    trajectory_pb.trajectory_point.push_back(trajectory_point_);
+  }
+
   PublishPlanningPb(&trajectory_pb);
 }
 
@@ -50,6 +56,8 @@ Result_state Planning::Init(){
     AdapterManager::Init(adapter_conf_file);
   }
 
+  ROS_INFO("Planning init done!");
+  ROS_INFO("Planning started");
   return State_Ok;
 }
 
@@ -69,5 +77,5 @@ void Planning::OnTimer(const ros::TimerEvent &) {
   RunOnce();
 }
 
-} // planning
-} // EDrive
+} // namespace planning
+} // namespace EDrive

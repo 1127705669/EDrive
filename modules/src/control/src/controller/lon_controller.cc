@@ -43,7 +43,8 @@ Result_state LonController::Init(const ControlConf *control_conf) {
 
 std::string LonController::Name() const { return name_; }
 
-Result_state LonController::ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command) {
+Result_state LonController::ComputeControlCommand(const ::planning::ADCTrajectory *trajectory, ::control::CarlaEgoVehicleControl *control_command) {
+  trajectory_message_ = trajectory;
   if (trajectory_analyzer_ == nullptr) {
     trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory_message_));
   }

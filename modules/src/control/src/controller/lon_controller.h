@@ -10,8 +10,6 @@
 
 #include "control/src/controller/controller.h"
 
-#include "planning/ADCTrajectory.h"
-
 namespace EDrive {
 namespace control {
 
@@ -50,7 +48,7 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Result_state ComputeControlCommand(::control::CarlaEgoVehicleControl *control_command) override;
+  Result_state ComputeControlCommand(const ::planning::ADCTrajectory *trajectory, ::control::CarlaEgoVehicleControl *control_command) override;
 
   /**
    * @brief reset Controller
