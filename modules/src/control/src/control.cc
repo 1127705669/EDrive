@@ -14,7 +14,7 @@ namespace control {
 using EDrive::Result_state;
 using EDrive::common::adapter::AdapterManager;
 
-std::string Control::Name() const { return "control"; }
+std::string Control::Name() const { return "EDrive_control"; }
 
 Result_state Control::Init(){
   ROS_INFO("Control init, starting...");

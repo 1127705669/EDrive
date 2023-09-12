@@ -18,7 +18,7 @@ namespace viewer {
 using EDrive::Result_state;
 using EDrive::common::adapter::AdapterManager;
 
-std::string Viewer::Name() const { return "viewer"; }
+std::string Viewer::Name() const { return "EDrive_viewer"; }
 
 Result_state Viewer::CheckInput() {
   // snapshot all coming data
@@ -26,10 +26,11 @@ Result_state Viewer::CheckInput() {
 
   auto trajectory_adapter = AdapterManager::GetPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
+  
   return State_Ok;
 }
 
-EDrive::Result_state Viewer::Init(){
+Result_state Viewer::Init(){
   ROS_INFO("Viewer init, starting...");
 
   root_path = EDrive::common::util::GetRootPath();
@@ -42,7 +43,13 @@ EDrive::Result_state Viewer::Init(){
   return State_Ok;
 }
 
-EDrive::Result_state Viewer::Start(){
+Result_state Viewer::Start(){
+  // set initial vehicle state by cmd
+  // need to sleep, because advertised channel is not ready immediately
+  // simple test shows a short delay of 80 ms or so
+  ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
+  ros::Duration(1.0).sleep();
+
   timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(viewer_period), 
                                                               &Viewer::OnTimer,
                                                               this);
@@ -57,6 +64,7 @@ void Viewer::Stop() {
 
 void Viewer::OnTimer(const ros::TimerEvent &) {
   ros::Time begin = ros::Time::now();
+  Result_state state = CheckInput();
 }
 
 } // namespace viewer

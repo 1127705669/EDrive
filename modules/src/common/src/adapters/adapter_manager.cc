@@ -54,6 +54,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning("/EDrive/planning", config);
         break;
+      case AdapterConfig::VIEWER:
+        EnableViewer("/EDrive/viewer", config);
+        break;
       default:
         ROS_INFO("Unknown adapter config type!");
         break;

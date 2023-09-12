@@ -7,6 +7,7 @@ message AdapterConfig {
   enum MessageType {
     PLANNING_TRAJECTORY = 1;
     CONTROL_COMMAND = 2;
+    VIEWER = 3;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
