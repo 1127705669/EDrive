@@ -94,6 +94,11 @@ generate_messages(
   std_msgs
 )
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/common)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/visual_component)
+
+
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
@@ -175,6 +180,8 @@ add_dependencies(viewer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TA
 target_link_libraries(viewer_lib
   ${catkin_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
+  viewer_common
+  visual_component
   EDrive_app
   adapters
 )
