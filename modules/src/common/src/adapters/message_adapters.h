@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <nav_msgs/Odometry.h>
 // #include "control/proto/control_cmd.pb.h"
 #include "common/src/adapters/adapter.h"
 #include "control/ControlCommand.h"
@@ -24,6 +25,7 @@ namespace adapter {
 using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 using ViewerAdapter = Adapter<::viewer::VisualizingData>;
+using VehicleAdapter = Adapter<nav_msgs::Odometry>;
 
 } // namespace adapter
 } // namespace common

@@ -8,6 +8,7 @@ message AdapterConfig {
     PLANNING_TRAJECTORY = 1;
     CONTROL_COMMAND = 2;
     VIEWER = 3;
+    VEHICLE_DATA = 4;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

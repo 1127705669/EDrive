@@ -57,6 +57,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::VIEWER:
         EnableViewer("/EDrive/viewer", config);
         break;
+      case AdapterConfig::VEHICLE_DATA:
+        EnableVehicle("/carla/ego_vehicle/odometry", config);
+        break;
       default:
         ROS_INFO("Unknown adapter config type!");
         break;
