@@ -17,3 +17,15 @@ set(VIEWER_MANAGER_SRC
 )
 
 add_library(viewer_common SHARED ${VIEWER_MANAGER_SRC})
+
+set(VIEWER_AGENT_SRC
+  viewer_agent.cc
+)
+
+add_library(viewer_agent SHARED ${VIEWER_AGENT_SRC})
+
+target_link_libraries(viewer_agent 
+  ${PROTOBUF_LIBRARIES}
+  ${catkin_LIBRARIES}
+  viewer_proto
+)

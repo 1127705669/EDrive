@@ -5,6 +5,7 @@
 #pragma once
 
 #include "common/src/state.h"
+#include "viewer/proto/viewer_conf.pb.h"
 
 namespace EDrive {
 namespace viewer {
@@ -15,6 +16,13 @@ namespace viewer {
  */
 class ViewerBase {
  public:
+
+  /**
+   * @brief initialize Controller
+   * @param control_conf control configurations
+   * @return Status initialization status
+   */
+  virtual Result_state Init(const ViewerConf *viewer_conf_) = 0;
   
   virtual ~ViewerBase() = default;
 
@@ -23,8 +31,6 @@ class ViewerBase {
   virtual EDrive::Result_state PublishVisualizationData() = 0;
   
  protected:
-  
-  virtual EDrive::Result_state Init() = 0;
 
   virtual void Stop();
 

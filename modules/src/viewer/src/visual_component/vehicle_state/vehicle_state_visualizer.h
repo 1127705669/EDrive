@@ -17,6 +17,11 @@ namespace viewer {
 
 class Vehicle_state : public EDrive::viewer::ViewerBase {
  public:
+/**
+   * @brief 
+   */
+  Vehicle_state();
+  
 
   /**
    * @brief 
@@ -31,7 +36,7 @@ class Vehicle_state : public EDrive::viewer::ViewerBase {
   /**
   * @brief 
   */
-  EDrive::Result_state Init() override;
+  EDrive::Result_state Init(const ViewerConf *viewer_conf_) override;
 
   /**
   * @brief 

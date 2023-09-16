@@ -6,6 +6,7 @@
 #include "viewer/src/viewer.h"
 
 #include "common/src/adapters/adapter_manager.h"
+#include "viewer/src/common/viewer_agent.h"
 #include "common/src/util/file.h"
 
 #include <sensor_msgs/Image.h>
@@ -39,6 +40,12 @@ Result_state Viewer::Init(){
 
   ROS_INFO("  registering node: %s", Name().c_str());
   AdapterManager::Init(adapter_conf_file);
+
+  ROS_INFO("  viewer init, starting...");
+  EDrive::common::util::GetProtoFromASIIFile(viewer_conf_file, &viewer_conf_);
+  if(State_Ok != viewer_agent_.Init(&viewer_conf_)) {
+    ROS_ERROR("    controller agent init failed, stopping...");
+  }
 
   return State_Ok;
 }

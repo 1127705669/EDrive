@@ -31,7 +31,7 @@ endforeach()
 
 set_source_files_properties(${MESSAGE_SRC} ${MESSAGE_HDRS} PROPERTIES GENERATED TRUE)
 
-add_custom_target(generate_viewer_common_proto_message ALL
+add_custom_target(generate_viewer_proto_message ALL
   DEPENDS ${MESSAGE_SRC} ${MESSAGE_HDRS}
   COMMENT "generate Protocol Buffer target"
   VERBATIM
@@ -41,4 +41,13 @@ include_directories(
 include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+set(VIEWER_PROTO_SRC 
+  viewer_conf.pb.cc
+)
+
+add_library(viewer_proto SHARED ${VIEWER_PROTO_SRC})
+
+target_link_libraries(viewer_proto PRIVATE ${PROTOBUF_LIBRARIES})
