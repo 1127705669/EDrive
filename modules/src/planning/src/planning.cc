@@ -15,7 +15,7 @@ using ::planning::ADCTrajectory;
 
 Planning::~Planning() { Stop(); }
 
-std::string Planning::Name() const { return "planning"; }
+std::string Planning::Name() const { return "EDrive_planning"; }
 
 void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb) {
   Publish(trajectory_pb);

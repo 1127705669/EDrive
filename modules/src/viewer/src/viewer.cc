@@ -4,6 +4,11 @@
 
 #include <ros/ros.h>
 #include "viewer/src/viewer.h"
+
+#include "common/src/adapters/adapter_manager.h"
+#include "viewer/src/common/viewer_agent.h"
+#include "common/src/util/file.h"
+
 #include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -11,42 +16,62 @@
 namespace EDrive {
 namespace viewer {
 
-void imageCallback(const sensor_msgs::Image::ConstPtr& msg)
-{
-    // 在这里处理深度图像消息
-    cv_bridge::CvImagePtr cv_ptr;
-    try
-    {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
-    }
-    catch (cv_bridge::Exception& e)
-    {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
-    }
+using EDrive::Result_state;
+using EDrive::common::adapter::AdapterManager;
 
-    // 显示深度图像
-    cv::imshow("Depth Image", cv_ptr->image);
-    cv::waitKey(1);
-}
+std::string Viewer::Name() const { return "EDrive_viewer"; }
 
-std::string Viewer::Name() const { return "viewer"; }
+Result_state Viewer::CheckInput() {
+  // snapshot all coming data
+  AdapterManager::Observe();
 
-EDrive::Result_state Viewer::Init(){
-  ros::NodeHandle nh;
-
-  ros::Subscriber sub = nh.subscribe<sensor_msgs::Image>("/carla/ego_vehicle/rgb_front/image", 1, imageCallback);
-
-  ros::spin();
+  auto trajectory_adapter = AdapterManager::GetPlanning();
+  trajectory_ = trajectory_adapter->GetLatestObserved();
+  
   return State_Ok;
 }
 
-EDrive::Result_state Viewer::Start(){
+Result_state Viewer::Init(){
+  ROS_INFO("Viewer init, starting...");
+
+  root_path = EDrive::common::util::GetRootPath();
+  adapter_conf_file = root_path + adapter_conf_file;
+  viewer_conf_file = root_path + viewer_conf_file;
+
+  ROS_INFO("  registering node: %s", Name().c_str());
+  AdapterManager::Init(adapter_conf_file);
+
+  ROS_INFO("  viewer init, starting...");
+  EDrive::common::util::GetProtoFromASIIFile(viewer_conf_file, &viewer_conf_);
+  if(State_Ok != viewer_agent_.Init(&viewer_conf_)) {
+    ROS_ERROR("    controller agent init failed, stopping...");
+  }
+
+  return State_Ok;
+}
+
+Result_state Viewer::Start(){
+  // set initial vehicle state by cmd
+  // need to sleep, because advertised channel is not ready immediately
+  // simple test shows a short delay of 80 ms or so
+  ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
+  ros::Duration(1.0).sleep();
+
+  timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(viewer_period), 
+                                                              &Viewer::OnTimer,
+                                                              this);
+  ROS_INFO("Viewer init done!");
+  ROS_INFO("Viewer started");
   return State_Ok;
 }
 
 void Viewer::Stop() {
   
+}
+
+void Viewer::OnTimer(const ros::TimerEvent &) {
+  ros::Time begin = ros::Time::now();
+  Result_state state = CheckInput();
 }
 
 } // namespace viewer

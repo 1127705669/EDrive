@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package EDrive.viewer;
+
+message ViewerConf {
+  enum ViewerType {
+    ENV_VIEWER = 0;
+    PLA_VIEWER = 1;
+    VEHSTA_VIEWER = 2;
+  };
+
+  optional double viewer_period = 1;
+  repeated ViewerType active_viewers = 2;
+}

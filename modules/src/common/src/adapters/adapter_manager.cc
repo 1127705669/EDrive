@@ -52,7 +52,13 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableControlCommand("/carla/ego_vehicle/vehicle_control_cmd", config);
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
-        EnablePlanning("planning", config);
+        EnablePlanning("/EDrive/planning", config);
+        break;
+      case AdapterConfig::VIEWER:
+        EnableViewer("/EDrive/viewer", config);
+        break;
+      case AdapterConfig::VEHICLE_DATA:
+        EnableVehicle("/carla/ego_vehicle/odometry", config);
         break;
       default:
         ROS_INFO("Unknown adapter config type!");

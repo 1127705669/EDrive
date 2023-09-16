@@ -20,7 +20,7 @@ class EDriveApp {
   virtual int Spin();
 
   // virtual ~EDriveApp() = default;
-  // virtual void Stop() = 0;
+  
 
   uint32_t callback_thread_num_ = 1;
 
