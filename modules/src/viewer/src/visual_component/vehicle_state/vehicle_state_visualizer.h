@@ -5,6 +5,7 @@
 #pragma once
 
 #include "viewer/src/common/viewer_manager.h"
+#include <nav_msgs/Odometry.h>
 
 
 /**
@@ -42,6 +43,14 @@ class Vehicle_state : public EDrive::viewer::ViewerBase {
   * @brief 
   */
   void Stop() override;
+
+  /**
+  * @brief 
+  */
+  EDrive::Result_state Visualize(const nav_msgs::Odometry *location_) override;
+
+ private:
+  std::unique_ptr<nav_msgs::Odometry> location_message_;
 
 };
 

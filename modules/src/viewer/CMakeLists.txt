@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   sensor_msgs
+  visualization_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -92,6 +93,7 @@ endforeach()
 generate_messages(
   DEPENDENCIES
   std_msgs
+  visualization_msgs
 )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)

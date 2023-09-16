@@ -28,5 +28,22 @@ EDrive::Result_state Vehicle_state::PublishVisualizationData() {
 void Vehicle_state::Stop() {
 }
 
+EDrive::Result_state Vehicle_state::Visualize(const nav_msgs::Odometry *location_){
+  Result_state state = State_Failed;
+  location_message_.reset(new nav_msgs::Odometry(*location_));
+
+  state = InterfaceMatch();
+  if(State_Ok != state){
+
+  }
+
+  state = PublishVisualizationData();
+  if(State_Ok != state){
+
+  }
+
+  return state;
+}
+
 } // namespace viewer
 } // namespace EDrive

@@ -27,6 +27,9 @@ Result_state Viewer::CheckInput() {
 
   auto trajectory_adapter = AdapterManager::GetPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
+
+  auto location_adapter = AdapterManager::GetVehicle();
+  location_ = location_adapter->GetLatestObserved();
   
   return State_Ok;
 }
@@ -57,7 +60,7 @@ Result_state Viewer::Start(){
   ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
   ros::Duration(1.0).sleep();
 
-  timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(viewer_period), 
+  timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(viewer_conf_.viewer_period()), 
                                                               &Viewer::OnTimer,
                                                               this);
   ROS_INFO("Viewer init done!");
@@ -72,6 +75,9 @@ void Viewer::Stop() {
 void Viewer::OnTimer(const ros::TimerEvent &) {
   ros::Time begin = ros::Time::now();
   Result_state state = CheckInput();
+  if(State_Ok != viewer_agent_.Visualize(&location_)) {
+    ROS_INFO("visualize failed, stopping...");
+  }
 }
 
 } // namespace viewer

@@ -6,6 +6,7 @@
 
 #include "common/src/state.h"
 #include "viewer/proto/viewer_conf.pb.h"
+#include <nav_msgs/Odometry.h>
 
 namespace EDrive {
 namespace viewer {
@@ -29,6 +30,8 @@ class ViewerBase {
   virtual EDrive::Result_state InterfaceMatch() = 0;
 
   virtual EDrive::Result_state PublishVisualizationData() = 0;
+
+  virtual EDrive::Result_state Visualize(const nav_msgs::Odometry *location_) = 0;
   
  protected:
 
