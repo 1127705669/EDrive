@@ -29,3 +29,5 @@ target_link_libraries(viewer_agent
   ${catkin_LIBRARIES}
   viewer_proto
 )
+
+add_dependencies(viewer_agent ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
