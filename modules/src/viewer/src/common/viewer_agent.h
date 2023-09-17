@@ -9,6 +9,7 @@
 #include "viewer/src/common/viewer_manager.h"
 #include "viewer/proto/viewer_conf.pb.h"
 #include <nav_msgs/Odometry.h>
+#include "viewer/VisualizingData.h"
 
 namespace EDrive {
 namespace viewer {
@@ -27,7 +28,7 @@ class ViewerAgent {
    */
   Result_state Init(const ViewerConf *viewer_conf_);
 
-  Result_state Visualize(const nav_msgs::Odometry *location_);
+  Result_state Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_);
 
  private:
   /**

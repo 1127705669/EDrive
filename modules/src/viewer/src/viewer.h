@@ -19,6 +19,7 @@
 
 #include "planning/ADCTrajectory.h"
 #include <nav_msgs/Odometry.h>
+#include "viewer/VisualizingData.h"
 
 namespace EDrive {
 namespace viewer {
@@ -39,6 +40,8 @@ class Viewer : public EDrive::common::EDriveApp {
   void OnTimer(const ros::TimerEvent &);
 
   EDrive::Result_state CheckInput();
+
+  void SendData(const ::viewer::VisualizingData *visualizing_data_);
 
   ViewerAgent viewer_agent_;
 

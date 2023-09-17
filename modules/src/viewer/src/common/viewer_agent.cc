@@ -32,10 +32,10 @@ Result_state ViewerAgent::Init(const ViewerConf *viewer_conf_) {
   return State_Ok;
 }
 
-Result_state ViewerAgent::Visualize(const nav_msgs::Odometry *location_) {
+Result_state ViewerAgent::Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_) {
   for (auto &viwer : viewer_list_) {
     ros::Time start_timestamp = ros::Time::now();
-    viwer->Visualize(location_);
+    viwer->Visualize(location_, visualizing_data_);
     ros::Time end_timestamp = ros::Time::now();
   }
   return State_Ok;

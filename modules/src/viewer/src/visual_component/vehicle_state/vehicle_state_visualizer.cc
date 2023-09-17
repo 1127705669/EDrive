@@ -28,9 +28,10 @@ EDrive::Result_state Vehicle_state::PublishVisualizationData() {
 void Vehicle_state::Stop() {
 }
 
-EDrive::Result_state Vehicle_state::Visualize(const nav_msgs::Odometry *location_){
+EDrive::Result_state Vehicle_state::Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_){
   Result_state state = State_Failed;
   location_message_.reset(new nav_msgs::Odometry(*location_));
+  visualizing_message_.reset(new ::viewer::VisualizingData(*visualizing_data_));
 
   state = InterfaceMatch();
   if(State_Ok != state){

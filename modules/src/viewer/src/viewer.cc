@@ -75,9 +75,16 @@ void Viewer::Stop() {
 void Viewer::OnTimer(const ros::TimerEvent &) {
   ros::Time begin = ros::Time::now();
   Result_state state = CheckInput();
-  if(State_Ok != viewer_agent_.Visualize(&location_)) {
+  ::viewer::VisualizingData visualizing_data_;
+  if(State_Ok != viewer_agent_.Visualize(&location_, &visualizing_data_)) {
     ROS_INFO("visualize failed, stopping...");
   }
+
+  SendData(&visualizing_data_);
+}
+
+void Viewer::SendData(const ::viewer::VisualizingData *visualizing_data_) {
+  AdapterManager::PublishViewer(*visualizing_data_);
 }
 
 } // namespace viewer
