@@ -24,7 +24,7 @@ class ViewerBase {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  virtual Result_state Init(const ViewerConf *viewer_conf_) = 0;
+  virtual Result_state Init(const ViewerConf *viewer_conf) = 0;
   
   virtual ~ViewerBase() = default;
 
@@ -32,7 +32,7 @@ class ViewerBase {
 
   virtual EDrive::Result_state PublishVisualizationData() = 0;
 
-  virtual EDrive::Result_state Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_) = 0;
+  virtual EDrive::Result_state Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data) = 0;
   
  protected:
 

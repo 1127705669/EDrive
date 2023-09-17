@@ -26,9 +26,9 @@ class ViewerAgent {
    * @param viewer_conf_ control configurations
    * @return Status initialization status
    */
-  Result_state Init(const ViewerConf *viewer_conf_);
+  Result_state Init(const ViewerConf *viewer_conf);
 
-  Result_state Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_);
+  Result_state Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data);
 
  private:
   /**

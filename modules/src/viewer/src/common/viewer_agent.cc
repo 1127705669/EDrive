@@ -10,8 +10,8 @@
 namespace EDrive {
 namespace viewer {
 
-void ViewerAgent::RegisterControllers(const ViewerConf *viewer_conf_) {
-  for (auto active_viewer : viewer_conf_->active_viewers()) {
+void ViewerAgent::RegisterControllers(const ViewerConf *viewer_conf) {
+  for (auto active_viewer : viewer_conf->active_viewers()) {
     switch (active_viewer) {
       case ViewerConf::VEHSTA_VIEWER:
         viewer_list_.emplace_back(std::move(new Vehicle_state()));
@@ -22,10 +22,10 @@ void ViewerAgent::RegisterControllers(const ViewerConf *viewer_conf_) {
   }
 }
 
-Result_state ViewerAgent::Init(const ViewerConf *viewer_conf_) {
-  RegisterControllers(viewer_conf_);
+Result_state ViewerAgent::Init(const ViewerConf *viewer_conf) {
+  RegisterControllers(viewer_conf);
   for(auto &viewer : viewer_list_) {
-    if (viewer == NULL || EDrive::State_Ok != viewer->Init(viewer_conf_)) {
+    if (viewer == NULL || EDrive::State_Ok != viewer->Init(viewer_conf)) {
       ROS_ERROR("    viewer init failed!");
     }
   }
