@@ -6,6 +6,8 @@
 
 #include "common/src/state.h"
 #include "viewer/proto/viewer_conf.pb.h"
+#include <nav_msgs/Odometry.h>
+#include "viewer/VisualizingData.h"
 
 namespace EDrive {
 namespace viewer {
@@ -22,13 +24,15 @@ class ViewerBase {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  virtual Result_state Init(const ViewerConf *viewer_conf_) = 0;
+  virtual Result_state Init(const ViewerConf *viewer_conf) = 0;
   
   virtual ~ViewerBase() = default;
 
   virtual EDrive::Result_state InterfaceMatch() = 0;
 
   virtual EDrive::Result_state PublishVisualizationData() = 0;
+
+  virtual EDrive::Result_state Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data) = 0;
   
  protected:
 

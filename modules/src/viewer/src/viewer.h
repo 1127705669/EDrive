@@ -18,6 +18,8 @@
 #include "viewer/proto/viewer_conf.pb.h"
 
 #include "planning/ADCTrajectory.h"
+#include <nav_msgs/Odometry.h>
+#include "viewer/VisualizingData.h"
 
 namespace EDrive {
 namespace viewer {
@@ -39,13 +41,15 @@ class Viewer : public EDrive::common::EDriveApp {
 
   EDrive::Result_state CheckInput();
 
+  void SendData(const ::viewer::VisualizingData *visualizing_data_);
+
   ViewerAgent viewer_agent_;
 
   ViewerConf viewer_conf_;
 
   ros::Timer timer_;
-  const double viewer_period = 0.01;
   planning::ADCTrajectory trajectory_;
+  nav_msgs::Odometry location_;
 
   std::string root_path;
   std::string adapter_conf_file = "/src/viewer/conf/adapter.conf";

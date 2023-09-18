@@ -5,6 +5,7 @@
 #pragma once
 
 #include "viewer/src/common/viewer_manager.h"
+#include <nav_msgs/Odometry.h>
 
 
 /**
@@ -36,12 +37,21 @@ class Vehicle_state : public EDrive::viewer::ViewerBase {
   /**
   * @brief 
   */
-  EDrive::Result_state Init(const ViewerConf *viewer_conf_) override;
+  EDrive::Result_state Init(const ViewerConf *viewer_conf) override;
 
   /**
   * @brief 
   */
   void Stop() override;
+
+  /**
+  * @brief 
+  */
+  EDrive::Result_state Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_) override;
+
+ private:
+  const nav_msgs::Odometry *location_ = nullptr;
+  ::viewer::VisualizingData *visualizing_data_ = nullptr;
 
 };
 

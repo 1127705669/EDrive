@@ -13,7 +13,7 @@ Vehicle_state::Vehicle_state() {
   ROS_INFO("    Registering viewer [vehicle state]...");
 }
 
-EDrive::Result_state Vehicle_state::Init(const ViewerConf *viewer_conf_) {
+EDrive::Result_state Vehicle_state::Init(const ViewerConf *viewer_conf) {
   return State_Ok;
 }
 
@@ -26,6 +26,25 @@ EDrive::Result_state Vehicle_state::PublishVisualizationData() {
 }
 
 void Vehicle_state::Stop() {
+}
+
+EDrive::Result_state Vehicle_state::Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data){
+  Result_state state = State_Failed;
+  
+  location_ = location;
+  visualizing_data_ = visualizing_data;
+
+  state = InterfaceMatch();
+  if(State_Ok != state){
+
+  }
+
+  state = PublishVisualizationData();
+  if(State_Ok != state){
+
+  }
+
+  return state;
 }
 
 } // namespace viewer
