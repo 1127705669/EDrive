@@ -4,31 +4,31 @@
 
 #include <ros/ros.h>
 
-#include "viewer/src/visual_component/vehicle_state/vehicle_state_visualizer.h"
+#include "viewer/src/visual_component/environment/env_handle.h"
 
 namespace EDrive {
 namespace viewer {
 
-Vehicle_state::Vehicle_state() {
-  ROS_INFO("    Registering viewer [vehicle state]...");
+Env_handle::Env_handle() {
+  ROS_INFO("    Registering viewer [environment data]...");
 }
 
-EDrive::Result_state Vehicle_state::Init(const ViewerConf *viewer_conf) {
+EDrive::Result_state Env_handle::Init(const ViewerConf *viewer_conf) {
   return State_Ok;
 }
 
-EDrive::Result_state Vehicle_state::InterfaceMatch() {
+EDrive::Result_state Env_handle::InterfaceMatch() {
   return State_Ok;
 }
 
-EDrive::Result_state Vehicle_state::PublishVisualizationData() {
+EDrive::Result_state Env_handle::PublishVisualizationData() {
   return State_Ok;
 }
 
-void Vehicle_state::Stop() {
+void Env_handle::Stop() {
 }
 
-EDrive::Result_state Vehicle_state::Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data){
+EDrive::Result_state Env_handle::Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data){
   Result_state state = State_Failed;
   
   location_ = location;

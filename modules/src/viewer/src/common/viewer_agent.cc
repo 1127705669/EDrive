@@ -6,6 +6,7 @@
 #include "viewer/src/common/viewer_agent.h"
 
 #include "viewer/src/visual_component/vehicle_state/vehicle_state_visualizer.h"
+#include "viewer/src/visual_component/environment/env_handle.h"
 
 namespace EDrive {
 namespace viewer {
@@ -16,6 +17,10 @@ void ViewerAgent::RegisterControllers(const ViewerConf *viewer_conf) {
       case ViewerConf::VEHSTA_VIEWER:
         viewer_list_.emplace_back(std::move(new Vehicle_state()));
         break;
+      case ViewerConf::ENV_VIEWER:
+        viewer_list_.emplace_back(std::move(new Env_handle()));
+        break;
+      
       default:
         ROS_ERROR("    Unknown active controller type: ");
     }

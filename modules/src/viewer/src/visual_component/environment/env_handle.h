@@ -10,19 +10,19 @@
 #include "viewer/VisualizingData.h"
 
 /**
- * @class Vehicle_state
+ * @class Env_handle
  *
  * @brief 
  */
 namespace EDrive {
 namespace viewer {
 
-class Vehicle_state : public EDrive::viewer::ViewerBase {
+class Env_handle : public EDrive::viewer::ViewerBase {
  public:
 /**
    * @brief 
    */
-  Vehicle_state();
+  Env_handle();
   
 
   /**
