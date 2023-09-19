@@ -153,7 +153,7 @@ add_library(EDrive_app SHARED ${EDRIVE_APP})
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
- LIBRARIES EDrive_app adapters adapter_proto
+ LIBRARIES EDrive_app common_adapters adapter_proto
  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
 )
@@ -182,7 +182,7 @@ add_dependencies(EDrive_app ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTE
 target_link_libraries(EDrive_app
   ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
-  adapters
+  common_adapters
 )
 
 #############

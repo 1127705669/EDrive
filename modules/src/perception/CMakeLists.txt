@@ -155,7 +155,7 @@ add_executable(perception
 target_link_libraries(perception
   ${catkin_LIBRARIES}
   EDrive_app
-  adapters
+  common_adapters
 )
 
 #############

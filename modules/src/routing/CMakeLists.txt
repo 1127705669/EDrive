@@ -156,7 +156,7 @@ add_executable(routing
 target_link_libraries(routing
   ${catkin_LIBRARIES}
   EDrive_app
-  adapters
+  common_adapters
 )
 
 #############

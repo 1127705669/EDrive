@@ -18,6 +18,6 @@ set(ADAPTER_SRC
   adapter_manager.cc
 )
 
-add_library(adapters SHARED ${ADAPTER_SRC})
+add_library(common_adapters SHARED ${ADAPTER_SRC})
 
-target_link_libraries(adapters adapter_proto)
+target_link_libraries(common_adapters adapter_proto)

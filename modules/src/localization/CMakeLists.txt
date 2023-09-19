@@ -156,7 +156,7 @@ add_executable(localization
 target_link_libraries(localization
   ${catkin_LIBRARIES}
   EDrive_app
-  adapters
+  common_adapters
 )
 
 #############

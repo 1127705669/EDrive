@@ -185,7 +185,7 @@ target_link_libraries(viewer_lib
   visual_common
   visual_component
   EDrive_app
-  adapters
+  common_adapters
 )
 
 target_link_libraries(viewer
