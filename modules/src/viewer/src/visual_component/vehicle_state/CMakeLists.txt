@@ -10,15 +10,11 @@ include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ../
 )
 
 set(VEHIVLE_STATE_SRC 
-vehicle_state_visualizer.cc
+  vehicle_state_visualizer.cc
 )
 
 add_library(vehicle_state_visualizer SHARED ${VEHIVLE_STATE_SRC})
-
-target_link_libraries(vehicle_state_visualizer
-  ${catkin_LIBRARIES}
-  viewer_common
-)

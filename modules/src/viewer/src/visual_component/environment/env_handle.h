@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "viewer/src/common/viewer_manager.h"
+#include "viewer/src/visual_component/viewer_base.h"
 #include <nav_msgs/Odometry.h>
 
 #include "viewer/VisualizingData.h"

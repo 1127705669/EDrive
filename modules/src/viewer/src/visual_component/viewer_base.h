@@ -33,10 +33,8 @@ class ViewerBase {
   virtual EDrive::Result_state PublishVisualizationData() = 0;
 
   virtual EDrive::Result_state Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data) = 0;
-  
- protected:
 
-  virtual void Stop();
+  virtual void Stop() = 0;
 
 };
 

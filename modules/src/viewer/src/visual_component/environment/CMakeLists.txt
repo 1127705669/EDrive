@@ -17,8 +17,3 @@ set(ENV_HANDLE_SRC
 )
 
 add_library(env_data SHARED ${ENV_HANDLE_SRC})
-
-target_link_libraries(env_data
-  ${catkin_LIBRARIES}
-  viewer_common
-)
