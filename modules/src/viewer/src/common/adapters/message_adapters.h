@@ -26,8 +26,10 @@ namespace adapter {
 using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 using ViewerAdapter = Adapter<::viewer::VisualizingData>;
-using VehicleAdapter = Adapter<nav_msgs::Odometry>;
+
+using CARLAVehicleAdapter = Adapter<nav_msgs::Odometry>;
 using CARLAObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
+
 using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
 
 } // namespace adapter

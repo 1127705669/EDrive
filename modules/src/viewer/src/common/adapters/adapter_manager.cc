@@ -58,7 +58,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableViewer("/EDrive/viewer", config);
         break;
       case AdapterConfig::VEHICLE_DATA:
-        EnableVehicle("/carla/ego_vehicle/odometry", config);
+        EnableCARLAVehicle("/carla/ego_vehicle/odometry", config);
         break;
       case AdapterConfig::CARLA_ENV_OBJECT:
         EnableCARLAObjects("/carla/ego_vehicle/objects", config);

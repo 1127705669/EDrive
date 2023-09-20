@@ -148,7 +148,7 @@ class AdapterManager
   REGISTER_ADAPTER(CARLAObjects);
   REGISTER_ADAPTER(ViewerObjects);
   REGISTER_ADAPTER(Viewer);
-  REGISTER_ADAPTER(Vehicle);
+  REGISTER_ADAPTER(CARLAVehicle);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(ControlCommand);
   DECLARE_SINGLETON(AdapterManager);
