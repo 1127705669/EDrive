@@ -21,6 +21,7 @@
 #include <nav_msgs/Odometry.h>
 #include "viewer/VisualizingData.h"
 #include "derived_object_msgs/ObjectArray.h"
+#include "visualization_msgs/MarkerArray.h"
 
 namespace EDrive {
 namespace viewer {
@@ -42,7 +43,7 @@ class Viewer : public EDrive::common::EDriveApp {
 
   EDrive::Result_state CheckInput();
 
-  void SendData(const ::viewer::VisualizingData *visualizing_data_);
+  void SendData(const ::viewer::VisualizingData *visualizing_data, const visualization_msgs::MarkerArray *viewer_Objects);
 
   ViewerAgent viewer_agent_;
 

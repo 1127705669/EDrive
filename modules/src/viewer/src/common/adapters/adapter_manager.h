@@ -145,7 +145,8 @@ class AdapterManager
   bool initialized_ = false;
 
   /// The following code registered all the adapters of interest.
-  REGISTER_ADAPTER(Objects);
+  REGISTER_ADAPTER(CARLAObjects);
+  REGISTER_ADAPTER(ViewerObjects);
   REGISTER_ADAPTER(Viewer);
   REGISTER_ADAPTER(Vehicle);
   REGISTER_ADAPTER(Planning);

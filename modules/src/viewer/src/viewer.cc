@@ -31,7 +31,7 @@ Result_state Viewer::CheckInput() {
   auto location_adapter = AdapterManager::GetVehicle();
   location_ = location_adapter->GetLatestObserved();
 
-  auto object_adapter = AdapterManager::GetObjects();
+  auto object_adapter = AdapterManager::GetCARLAObjects();
   objects_ = object_adapter->GetLatestObserved();
   
   return State_Ok;
@@ -80,17 +80,20 @@ void Viewer::OnTimer(const ros::TimerEvent &) {
   Result_state state = CheckInput();
   
   /* init send data */
-  ::viewer::VisualizingData visualizing_data_;
+  ::viewer::VisualizingData visualizing_data;
+  derived_object_msgs::ObjectArray CARLA_objects;
+  visualization_msgs::MarkerArray viewer_Objects;
 
-  if(State_Ok != viewer_agent_.Visualize(&location_, &objects_, &visualizing_data_)) {
+  if(State_Ok != viewer_agent_.Visualize(&location_, &CARLA_objects, &visualizing_data)) {
     ROS_INFO("visualize failed, stopping...");
   }
 
-  SendData(&visualizing_data_);
+  SendData(&visualizing_data, &viewer_Objects);
 }
 
-void Viewer::SendData(const ::viewer::VisualizingData *visualizing_data_) {
-  AdapterManager::PublishViewer(*visualizing_data_);
+void Viewer::SendData(const ::viewer::VisualizingData *visualizing_data, const visualization_msgs::MarkerArray *viewer_Objects) {
+  AdapterManager::PublishViewerObjects(*viewer_Objects);
+  AdapterManager::PublishViewer(*visualizing_data);
 }
 
 } // namespace viewer

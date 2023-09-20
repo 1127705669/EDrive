@@ -11,6 +11,7 @@
 #include "planning/ADCTrajectory.h"
 #include "viewer/VisualizingData.h"
 #include "derived_object_msgs/ObjectArray.h"
+#include "visualization_msgs/MarkerArray.h"
 
 /**
  * @file message_adapters.h
@@ -26,7 +27,8 @@ using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 using ViewerAdapter = Adapter<::viewer::VisualizingData>;
 using VehicleAdapter = Adapter<nav_msgs::Odometry>;
-using ObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
+using CARLAObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
+using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
 
 } // namespace adapter
 } // namespace viewer
