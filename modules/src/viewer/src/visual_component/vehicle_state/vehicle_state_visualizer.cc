@@ -28,10 +28,11 @@ EDrive::Result_state Vehicle_state::PublishVisualizationData() {
 void Vehicle_state::Stop() {
 }
 
-EDrive::Result_state Vehicle_state::Visualize(const nav_msgs::Odometry *location, const derived_object_msgs::ObjectArray *object, ::viewer::VisualizingData *visualizing_data){
+EDrive::Result_state Vehicle_state::Visualize(const nav_msgs::Odometry *CARLA_location, const derived_object_msgs::ObjectArray *CARLA_object, 
+                                        ::viewer::VisualizingData *visualizing_data, visualization_msgs::Marker *viewer_vehicle_data){
   Result_state state = State_Failed;
   
-  location_ = location;
+  location_ = CARLA_location;
   visualizing_data_ = visualizing_data;
 
   state = InterfaceMatch();

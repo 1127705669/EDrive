@@ -146,6 +146,7 @@ class AdapterManager
 
   /// The following code registered all the adapters of interest.
   REGISTER_ADAPTER(CARLAObjects);
+  REGISTER_ADAPTER(ViewerVehicle);
   REGISTER_ADAPTER(ViewerObjects);
   REGISTER_ADAPTER(Viewer);
   REGISTER_ADAPTER(CARLAVehicle);

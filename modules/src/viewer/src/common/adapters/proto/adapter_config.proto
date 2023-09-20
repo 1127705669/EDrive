@@ -11,6 +11,7 @@ message AdapterConfig {
     VEHICLE_DATA = 4;
     VIEWER_ENV_OBJECT = 5;
     CARLA_ENV_OBJECT = 6;
+    VIEWER_VEHICLE = 7;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

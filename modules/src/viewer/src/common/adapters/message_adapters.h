@@ -31,6 +31,7 @@ using CARLAVehicleAdapter = Adapter<nav_msgs::Odometry>;
 using CARLAObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
 
 using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
+using ViewerVehicleAdapter = Adapter<visualization_msgs::Marker>;
 
 } // namespace adapter
 } // namespace viewer

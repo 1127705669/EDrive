@@ -22,6 +22,7 @@
 #include "viewer/VisualizingData.h"
 #include "derived_object_msgs/ObjectArray.h"
 #include "visualization_msgs/MarkerArray.h"
+#include "visualization_msgs/Marker.h"
 
 namespace EDrive {
 namespace viewer {
@@ -43,7 +44,7 @@ class Viewer : public EDrive::common::EDriveApp {
 
   EDrive::Result_state CheckInput();
 
-  void SendData(const ::viewer::VisualizingData *visualizing_data, const visualization_msgs::MarkerArray *viewer_Objects);
+  void SendData(const ::viewer::VisualizingData *visualizing_data, const visualization_msgs::MarkerArray *viewer_Objects, const visualization_msgs::Marker *viewer_vehicle_data);
 
   ViewerAgent viewer_agent_;
 
@@ -51,7 +52,7 @@ class Viewer : public EDrive::common::EDriveApp {
 
   ros::Timer timer_;
   planning::ADCTrajectory trajectory_;
-  nav_msgs::Odometry location_;
+  nav_msgs::Odometry CARLA_location_;
   derived_object_msgs::ObjectArray objects_;
 
   std::string root_path;
