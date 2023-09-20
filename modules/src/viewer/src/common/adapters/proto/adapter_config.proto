@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package EDrive.viewer.adapter;
+
+// Property of a certain Input/Output that will be used by a module.
+message AdapterConfig {
+  enum MessageType {
+    PLANNING_TRAJECTORY = 1;
+    CONTROL_COMMAND = 2;
+    VIEWER = 3;
+    VEHICLE_DATA = 4;
+    VIEWER_ENV_OBJECT = 5;
+  }
+  enum Mode {
+    RECEIVE_ONLY = 0;
+    PUBLISH_ONLY = 1;
+    DUPLEX = 2;
+  }
+  required MessageType type = 1;
+  required Mode mode = 2;
+  // The max number of received messages to keep in the adapter, this field
+  // is not useful for PUBLISH_ONLY mode messages.
+  optional int32 message_history_limit = 3 [default = 10];
+  optional bool latch = 4 [default=false];
+}
+
+// A config to specify which messages a certain module would consume and
+// produce.
+message AdapterManagerConfig {
+  repeated AdapterConfig config = 1;
+  required bool is_ros = 2;  // Whether the message comes from ROS
+}

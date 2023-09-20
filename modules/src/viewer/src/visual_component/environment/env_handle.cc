@@ -28,7 +28,7 @@ EDrive::Result_state Env_handle::PublishVisualizationData() {
 void Env_handle::Stop() {
 }
 
-EDrive::Result_state Env_handle::Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data){
+EDrive::Result_state Env_handle::Visualize(const nav_msgs::Odometry *location, const derived_object_msgs::ObjectArray *object, ::viewer::VisualizingData *visualizing_data){
   Result_state state = State_Failed;
   
   location_ = location;

@@ -28,7 +28,7 @@ class ViewerAgent {
    */
   Result_state Init(const ViewerConf *viewer_conf);
 
-  Result_state Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data);
+  Result_state Visualize(const nav_msgs::Odometry *location, const derived_object_msgs::ObjectArray *object, ::viewer::VisualizingData *visualizing_data);
 
  private:
   /**

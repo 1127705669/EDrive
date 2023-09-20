@@ -20,6 +20,7 @@
 #include "planning/ADCTrajectory.h"
 #include <nav_msgs/Odometry.h>
 #include "viewer/VisualizingData.h"
+#include "derived_object_msgs/ObjectArray.h"
 
 namespace EDrive {
 namespace viewer {
@@ -50,6 +51,7 @@ class Viewer : public EDrive::common::EDriveApp {
   ros::Timer timer_;
   planning::ADCTrajectory trajectory_;
   nav_msgs::Odometry location_;
+  derived_object_msgs::ObjectArray objects_;
 
   std::string root_path;
   std::string adapter_conf_file = "/src/viewer/conf/adapter.conf";

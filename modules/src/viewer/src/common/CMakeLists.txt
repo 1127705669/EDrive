@@ -12,6 +12,8 @@ include
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/adapters)
+
 set(VIEWER_AGENT_SRC
   viewer_agent.cc
 )
@@ -28,4 +30,5 @@ add_library(visual_common INTERFACE)
 
 target_link_libraries(visual_common INTERFACE
   viewer_agent
+  viewer_adapters
 )

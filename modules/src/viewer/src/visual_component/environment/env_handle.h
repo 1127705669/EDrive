@@ -8,6 +8,7 @@
 #include <nav_msgs/Odometry.h>
 
 #include "viewer/VisualizingData.h"
+#include "derived_object_msgs/ObjectArray.h"
 
 /**
  * @class Env_handle
@@ -48,11 +49,12 @@ class Env_handle : public EDrive::viewer::ViewerBase {
   /**
   * @brief 
   */
-  EDrive::Result_state Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_) override;
+  EDrive::Result_state Visualize(const nav_msgs::Odometry *location, const derived_object_msgs::ObjectArray *object, ::viewer::VisualizingData *visualizing_data) override;
 
  private:
   const nav_msgs::Odometry *location_ = nullptr;
   ::viewer::VisualizingData *visualizing_data_ = nullptr;
+  derived_object_msgs::ObjectArray *objects = nullptr;
 
 };
 

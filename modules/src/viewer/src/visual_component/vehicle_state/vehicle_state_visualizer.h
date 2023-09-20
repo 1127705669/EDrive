@@ -48,7 +48,7 @@ class Vehicle_state : public EDrive::viewer::ViewerBase {
   /**
   * @brief 
   */
-  EDrive::Result_state Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_) override;
+  EDrive::Result_state Visualize(const nav_msgs::Odometry *location, const derived_object_msgs::ObjectArray *object, ::viewer::VisualizingData *visualizing_data) override;
 
  private:
   const nav_msgs::Odometry *location_ = nullptr;

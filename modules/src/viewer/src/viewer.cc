@@ -5,7 +5,7 @@
 #include <ros/ros.h>
 #include "viewer/src/viewer.h"
 
-#include "common/src/adapters/adapter_manager.h"
+#include "viewer/src/common/adapters/adapter_manager.h"
 #include "viewer/src/common/viewer_agent.h"
 #include "common/src/util/file.h"
 
@@ -17,7 +17,7 @@ namespace EDrive {
 namespace viewer {
 
 using EDrive::Result_state;
-using EDrive::common::adapter::AdapterManager;
+using EDrive::viewer::adapter::AdapterManager;
 
 std::string Viewer::Name() const { return "EDrive_viewer"; }
 
@@ -30,6 +30,9 @@ Result_state Viewer::CheckInput() {
 
   auto location_adapter = AdapterManager::GetVehicle();
   location_ = location_adapter->GetLatestObserved();
+
+  auto object_adapter = AdapterManager::GetObjects();
+  objects_ = object_adapter->GetLatestObserved();
   
   return State_Ok;
 }
@@ -60,7 +63,7 @@ Result_state Viewer::Start(){
   ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
   ros::Duration(1.0).sleep();
 
-  timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(viewer_conf_.viewer_period()), 
+  timer_ = AdapterManager::CreateTimer(ros::Duration(viewer_conf_.viewer_period()), 
                                                               &Viewer::OnTimer,
                                                               this);
   ROS_INFO("Viewer init done!");
@@ -75,8 +78,11 @@ void Viewer::Stop() {
 void Viewer::OnTimer(const ros::TimerEvent &) {
   ros::Time begin = ros::Time::now();
   Result_state state = CheckInput();
+  
+  /* init send data */
   ::viewer::VisualizingData visualizing_data_;
-  if(State_Ok != viewer_agent_.Visualize(&location_, &visualizing_data_)) {
+
+  if(State_Ok != viewer_agent_.Visualize(&location_, &objects_, &visualizing_data_)) {
     ROS_INFO("visualize failed, stopping...");
   }
 
