@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <derived_object_msgs/ObjectArray.h>
 #include <nav_msgs/Odometry.h>
 // #include "control/proto/control_cmd.pb.h"
 #include "common/src/adapters/adapter.h"
@@ -26,6 +27,7 @@ using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 using ViewerAdapter = Adapter<::viewer::VisualizingData>;
 using VehicleAdapter = Adapter<nav_msgs::Odometry>;
+using CarlaObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
 
 } // namespace adapter
 } // namespace common

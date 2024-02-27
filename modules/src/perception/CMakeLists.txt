@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  message_generation
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -46,6 +48,23 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
+file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
+
+foreach(MSG_FOLDER ${MSG_FOLDERS})
+  message("Found msg folder: ${MSG_FOLDER}")
+  file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
+
+  foreach(MSG_FILE ${MSG_FILES})
+    message(" Found msg file: ${MSG_FILE}")
+  endforeach()
+  add_message_files(
+    DIRECTORY msg/${MSG_FOLDER}
+    FILES
+    ${MSG_FILES}
+  )
+
+endforeach()
+
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
@@ -68,10 +87,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  common
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -104,8 +124,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES perception
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+ LIBRARIES perception
+ CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -157,6 +177,7 @@ target_link_libraries(perception
   EDrive_app
   common_adapters
 )
+
 
 #############
 ## Install ##

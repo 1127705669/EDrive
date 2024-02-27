@@ -9,6 +9,7 @@ message AdapterConfig {
     CONTROL_COMMAND = 2;
     VIEWER = 3;
     VEHICLE_DATA = 4;
+    CARLA_OBJECTS = 5;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

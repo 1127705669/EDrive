@@ -60,7 +60,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::VEHICLE_DATA:
         EnableCARLAVehicle("/carla/ego_vehicle/odometry", config);
         break;
-      case AdapterConfig::CARLA_ENV_OBJECT:
+      case AdapterConfig::CARLA_OBJECTS:
         EnableCARLAObjects("/carla/ego_vehicle/objects", config);
         break;
       case AdapterConfig::VIEWER_ENV_OBJECT:
