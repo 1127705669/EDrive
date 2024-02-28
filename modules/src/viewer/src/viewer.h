@@ -42,9 +42,16 @@ class Viewer : public EDrive::common::EDriveApp {
   // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
+  /**
+   * @brief
+   * Register new controllers. If you need to add a new type of controller,
+   * You should first register your controller in this function.
+   */
+  void RegisterControllers(const ViewerConf *viewer_conf_);
+
   EDrive::Result_state CheckInput();
 
-  void SendData(const ::viewer::VisualizingData *visualizing_data, const visualization_msgs::MarkerArray *viewer_Objects, const visualization_msgs::Marker *viewer_vehicle_data);
+  void Publish(visualization_msgs::MarkerArray *objects_marker_array);
 
   ViewerAgent viewer_agent_;
 
@@ -53,7 +60,10 @@ class Viewer : public EDrive::common::EDriveApp {
   ros::Timer timer_;
   planning::ADCTrajectory trajectory_;
   nav_msgs::Odometry CARLA_location_;
-  derived_object_msgs::ObjectArray objects_;
+  derived_object_msgs::ObjectArray Carla_objects_;
+  visualization_msgs::MarkerArray objects_marker_array_;
+
+  std::vector<std::unique_ptr<ViewerBase>> viewer_list_;
 
   std::string root_path;
   std::string adapter_conf_file = "/src/viewer/conf/adapter.conf";

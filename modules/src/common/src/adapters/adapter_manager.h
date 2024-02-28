@@ -150,6 +150,7 @@ class AdapterManager
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(ControlCommand);
   REGISTER_ADAPTER(CarlaObjects);
+  REGISTER_ADAPTER(ViewerObjects);
   DECLARE_SINGLETON(AdapterManager);
 };
 

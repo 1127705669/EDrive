@@ -12,6 +12,7 @@
 #include "control/CarlaEgoVehicleControl.h"
 #include "planning/ADCTrajectory.h"
 #include "viewer/VisualizingData.h"
+#include <visualization_msgs/MarkerArray.h>
 
 /**
  * @file message_adapters.h
@@ -28,6 +29,7 @@ using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 using ViewerAdapter = Adapter<::viewer::VisualizingData>;
 using VehicleAdapter = Adapter<nav_msgs::Odometry>;
 using CarlaObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
+using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
 
 } // namespace adapter
 } // namespace common

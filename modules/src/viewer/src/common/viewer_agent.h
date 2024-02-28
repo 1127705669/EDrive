@@ -28,8 +28,7 @@ class ViewerAgent {
    */
   Result_state Init(const ViewerConf *viewer_conf);
 
-  Result_state Visualize(const nav_msgs::Odometry *CARLA_location, const derived_object_msgs::ObjectArray *CARLA_object, 
-                                        ::viewer::VisualizingData *visualizing_data, visualization_msgs::Marker *viewer_vehicle_data);
+  Result_state Visualize();
 
  private:
   /**

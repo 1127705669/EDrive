@@ -63,6 +63,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::CARLA_OBJECTS:
         EnableCarlaObjects("/carla/ego_vehicle/objects", config);
         break;
+      case AdapterConfig::VIEWER_OBJECTS:
+        EnableViewerObjects("/EDrive/viewer/objects", config);
+        break;
 
       default:
         ROS_INFO("Unknown adapter config type!");
