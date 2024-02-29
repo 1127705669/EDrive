@@ -58,6 +58,10 @@ void Perception::OnTimer(const ros::TimerEvent &) {
 
 }
 
+void Perception::Publish(){
+  AdapterManager::PublishPerception(objects_);
+}
+
 void Perception::Stop() {
   
 }

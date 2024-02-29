@@ -151,6 +151,7 @@ class AdapterManager
   REGISTER_ADAPTER(ControlCommand);
   REGISTER_ADAPTER(CarlaObjects);
   REGISTER_ADAPTER(ViewerObjects);
+  REGISTER_ADAPTER(Perception);
   DECLARE_SINGLETON(AdapterManager);
 };
 

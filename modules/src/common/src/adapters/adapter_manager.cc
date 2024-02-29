@@ -52,7 +52,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableControlCommand("/carla/ego_vehicle/vehicle_control_cmd", config);
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
-        EnablePlanning("/EDrive/planning", config);
+        EnablePlanning("/EDrive/planning/trajectory", config);
         break;
       case AdapterConfig::VIEWER:
         EnableViewer("/EDrive/viewer", config);
@@ -65,6 +65,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         break;
       case AdapterConfig::VIEWER_OBJECTS:
         EnableViewerObjects("/EDrive/viewer/objects", config);
+        break;
+      case AdapterConfig::PERCEPTION_OBJECTS:
+        EnablePerception("/EDrive/perception/objects", config);
         break;
 
       default:
