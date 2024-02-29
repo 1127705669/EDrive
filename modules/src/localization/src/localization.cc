@@ -13,10 +13,12 @@ namespace localization {
 
 using EDrive::Result_state;
 using EDrive::common::adapter::AdapterManager;
-
+  
 std::string Localization::Name() const { return "EDrive_localization"; }
 
 EDrive::Result_state Localization::Init(){
+
+  ROS_INFO("Localization init, starting...");
 
   root_path = EDrive::common::util::GetRootPath();
   adapter_conf_file = root_path + adapter_conf_file;
@@ -24,6 +26,8 @@ EDrive::Result_state Localization::Init(){
 
   ROS_INFO("  registering node: %s", Name().c_str());
   AdapterManager::Init(adapter_conf_file);
+
+  EDrive::common::util::GetProtoFromASIIFile(localization_conf_file, &localization_conf_);
 
   return State_Ok;
 }
@@ -40,14 +44,14 @@ EDrive::Result_state Localization::Start(){
   timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(localization_conf_.localization_period()), 
                                                                 &Localization::OnTimer,
                                                                 this);
-  ROS_INFO("Control init done!");
-  ROS_INFO("Control started");
+  ROS_INFO("Localization init done!");
+  ROS_INFO("Localization started");
   
   return State_Ok;
 }
 
 void Localization::OnTimer(const ros::TimerEvent &) {
-
+  Result_state status = CheckInput();
 }
 
 void Localization::Stop() {
