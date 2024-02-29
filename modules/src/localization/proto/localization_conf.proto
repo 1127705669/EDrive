@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package EDrive.localization;
+
+message LocalizationConf {
+
+  optional double localization_period = 1;
+}

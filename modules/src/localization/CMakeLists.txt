@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  message_generation
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -46,6 +48,23 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
+file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
+
+foreach(MSG_FOLDER ${MSG_FOLDERS})
+  message("Found msg folder: ${MSG_FOLDER}")
+  file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
+
+  foreach(MSG_FILE ${MSG_FILES})
+    message(" Found msg file: ${MSG_FILE}")
+  endforeach()
+  add_message_files(
+    DIRECTORY msg/${MSG_FOLDER}
+    FILES
+    ${MSG_FILES}
+  )
+
+endforeach()
+
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
@@ -68,10 +87,12 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -104,8 +125,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES localization
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+  LIBRARIES localization_proto
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -118,15 +139,14 @@ catkin_package(
 include_directories(
 include
   ${catkin_INCLUDE_DIRS}
-  ../
-  ../../
-  ../../../
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/localization.cpp
-# )
+add_library(localization_lib
+  src/localization.cc
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -139,8 +159,9 @@ include
 # add_executable(${PROJECT_NAME}_node src/localization_node.cpp)
 add_executable(localization 
   src/main.cc  
-  src/localization.cc 
 )
+
+add_dependencies(localization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -155,6 +176,14 @@ add_executable(localization
 ## Specify libraries to link a library or executable target against
 target_link_libraries(localization
   ${catkin_LIBRARIES}
+  EDrive_app
+  localization_lib
+)
+
+target_link_libraries(localization_lib
+  ${PROTOBUF_LIBRARIES}
+  ${catkin_LIBRARIES}
+  localization_proto
   EDrive_app
   common_adapters
 )
