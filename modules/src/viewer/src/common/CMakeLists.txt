@@ -12,11 +12,7 @@ include
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-set(VIEWER_MANAGER_SRC 
-  viewer_manager.cc
-)
-
-add_library(viewer_common SHARED ${VIEWER_MANAGER_SRC})
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/adapters)
 
 set(VIEWER_AGENT_SRC
   viewer_agent.cc
@@ -30,4 +26,9 @@ target_link_libraries(viewer_agent
   viewer_proto
 )
 
-add_dependencies(viewer_agent ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_library(visual_common INTERFACE)
+
+target_link_libraries(visual_common INTERFACE
+  viewer_agent
+  viewer_adapters
+)

@@ -11,11 +11,11 @@
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
 
-#include "common/src/adapters/adapter_manager.h"
+#include "viewer/src/common/adapters/adapter_manager.h"
 #include "common/src/util/file.h"
 
 namespace EDrive {
-namespace common {
+namespace viewer {
 namespace adapter {
 
 AdapterManager::AdapterManager() {}
@@ -52,24 +52,17 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableControlCommand("/carla/ego_vehicle/vehicle_control_cmd", config);
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
-        EnablePlanning("/EDrive/planning/trajectory", config);
+        EnablePlanning("/EDrive/planning", config);
         break;
       case AdapterConfig::VIEWER:
         EnableViewer("/EDrive/viewer", config);
         break;
       case AdapterConfig::VEHICLE_DATA:
-        EnableVehicle("/carla/ego_vehicle/odometry", config);
+        EnableCARLAVehicle("/carla/ego_vehicle/odometry", config);
         break;
       case AdapterConfig::CARLA_OBJECTS:
-        EnableCarlaObjects("/carla/ego_vehicle/objects", config);
+        EnableCARLAObjects("/carla/ego_vehicle/objects", config);
         break;
-      case AdapterConfig::VIEWER_OBJECTS:
-        EnableViewerObjects("/EDrive/viewer/objects", config);
-        break;
-      case AdapterConfig::PERCEPTION_OBJECTS:
-        EnablePerception("/EDrive/perception/objects", config);
-        break;
-
       default:
         ROS_INFO("Unknown adapter config type!");
         break;
@@ -77,6 +70,6 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
   }
 }
 
-} // adapter
-} // common
-} // EDrive
+} // namespace adapter
+} // namespace viewer
+} // namespace EDrive

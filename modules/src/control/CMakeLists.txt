@@ -160,5 +160,5 @@ target_link_libraries(control_lib
   controller
   control_proto
   EDrive_app
-  adapters
+  common_adapters
 )

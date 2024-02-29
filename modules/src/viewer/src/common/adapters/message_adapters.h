@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include <derived_object_msgs/ObjectArray.h>
 #include <nav_msgs/Odometry.h>
-// #include "control/proto/control_cmd.pb.h"
-#include "common/src/adapters/adapter.h"
+#include "viewer/src/common/adapters/adapter.h"
 #include "control/ControlCommand.h"
 #include "control/CarlaEgoVehicleControl.h"
 #include "planning/ADCTrajectory.h"
 #include "viewer/VisualizingData.h"
-#include <visualization_msgs/MarkerArray.h>
+#include "derived_object_msgs/ObjectArray.h"
+#include "visualization_msgs/MarkerArray.h"
 
 /**
  * @file message_adapters.h
@@ -21,17 +20,19 @@
  * specializes the adapter template.
  */
 namespace EDrive {
-namespace common {
+namespace viewer {
 namespace adapter {
 
 using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 using ViewerAdapter = Adapter<::viewer::VisualizingData>;
-using VehicleAdapter = Adapter<nav_msgs::Odometry>;
-using CarlaObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
+
+using CARLAVehicleAdapter = Adapter<nav_msgs::Odometry>;
+using CARLAObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
+
 using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
-using PerceptionAdapter = Adapter<derived_object_msgs::ObjectArray>;
+using ViewerVehicleAdapter = Adapter<visualization_msgs::Marker>;
 
 } // namespace adapter
-} // namespace common
+} // namespace viewer
 } // namespace EDrive

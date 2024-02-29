@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package EDrive.common.adapter;
+package EDrive.viewer.adapter;
 
 // Property of a certain Input/Output that will be used by a module.
 message AdapterConfig {
@@ -10,8 +10,6 @@ message AdapterConfig {
     VIEWER = 3;
     VEHICLE_DATA = 4;
     CARLA_OBJECTS = 5;
-    VIEWER_OBJECTS = 6;
-    PERCEPTION_OBJECTS = 7;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

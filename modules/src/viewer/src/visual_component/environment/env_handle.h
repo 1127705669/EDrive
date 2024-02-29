@@ -4,10 +4,12 @@
 
 #pragma once
 
-#include "viewer/src/common/viewer_manager.h"
+#include "viewer/src/visual_component/viewer_base.h"
 #include <nav_msgs/Odometry.h>
 
 #include "viewer/VisualizingData.h"
+#include "derived_object_msgs/ObjectArray.h"
+#include <visualization_msgs/MarkerArray.h>
 
 /**
  * @class Env_handle
@@ -17,14 +19,13 @@
 namespace EDrive {
 namespace viewer {
 
-class Env_handle : public EDrive::viewer::ViewerBase {
+class Env_handle : public EDrive::viewer::ViewerBase{
  public:
-/**
+  /**
    * @brief 
    */
-  Env_handle();
+  Env_handle(derived_object_msgs::ObjectArray *objects, visualization_msgs::MarkerArray *objects_marker_array);
   
-
   /**
    * @brief 
    */
@@ -48,11 +49,13 @@ class Env_handle : public EDrive::viewer::ViewerBase {
   /**
   * @brief 
   */
-  EDrive::Result_state Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_) override;
+  EDrive::Result_state Visualize() override;
 
  private:
   const nav_msgs::Odometry *location_ = nullptr;
   ::viewer::VisualizingData *visualizing_data_ = nullptr;
+  derived_object_msgs::ObjectArray *objects_ = nullptr;
+  visualization_msgs::MarkerArray *objects_marker_array_;
 
 };
 

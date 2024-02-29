@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "viewer/src/common/viewer_manager.h"
+#include "viewer/src/visual_component/viewer_base.h"
 #include <nav_msgs/Odometry.h>
 
 #include "viewer/VisualizingData.h"
@@ -48,7 +48,7 @@ class Vehicle_state : public EDrive::viewer::ViewerBase {
   /**
   * @brief 
   */
-  EDrive::Result_state Visualize(const nav_msgs::Odometry *location_, ::viewer::VisualizingData *visualizing_data_) override;
+  EDrive::Result_state Visualize() override;
 
  private:
   const nav_msgs::Odometry *location_ = nullptr;

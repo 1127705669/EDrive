@@ -176,7 +176,7 @@ target_link_libraries(planning
   ${catkin_LIBRARIES}
   ${catkin_LIBRARIES}
   EDrive_app
-  adapters
+  common_adapters
 )
 
 #############

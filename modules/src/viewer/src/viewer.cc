@@ -13,6 +13,9 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "viewer/src/visual_component/environment/env_handle.h"
+#include "viewer/src/visual_component/vehicle_state/vehicle_state_visualizer.h"
+
 namespace EDrive {
 namespace viewer {
 
@@ -28,10 +31,29 @@ Result_state Viewer::CheckInput() {
   auto trajectory_adapter = AdapterManager::GetPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
 
-  auto location_adapter = AdapterManager::GetVehicle();
-  location_ = location_adapter->GetLatestObserved();
+  // auto location_adapter = AdapterManager::GetCARLAVehicle();
+  // CARLA_location_ = location_adapter->GetLatestObserved();
+
+  auto objects_adapter = AdapterManager::GetCarlaObjects();
+  Carla_objects_ = objects_adapter->GetLatestObserved();
   
   return State_Ok;
+}
+
+void Viewer::RegisterControllers(const ViewerConf *viewer_conf) {
+  for (auto active_viewer : viewer_conf->active_viewers()) {
+    switch (active_viewer) {
+      case ViewerConf::VEHSTA_VIEWER:
+        viewer_list_.emplace_back(std::move(new Vehicle_state()));
+        break;
+      case ViewerConf::ENV_VIEWER:
+        viewer_list_.emplace_back(std::move(new Env_handle(&Carla_objects_, &objects_marker_array_)));
+        break;
+      
+      default:
+        ROS_ERROR("    Unknown active controller type: ");
+    }
+  }
 }
 
 Result_state Viewer::Init(){
@@ -46,9 +68,8 @@ Result_state Viewer::Init(){
 
   ROS_INFO("  viewer init, starting...");
   EDrive::common::util::GetProtoFromASIIFile(viewer_conf_file, &viewer_conf_);
-  if(State_Ok != viewer_agent_.Init(&viewer_conf_)) {
-    ROS_ERROR("    controller agent init failed, stopping...");
-  }
+
+  RegisterControllers(&viewer_conf_);
 
   return State_Ok;
 }
@@ -60,7 +81,7 @@ Result_state Viewer::Start(){
   ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
   ros::Duration(1.0).sleep();
 
-  timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(viewer_conf_.viewer_period()), 
+  timer_ = AdapterManager::CreateTimer(ros::Duration(viewer_conf_.viewer_period()), 
                                                               &Viewer::OnTimer,
                                                               this);
   ROS_INFO("Viewer init done!");
@@ -75,16 +96,26 @@ void Viewer::Stop() {
 void Viewer::OnTimer(const ros::TimerEvent &) {
   ros::Time begin = ros::Time::now();
   Result_state state = CheckInput();
-  ::viewer::VisualizingData visualizing_data_;
-  if(State_Ok != viewer_agent_.Visualize(&location_, &visualizing_data_)) {
-    ROS_INFO("visualize failed, stopping...");
-  }
 
-  SendData(&visualizing_data_);
+  for (auto &viwer : viewer_list_) {
+    ros::Time start_timestamp = ros::Time::now();
+    viwer->InterfaceMatch();
+    ros::Time end_timestamp = ros::Time::now();
+  }
+  
+  /* init send data */
+  ::viewer::VisualizingData visualizing_data;
+  visualization_msgs::MarkerArray viewer_Objects;
+  visualization_msgs::Marker viewer_vehicle;
+
+  Publish(&objects_marker_array_);
 }
 
-void Viewer::SendData(const ::viewer::VisualizingData *visualizing_data_) {
-  AdapterManager::PublishViewer(*visualizing_data_);
+void Viewer::Publish(visualization_msgs::MarkerArray *objects_marker_array) {
+  // AdapterManager::PublishViewerVehicle(*viewer_vehicle_data);
+  AdapterManager::PublishViewerObjects(*objects_marker_array);
+  objects_marker_array_.markers.clear();
+  // AdapterManager::PublishViewer(*visualizing_data);
 }
 
 } // namespace viewer

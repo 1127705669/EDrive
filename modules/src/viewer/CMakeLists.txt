@@ -182,11 +182,9 @@ add_dependencies(viewer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TA
 target_link_libraries(viewer_lib
   ${catkin_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
-  viewer_agent
-  viewer_common
+  visual_common
   visual_component
   EDrive_app
-  adapters
 )
 
 target_link_libraries(viewer

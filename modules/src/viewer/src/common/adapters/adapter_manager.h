@@ -12,13 +12,13 @@
 
 #include <ros/ros.h>
 
-#include "common/src/adapters/adapter.h"
+#include "viewer/src/common/adapters/adapter.h"
 #include "common/src/macro.h"
-#include "common/src/adapters/proto/adapter_config.pb.h"
-#include "common/src/adapters/message_adapters.h"
+#include "viewer/src/common/adapters/proto/adapter_config.pb.h"
+#include "viewer/src/common/adapters/message_adapters.h"
 
 namespace EDrive {
-namespace common {
+namespace viewer {
 namespace adapter {
 
 /// Macro to prepare all the necessary adapter functions when adding a
@@ -145,16 +145,16 @@ class AdapterManager
   bool initialized_ = false;
 
   /// The following code registered all the adapters of interest.
+  REGISTER_ADAPTER(CARLAObjects);
+  REGISTER_ADAPTER(ViewerVehicle);
+  REGISTER_ADAPTER(ViewerObjects);
   REGISTER_ADAPTER(Viewer);
-  REGISTER_ADAPTER(Vehicle);
+  REGISTER_ADAPTER(CARLAVehicle);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(ControlCommand);
-  REGISTER_ADAPTER(CarlaObjects);
-  REGISTER_ADAPTER(ViewerObjects);
-  REGISTER_ADAPTER(Perception);
   DECLARE_SINGLETON(AdapterManager);
 };
 
-} // adapter
-} // common
-} // EDrive
+} // namespace adapter
+} // namespace viewer
+} // namespace EDrive

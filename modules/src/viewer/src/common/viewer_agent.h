@@ -6,7 +6,7 @@
 
 #include "common/src/state.h"
 
-#include "viewer/src/common/viewer_manager.h"
+#include "viewer/src/visual_component/viewer_base.h"
 #include "viewer/proto/viewer_conf.pb.h"
 #include <nav_msgs/Odometry.h>
 #include "viewer/VisualizingData.h"
@@ -28,7 +28,7 @@ class ViewerAgent {
    */
   Result_state Init(const ViewerConf *viewer_conf);
 
-  Result_state Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data);
+  Result_state Visualize();
 
  private:
   /**

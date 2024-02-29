@@ -156,7 +156,7 @@ add_executable(prediction
 target_link_libraries(prediction
   ${catkin_LIBRARIES}
   EDrive_app
-  adapters
+  common_adapters
 )
 
 #############

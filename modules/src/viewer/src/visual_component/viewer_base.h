@@ -8,6 +8,7 @@
 #include "viewer/proto/viewer_conf.pb.h"
 #include <nav_msgs/Odometry.h>
 #include "viewer/VisualizingData.h"
+#include "derived_object_msgs/ObjectArray.h"
 
 namespace EDrive {
 namespace viewer {
@@ -32,11 +33,9 @@ class ViewerBase {
 
   virtual EDrive::Result_state PublishVisualizationData() = 0;
 
-  virtual EDrive::Result_state Visualize(const nav_msgs::Odometry *location, ::viewer::VisualizingData *visualizing_data) = 0;
-  
- protected:
+  virtual EDrive::Result_state Visualize() = 0;
 
-  virtual void Stop();
+  virtual void Stop() = 0;
 
 };
 
