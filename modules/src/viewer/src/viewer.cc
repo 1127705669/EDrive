@@ -32,8 +32,8 @@ Result_state Viewer::CheckInput() {
   auto trajectory_adapter = AdapterManager::GetPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
 
-  // auto location_adapter = AdapterManager::GetCARLAVehicle();
-  // CARLA_location_ = location_adapter->GetLatestObserved();
+  auto localization_adapter = AdapterManager::GetLocalization();
+  localization_ = localization_adapter->GetLatestObserved();
 
   auto objects_adapter = AdapterManager::GetPerception();
   objects_ = objects_adapter->GetLatestObserved();
