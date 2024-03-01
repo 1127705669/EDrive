@@ -2,7 +2,7 @@
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "perception.h"
+#include "perception/src/perception.h"
 
 #include "common/src/adapters/adapter_manager.h"
 
@@ -46,6 +46,10 @@ Result_state Perception::CheckInput() {
   return State_Ok;
 }
 
+void Perception::Publish(){
+  AdapterManager::PublishPerception(objects_);
+}
+
 EDrive::Result_state Perception::Start(){
 
   timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(0.1), 
@@ -55,7 +59,8 @@ EDrive::Result_state Perception::Start(){
 }
 
 void Perception::OnTimer(const ros::TimerEvent &) {
-
+  Result_state state = CheckInput();
+  Publish();
 }
 
 void Perception::Stop() {
