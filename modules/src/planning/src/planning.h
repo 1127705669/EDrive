@@ -50,10 +50,13 @@ class Planning : public EDrive::common::EDriveApp {
 
   EDrive::Result_state RegisterPlanners();
 
+  void CheckInput();
+
   void PublishPlanningPb(::planning::ADCTrajectory* trajectory_pb);
   const double planning_period = 0.1;
   ros::Timer timer_;
 
+  nav_msgs::Odometry position_;
   std::string root_path;
   std::string adapter_conf_file = "/src/planning/conf/adapter.conf";
   std::string planning_conf_file = "/src/planning/conf/planning.conf";

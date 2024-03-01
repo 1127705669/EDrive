@@ -152,6 +152,7 @@ class AdapterManager
   REGISTER_ADAPTER(CarlaObjects);
   REGISTER_ADAPTER(ViewerObjects);
   REGISTER_ADAPTER(Perception);
+  REGISTER_ADAPTER(Localization);
   DECLARE_SINGLETON(AdapterManager);
 };
 
