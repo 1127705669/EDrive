@@ -13,6 +13,7 @@
 #include "planning/ADCTrajectory.h"
 #include "viewer/VisualizingData.h"
 #include <visualization_msgs/MarkerArray.h>
+#include <nav_msgs/Path.h>
 
 /**
  * @file message_adapters.h
@@ -32,6 +33,7 @@ using CarlaObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
 using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
 using PerceptionAdapter = Adapter<derived_object_msgs::ObjectArray>;
 using LocalizationAdapter = Adapter<nav_msgs::Odometry>;
+using ViewerPathAdapter = Adapter<nav_msgs::Path>;
 
 } // namespace adapter
 } // namespace common

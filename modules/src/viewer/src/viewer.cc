@@ -15,6 +15,7 @@
 
 #include "viewer/src/visual_component/environment/env_handle.h"
 #include "viewer/src/visual_component/vehicle_state/vehicle_state_visualizer.h"
+#include "viewer/src/visual_component/planning/planning_handle.h"
 
 namespace EDrive {
 namespace viewer {
@@ -49,6 +50,9 @@ void Viewer::RegisterControllers(const ViewerConf *viewer_conf) {
       case ViewerConf::ENV_VIEWER:
         viewer_list_.emplace_back(std::move(new Env_handle(&Carla_objects_, &objects_marker_array_)));
         break;
+      case ViewerConf::PLANNING_TRAJECTORY:
+        viewer_list_.emplace_back(std::move(new Planning_handle(&trajectory_, &trajectory_path_)));
+        break;
       
       default:
         ROS_ERROR("    Unknown active controller type: ");
@@ -78,8 +82,8 @@ Result_state Viewer::Start(){
   // set initial vehicle state by cmd
   // need to sleep, because advertised channel is not ready immediately
   // simple test shows a short delay of 80 ms or so
-  ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
-  ros::Duration(1.0).sleep();
+  // ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
+  // ros::Duration(1.0).sleep();
 
   timer_ = AdapterManager::CreateTimer(ros::Duration(viewer_conf_.viewer_period()), 
                                                               &Viewer::OnTimer,
@@ -115,6 +119,7 @@ void Viewer::Publish(visualization_msgs::MarkerArray *objects_marker_array) {
   // AdapterManager::PublishViewerVehicle(*viewer_vehicle_data);
   AdapterManager::PublishViewerObjects(*objects_marker_array);
   objects_marker_array_.markers.clear();
+  AdapterManager::PublishViewerPath(trajectory_path_);
   // AdapterManager::PublishViewer(*visualizing_data);
 }
 

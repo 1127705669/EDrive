@@ -153,6 +153,7 @@ class AdapterManager
   REGISTER_ADAPTER(ViewerObjects);
   REGISTER_ADAPTER(Perception);
   REGISTER_ADAPTER(Localization);
+  REGISTER_ADAPTER(ViewerPath);
   DECLARE_SINGLETON(AdapterManager);
 };
 

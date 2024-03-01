@@ -5,7 +5,7 @@ package EDrive.viewer;
 message ViewerConf {
   enum ViewerType {
     ENV_VIEWER = 0;
-    PLA_VIEWER = 1;
+    PLANNING_TRAJECTORY = 1;
     VEHSTA_VIEWER = 2;
   };
 
