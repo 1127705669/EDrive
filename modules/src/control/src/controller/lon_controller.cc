@@ -15,7 +15,7 @@ using EDrive::Result_state;
 constexpr double GRA_ACC = 9.8;
 
 LonController::LonController() : name_("LonController"){
-  ROS_INFO("    Registering Lon controller...");
+  ROS_INFO("    registering Lon controller...");
 }
 
 LonController::~LonController() {

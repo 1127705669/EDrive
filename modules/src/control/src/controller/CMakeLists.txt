@@ -26,6 +26,7 @@ add_library(controller_agent SHARED
 
 target_link_libraries(controller_agent 
   lon_controller
+  lat_controller
 )
 
 ###################################
@@ -45,6 +46,21 @@ target_link_libraries(lon_controller
 )
 
 ###################################
+#    lat_controller               #
+###################################
+
+set(LAT_CONTROLLER_SRC 
+  lat_controller.cc
+)
+
+add_library(lat_controller SHARED ${LAT_CONTROLLER_SRC})
+
+target_link_libraries(lat_controller 
+  trajectory_analyzer
+  vehicle_state_provider
+)
+
+###################################
 #    controller                   #
 ###################################
 
@@ -53,4 +69,5 @@ add_library(controller INTERFACE)
 target_link_libraries(controller INTERFACE
   controller_agent
   lon_controller
+  lat_controller
 )

@@ -3,6 +3,7 @@
  *****************************************************************************/
 
 #include "control/src/controller/lon_controller.h"
+#include "control/src/controller/lat_controller.h"
 
 #include "control/src/controller/controller_agent.h"
 
@@ -19,7 +20,7 @@ void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
         controller_list_.emplace_back(std::move(new LonController()));
         break;
       case ControlConf::LAT_CONTROLLER:
-        ROS_WARN("    Lat controller not deployed yet");
+        controller_list_.emplace_back(std::move(new LatController()));
         break;
       default:
         ROS_ERROR("    Unknown active controller type: ");
