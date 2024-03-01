@@ -69,6 +69,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::PERCEPTION_OBJECTS:
         EnablePerception("/EDrive/perception/objects", config);
         break;
+      case AdapterConfig::LOCALIZATION_POSITION:
+        EnableLocalization("/EDrive/localization/position", config);
+        break;
 
       default:
         ROS_INFO("Unknown adapter config type!");

@@ -52,6 +52,11 @@ EDrive::Result_state Localization::Start(){
 
 void Localization::OnTimer(const ros::TimerEvent &) {
   Result_state status = CheckInput();
+  Publish();
+}
+
+void Localization::Publish(){
+  AdapterManager::PublishLocalization(position_);
 }
 
 void Localization::Stop() {

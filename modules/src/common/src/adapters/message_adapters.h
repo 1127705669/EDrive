@@ -31,6 +31,7 @@ using VehicleAdapter = Adapter<nav_msgs::Odometry>;
 using CarlaObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
 using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
 using PerceptionAdapter = Adapter<derived_object_msgs::ObjectArray>;
+using LocalizationAdapter = Adapter<nav_msgs::Odometry>;
 
 } // namespace adapter
 } // namespace common

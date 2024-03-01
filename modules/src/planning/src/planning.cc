@@ -68,6 +68,12 @@ Result_state Planning::Start(){
   return State_Ok;
 }
 
+void Planning::CheckInput(){
+  AdapterManager::Observe();
+  auto position_adapter = AdapterManager::GetLocalization();
+  position_ = position_adapter->GetLatestObserved();
+}
+
 void Planning::Stop() {
   
 }
