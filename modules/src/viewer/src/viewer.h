@@ -62,7 +62,7 @@ class Viewer : public EDrive::common::EDriveApp {
   ros::Timer timer_;
   ::planning::ADCTrajectory trajectory_;
   nav_msgs::Odometry CARLA_location_;
-  derived_object_msgs::ObjectArray Carla_objects_;
+  derived_object_msgs::ObjectArray objects_;
   visualization_msgs::MarkerArray objects_marker_array_;
   nav_msgs::Path trajectory_path_;
 

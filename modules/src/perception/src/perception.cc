@@ -42,7 +42,7 @@ EDrive::Result_state Perception::Init(){
 Result_state Perception::CheckInput() {
   AdapterManager::Observe();
   auto objects_adapter = AdapterManager::GetCarlaObjects();
-  objects_ = objects_adapter->GetLatestObserved();
+  carla_objects_ = objects_adapter->GetLatestObserved();
   return State_Ok;
 }
 
@@ -60,6 +60,7 @@ EDrive::Result_state Perception::Start(){
 
 void Perception::OnTimer(const ros::TimerEvent &) {
   Result_state state = CheckInput();
+  objects_ = carla_objects_;
   Publish();
 }
 

@@ -34,6 +34,7 @@ class Perception : public EDrive::common::EDriveApp {
   EDrive::Result_state CheckInput();
   void Publish();
 
+  derived_object_msgs::ObjectArray carla_objects_;
   derived_object_msgs::ObjectArray objects_;
 
   std::string root_path;
