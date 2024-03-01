@@ -38,9 +38,9 @@ class AdapterBase {
 /**
  * @class Adapter
  * @brief this class serves as the interface and a layer of
- * abstraction for Apollo modules to interact with various I/O (e.g.
+ * abstraction for EDrive modules to interact with various I/O (e.g.
  * ROS). The adapter will also store history data, so that other
- * Apollo modules can get access to both the current and the past data
+ * EDrive modules can get access to both the current and the past data
  * without having to handle communication protocols directly.
  *
  * \par
