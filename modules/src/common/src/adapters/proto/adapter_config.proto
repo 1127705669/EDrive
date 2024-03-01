@@ -13,6 +13,7 @@ message AdapterConfig {
     VIEWER_OBJECTS = 6;
     PERCEPTION_OBJECTS = 7;
     LOCALIZATION_POSITION = 8;
+    VIEWER_PATH = 9;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

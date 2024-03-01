@@ -21,6 +21,8 @@
 
 #include "planning/ADCTrajectory.h"
 
+#include <nav_msgs/Odometry.h>
+
 namespace EDrive {
 namespace control {
 
@@ -49,17 +51,18 @@ class Control : public EDrive::common::EDriveApp {
   void SendCmd(::control::CarlaEgoVehicleControl *control_command);
 
   Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
-  
+
   ros::Timer timer_;
   ros::Time init_time_;
   ControllerAgent controller_agent_;
   ControlConf control_conf_;
   planning::ADCTrajectory trajectory_;
+  nav_msgs::Odometry localization_; 
 
   std::string root_path;
   std::string adapter_conf_file = "/src/control/conf/adapter.conf";
   std::string control_conf_file = "/src/control/conf/control.conf";
-  
+
 };
 
 } // namespace control

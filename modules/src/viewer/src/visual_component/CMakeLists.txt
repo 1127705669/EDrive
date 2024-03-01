@@ -25,4 +25,5 @@ add_library(visual_component INTERFACE)
 target_link_libraries(visual_component INTERFACE
   vehicle_state_visualizer
   env_data
+  planning_handle
 )

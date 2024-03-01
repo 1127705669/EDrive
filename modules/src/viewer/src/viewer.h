@@ -23,6 +23,8 @@
 #include "derived_object_msgs/ObjectArray.h"
 #include "visualization_msgs/MarkerArray.h"
 #include "visualization_msgs/Marker.h"
+#include "planning/ADCTrajectory.h"
+#include <nav_msgs/Path.h>
 
 namespace EDrive {
 namespace viewer {
@@ -58,10 +60,11 @@ class Viewer : public EDrive::common::EDriveApp {
   ViewerConf viewer_conf_;
 
   ros::Timer timer_;
-  planning::ADCTrajectory trajectory_;
+  ::planning::ADCTrajectory trajectory_;
   nav_msgs::Odometry CARLA_location_;
   derived_object_msgs::ObjectArray Carla_objects_;
   visualization_msgs::MarkerArray objects_marker_array_;
+  nav_msgs::Path trajectory_path_;
 
   std::vector<std::unique_ptr<ViewerBase>> viewer_list_;
 

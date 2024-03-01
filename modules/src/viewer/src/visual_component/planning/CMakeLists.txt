@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(planning)
+project(planning_handle)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -11,3 +11,9 @@ include
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+set(PLANNING_HANDLE_SRC 
+  planning_handle.cc
+)
+
+add_library(planning_handle SHARED ${PLANNING_HANDLE_SRC})

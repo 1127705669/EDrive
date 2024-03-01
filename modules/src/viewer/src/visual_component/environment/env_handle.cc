@@ -10,7 +10,7 @@ namespace EDrive {
 namespace viewer {
 
 Env_handle::Env_handle(derived_object_msgs::ObjectArray *objects, visualization_msgs::MarkerArray *objects_marker_array) {
-  ROS_INFO("    Registering viewer [environment data]...");
+  ROS_INFO("    registering viewer [environment data]...");
   objects_ = objects;
   objects_marker_array_ = objects_marker_array;
 }
@@ -59,7 +59,6 @@ EDrive::Result_state Env_handle::InterfaceMatch() {
 
     objects_marker_array_->markers.push_back(marker);
   }
-
   return State_Ok;
 }
 
