@@ -21,6 +21,14 @@ LatController::~LatController() {
 }
 
 Result_state LatController::Init(const ControlConf *control_conf) {
+  control_conf_ = control_conf;
+  if (control_conf_ == nullptr) {
+    controller_initialized_ = false;
+    ROS_ERROR("get_lateral_param() nullptr");
+    return State_Failed;
+  }
+  
+  auto &lat_controller_conf = control_conf->lat_controller_conf();
 
   return State_Ok;
 }

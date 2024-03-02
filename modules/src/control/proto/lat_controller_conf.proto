@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package EDrive.control;
+
+// controller param
+message LatControllerConf {
+  optional double ts = 1; // longitudinal controller sampling time
+}

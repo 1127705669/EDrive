@@ -74,6 +74,9 @@ class LatController : public Controller {
   std::string name_;
   std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
   const planning::ADCTrajectory *trajectory_message_ = nullptr;
+
+  bool controller_initialized_ = false;
+  const ControlConf *control_conf_ = nullptr;
 };
 
 } // namespace control
