@@ -21,7 +21,7 @@ message LatencyStats {
 
 // next id : 27
 message ControlCommand {
-  /*optional apollo.common.Header header = 1;*/
+  /*optional EDrive.common.Header header = 1;*/
   // target throttle in percentage [0, 100]
   optional double throttle = 3;
 
@@ -49,14 +49,14 @@ message ControlCommand {
   optional bool engine_on_off = 17;
   // completion percentage of trajectory planned in last cycle
   optional double trajectory_fraction = 18;
-  // optional apollo.canbus.Chassis.DrivingMode driving_mode = 19 [deprecated = true];
-  // optional apollo.canbus.Chassis.GearPosition gear_location = 20;
+  // optional EDrive.canbus.Chassis.DrivingMode driving_mode = 19 [deprecated = true];
+  // optional EDrive.canbus.Chassis.GearPosition gear_location = 20;
 
   optional Debug debug = 22;
-  // optional apollo.common.VehicleSignal signal = 23;
+  // optional EDrive.common.VehicleSignal signal = 23;
   optional LatencyStats latency_stats = 24;
   // optional PadMessage pad_msg = 25;
-  // optional apollo.common.EngageAdvice engage_advice = 26;
+  // optional EDrive.common.EngageAdvice engage_advice = 26;
   optional bool is_in_safe_mode = 27 [default = false];
 
   // deprecated fields
@@ -148,9 +148,9 @@ message SimpleMPCDebug {
 }
 
 // message InputDebug {
-//   optional apollo.common.Header localization_header = 1;
-//   optional apollo.common.Header canbus_header = 2;
-//   optional apollo.common.Header trajectory_header = 3;
+//   optional EDrive.common.Header localization_header = 1;
+//   optional EDrive.common.Header canbus_header = 2;
+//   optional EDrive.common.Header trajectory_header = 3;
 //   }
 
 message Debug {
