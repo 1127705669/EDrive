@@ -48,7 +48,7 @@ Result_state Perception::CheckInput() {
 
 EDrive::Result_state Perception::Start(){
 
-  timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(0.1), 
+  timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(control_perception_.perception_period()), 
                                                                 &Perception::OnTimer,
                                                                 this);
   return State_Ok;
