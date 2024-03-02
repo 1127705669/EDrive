@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package EDrive.perception;
+
+message PerceptionConf {
+
+  optional double perception_period = 1;
+}

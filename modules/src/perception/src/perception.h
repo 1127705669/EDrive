@@ -10,6 +10,8 @@
 #include "common/src/EDrive.h"
 #include "common/src/state.h"
 
+#include "perception/proto/perception_conf.pb.h"
+
 #include <derived_object_msgs/ObjectArray.h>
 
 namespace EDrive {
@@ -33,6 +35,7 @@ class Perception : public EDrive::common::EDriveApp {
   ros::Timer timer_;
   EDrive::Result_state CheckInput();
   void Publish();
+  PerceptionConf control_perception_;
 
   derived_object_msgs::ObjectArray objects_;
   derived_object_msgs::ObjectArray Carla_objects_;

@@ -93,6 +93,8 @@ generate_messages(
   common
 )
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
+
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
@@ -124,7 +126,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
- LIBRARIES perception
+ LIBRARIES perception_proto
  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
@@ -138,15 +140,17 @@ catkin_package(
 include_directories(
 include
   ${catkin_INCLUDE_DIRS}
-  ../
-  ../../
-  ../../../
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/perception.cpp
 # )
+add_library(perception_lib
+  src/perception.cc
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -157,10 +161,10 @@ include
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(perception 
-  src/main.cc 
-  src/perception.cc 
+  src/main.cc
 )
 
+add_dependencies(perception ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -175,9 +179,16 @@ add_executable(perception
 target_link_libraries(perception
   ${catkin_LIBRARIES}
   EDrive_app
-  common_adapters
+  perception_lib
 )
 
+target_link_libraries(perception_lib
+  ${PROTOBUF_LIBRARIES}
+  ${catkin_LIBRARIES}
+  perception_proto
+  EDrive_app
+  common_adapters
+)
 
 #############
 ## Install ##
