@@ -3,6 +3,7 @@
  *****************************************************************************/
 
 #include "control/src/controller/lon_controller.h"
+#include "control/src/controller/lat_controller.h"
 
 #include "control/src/controller/controller_agent.h"
 
@@ -19,7 +20,7 @@ void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
         controller_list_.emplace_back(std::move(new LonController()));
         break;
       case ControlConf::LAT_CONTROLLER:
-        ROS_WARN("    Lat controller not deployed yet");
+        controller_list_.emplace_back(std::move(new LatController()));
         break;
       default:
         ROS_ERROR("    Unknown active controller type: ");
@@ -37,10 +38,13 @@ Result_state ControllerAgent::Init(const ControlConf *control_conf_) {
   return State_Ok;
 }
 
-Result_state ControllerAgent::ComputeControlCommand(const ::planning::ADCTrajectory *trajectory, ::control::CarlaEgoVehicleControl *control_command) {
+Result_state ControllerAgent::ComputeControlCommand(
+    const ::planning::ADCTrajectory *trajectory, 
+    const nav_msgs::Odometry *localization,
+    ::control::CarlaEgoVehicleControl *control_command) {
   for (auto &controller : controller_list_) {
     ros::Time start_timestamp = ros::Time::now();
-    controller->ComputeControlCommand(trajectory, control_command);
+    controller->ComputeControlCommand(trajectory, localization, control_command);
     ros::Time end_timestamp = ros::Time::now();
   }
   return State_Ok;

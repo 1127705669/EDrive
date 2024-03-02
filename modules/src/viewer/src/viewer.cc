@@ -32,11 +32,11 @@ Result_state Viewer::CheckInput() {
   auto trajectory_adapter = AdapterManager::GetPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
 
-  // auto location_adapter = AdapterManager::GetCARLAVehicle();
-  // CARLA_location_ = location_adapter->GetLatestObserved();
+  auto location_adapter = AdapterManager::GetLocalization();
+  location_ = location_adapter->GetLatestObserved();
 
-  auto objects_adapter = AdapterManager::GetCarlaObjects();
-  Carla_objects_ = objects_adapter->GetLatestObserved();
+  auto objects_adapter = AdapterManager::GetPerception();
+  objects_ = objects_adapter->GetLatestObserved();
   
   return State_Ok;
 }
@@ -48,7 +48,7 @@ void Viewer::RegisterControllers(const ViewerConf *viewer_conf) {
         viewer_list_.emplace_back(std::move(new Vehicle_state()));
         break;
       case ViewerConf::ENV_VIEWER:
-        viewer_list_.emplace_back(std::move(new Env_handle(&Carla_objects_, &objects_marker_array_)));
+        viewer_list_.emplace_back(std::move(new Env_handle(&objects_, &objects_marker_array_)));
         break;
       case ViewerConf::PLANNING_TRAJECTORY:
         viewer_list_.emplace_back(std::move(new Planning_handle(&trajectory_, &trajectory_path_)));
@@ -82,8 +82,8 @@ Result_state Viewer::Start(){
   // set initial vehicle state by cmd
   // need to sleep, because advertised channel is not ready immediately
   // simple test shows a short delay of 80 ms or so
-  // ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
-  // ros::Duration(1.0).sleep();
+  ROS_INFO("Viewer resetting vehicle state, sleeping for 1000 ms ...");
+  ros::Duration(1.0).sleep();
 
   timer_ = AdapterManager::CreateTimer(ros::Duration(viewer_conf_.viewer_period()), 
                                                               &Viewer::OnTimer,

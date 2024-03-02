@@ -31,7 +31,10 @@ class ControllerAgent {
    */
   Result_state Init(const ControlConf *control_conf_);
 
-  Result_state ComputeControlCommand(const ::planning::ADCTrajectory *trajectory,::control::CarlaEgoVehicleControl *control_command);
+  Result_state ComputeControlCommand(
+      const ::planning::ADCTrajectory *trajectory, 
+      const nav_msgs::Odometry *localization,
+      ::control::CarlaEgoVehicleControl *control_command);
 
  private:
   /**
