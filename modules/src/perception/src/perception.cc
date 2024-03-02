@@ -2,7 +2,7 @@
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "perception.h"
+#include "perception/src/perception.h"
 
 #include "common/src/adapters/adapter_manager.h"
 
@@ -42,7 +42,7 @@ EDrive::Result_state Perception::Init(){
 Result_state Perception::CheckInput() {
   AdapterManager::Observe();
   auto objects_adapter = AdapterManager::GetCarlaObjects();
-  objects_ = objects_adapter->GetLatestObserved();
+  Carla_objects_ = objects_adapter->GetLatestObserved();
   return State_Ok;
 }
 
@@ -55,7 +55,13 @@ EDrive::Result_state Perception::Start(){
 }
 
 void Perception::OnTimer(const ros::TimerEvent &) {
+  Result_state state = CheckInput();
+  objects_ = Carla_objects_;
+  Publish();
+}
 
+void Perception::Publish(){
+  AdapterManager::PublishPerception(objects_);
 }
 
 void Perception::Stop() {
