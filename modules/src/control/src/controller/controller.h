@@ -12,6 +12,7 @@
 #include "control/proto/control_conf.pb.h"
 #include "control/CarlaEgoVehicleControl.h"
 #include "planning/ADCTrajectory.h"
+#include "nav_msgs/Odometry.h"
 
 /**
  * @namespace EDrive::control
@@ -55,7 +56,10 @@ class Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  virtual Result_state ComputeControlCommand(const ::planning::ADCTrajectory *trajectory, ::control::CarlaEgoVehicleControl *control_command) = 0;
+  virtual Result_state ComputeControlCommand(
+      const ::planning::ADCTrajectory *trajectory, 
+      const nav_msgs::Odometry *localization, 
+      ::control::CarlaEgoVehicleControl *control_command) = 0;
 
   /**
    * @brief reset Controller

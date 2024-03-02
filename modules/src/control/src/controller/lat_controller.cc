@@ -27,7 +27,16 @@ Result_state LatController::Init(const ControlConf *control_conf) {
 
 std::string LatController::Name() const { return name_; }
 
-Result_state LatController::ComputeControlCommand(const ::planning::ADCTrajectory *trajectory, ::control::CarlaEgoVehicleControl *control_command) {
+Result_state LatController::ComputeControlCommand(
+    const ::planning::ADCTrajectory *trajectory,
+    const nav_msgs::Odometry *localization,
+    ::control::CarlaEgoVehicleControl *control_command) {
+  trajectory_message_ = trajectory;
+  if (trajectory_analyzer_ == nullptr) {
+    trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory_message_));
+  }
+
+  ComputeLateralErrors(trajectory_analyzer_.get());
 
   return State_Ok;
 }

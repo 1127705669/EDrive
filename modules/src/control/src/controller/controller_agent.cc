@@ -38,10 +38,13 @@ Result_state ControllerAgent::Init(const ControlConf *control_conf_) {
   return State_Ok;
 }
 
-Result_state ControllerAgent::ComputeControlCommand(const ::planning::ADCTrajectory *trajectory, ::control::CarlaEgoVehicleControl *control_command) {
+Result_state ControllerAgent::ComputeControlCommand(
+    const ::planning::ADCTrajectory *trajectory, 
+    const nav_msgs::Odometry *localization,
+    ::control::CarlaEgoVehicleControl *control_command) {
   for (auto &controller : controller_list_) {
     ros::Time start_timestamp = ros::Time::now();
-    controller->ComputeControlCommand(trajectory, control_command);
+    controller->ComputeControlCommand(trajectory, localization, control_command);
     ros::Time end_timestamp = ros::Time::now();
   }
   return State_Ok;

@@ -48,7 +48,10 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Result_state ComputeControlCommand(const ::planning::ADCTrajectory *trajectory, ::control::CarlaEgoVehicleControl *control_command) override;
+  Result_state ComputeControlCommand(
+      const ::planning::ADCTrajectory *trajectory,
+      const nav_msgs::Odometry *localization,
+      ::control::CarlaEgoVehicleControl *control_command) override;
 
   /**
    * @brief reset Controller

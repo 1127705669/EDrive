@@ -46,7 +46,10 @@ class LatController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Result_state ComputeControlCommand(const ::planning::ADCTrajectory *trajectory, ::control::CarlaEgoVehicleControl *control_command) override;
+  Result_state ComputeControlCommand(
+      const ::planning::ADCTrajectory *trajectory,
+      const nav_msgs::Odometry *localization,
+      ::control::CarlaEgoVehicleControl *control_command) override;
 
   /**
    * @brief reset Lateral Controller
@@ -69,6 +72,8 @@ class LatController : public Controller {
 
  private:
   std::string name_;
+  std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
+  const planning::ADCTrajectory *trajectory_message_ = nullptr;
 };
 
 } // namespace control
