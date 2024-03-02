@@ -35,6 +35,7 @@ class Perception : public EDrive::common::EDriveApp {
   void Publish();
 
   derived_object_msgs::ObjectArray objects_;
+  derived_object_msgs::ObjectArray Carla_objects_;
 
   std::string root_path;
   std::string adapter_conf_file = "/src/perception/conf/adapter.conf";
