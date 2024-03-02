@@ -14,8 +14,6 @@ namespace perception {
 using EDrive::Result_state;
 using EDrive::common::adapter::AdapterManager;
 
-// Planning::~Planning() { Stop(); }
-
 std::string Perception::Name() const { return "EDrive_perception"; }
 
 EDrive::Result_state Perception::Init(){
@@ -68,5 +66,5 @@ void Perception::Stop() {
   
 }
 
-} // perception
-} // EDrive
+} // namespace perception
+} // namespace EDrive
