@@ -2,17 +2,18 @@
  * Copyright 2022 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "common/src/adapters/adapter_manager.h"
-
 #include "control/src/control.h"
 
+#include "common/src/adapters/adapter_manager.h"
 #include "common/src/util/file.h"
+#include "common/src/vehicle_state/vehicle_state_provider.h"
 
 namespace EDrive {
 namespace control {
 
 using EDrive::Result_state;
 using EDrive::common::adapter::AdapterManager;
+using EDrive::common::VehicleStateProvider;
 
 std::string Control::Name() const { return "EDrive_control"; }
 
@@ -42,6 +43,9 @@ Result_state Control::CheckInput() {
 
   auto localization_adapter = AdapterManager::GetLocalization();
   localization_ = localization_adapter->GetLatestObserved();
+
+  VehicleStateProvider::instance()->Update(localization_);
+
   return State_Ok;
 }
 

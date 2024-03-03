@@ -72,7 +72,6 @@ class LatController : public Controller {
 
  private:
   std::string name_;
-  const planning::ADCTrajectory *trajectory_message_ = nullptr;
 
   bool controller_initialized_ = false;
   const ControlConf *control_conf_ = nullptr;

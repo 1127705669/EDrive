@@ -10,6 +10,7 @@ namespace control {
 
 using EDrive::Result_state;
 using Matrix = Eigen::MatrixXd;
+using EDrive::common::VehicleStateProvider;
 
 constexpr double GRA_ACC = 9.8;
 
@@ -96,9 +97,10 @@ Result_state LatController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
     ::control::CarlaEgoVehicleControl *control_command) {
-  trajectory_message_ = trajectory;
+  VehicleStateProvider::instance()->set_linear_velocity(localization->twist.twist.linear.x);
+
   if (trajectory_analyzer_ == nullptr) {
-    trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory_message_));
+    trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory));
   }
 
   ComputeLateralErrors(trajectory_analyzer_.get());
@@ -115,7 +117,12 @@ Result_state LatController::ComputeControlCommand(
 }
 
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
-
+  // State matrix update;
+  // First four elements are fixed;
+  matrix_state_(0, 0) = debug->lateral_error();
+  matrix_state_(1, 0) = debug->lateral_error_rate();
+  matrix_state_(2, 0) = debug->heading_error();
+  matrix_state_(3, 0) = debug->heading_error_rate();
 }
 
 void LatController::UpdateMatrix(){
