@@ -115,6 +115,9 @@ class LatController : public Controller {
   // the maximum turn of steer
   double steer_single_direction_max_degree_ = 0.0;
 
+  // limit steering to maximum theoretical lateral acceleration
+  double max_lat_acc_ = 0.0;
+
   // number of control cycles look ahead (preview controller)
   int preview_window_ = 0;
   // number of states without previews, includes
@@ -150,6 +153,9 @@ class LatController : public Controller {
   // parameters for lqr solver; threshold for computation
   double lqr_eps_ = 0.0;
 
+  double query_relative_time_;
+
+  double minimum_speed_protection_ = 0.1;
 };
 
 } // namespace control

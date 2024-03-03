@@ -3,6 +3,9 @@
  *****************************************************************************/
 
 #include <ros/ros.h>
+
+#include <algorithm> 
+
 #include "control/src/controller/lat_controller.h"
 
 namespace EDrive {
@@ -76,6 +79,9 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
+
+  max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
+  
   const double mass_fl = control_conf->lat_controller_conf().mass_fl();
   const double mass_fr = control_conf->lat_controller_conf().mass_fr();
   const double mass_rl = control_conf->lat_controller_conf().mass_rl();
@@ -90,6 +96,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   lqr_eps_ = control_conf->lat_controller_conf().eps();
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
 
+  query_relative_time_ = control_conf->query_relative_time();
+  minimum_speed_protection_ = control_conf->minimum_speed_protection();
   return true;
 }
 
@@ -136,7 +144,8 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateMatrix(){
-
+  const double v = std::max(VehicleStateProvider::instance()->linear_velocity(),
+                            minimum_speed_protection_);
 }
 
 void LatController::UpdateMatrixCompound(){

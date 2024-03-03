@@ -12,7 +12,8 @@ namespace common {
 VehicleStateProvider::VehicleStateProvider() {}
 
 Result_state VehicleStateProvider::Update(const nav_msgs::Odometry& localization){
-   vehicle_state_.set_linear_velocity(localization.twist.twist.linear.x);
+  vehicle_state_.set_linear_velocity(localization.twist.twist.linear.x);
+  vehicle_state_.set_angular_velocity(localization.twist.twist.angular.z);
   return State_Ok;
 }
 
@@ -48,7 +49,7 @@ math::Vec2d VehicleStateProvider::ComputeCOMPosition(
                           vehicle_state_.z());
   // Initialize the COM position without rotation
   Eigen::Vector3d com_pos_3d = v + pos_vec;
-  
+
   return math::Vec2d(com_pos_3d[0], com_pos_3d[1]);
 }
 
