@@ -70,8 +70,6 @@ class LatController : public Controller {
    */
   std::string Name() const override;
 
-  void ComputeLateralErrors(const TrajectoryAnalyzer *trajectory_analyzer);
-
  private:
   std::string name_;
   const planning::ADCTrajectory *trajectory_message_ = nullptr;
@@ -80,8 +78,15 @@ class LatController : public Controller {
   const ControlConf *control_conf_ = nullptr;
 
  protected:
+  void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
 
   bool LoadControlConf(const ControlConf *control_conf);
+
+  void ComputeLateralErrors(const TrajectoryAnalyzer *trajectory_analyzer);
+
+  void UpdateMatrix();
+
+  void UpdateMatrixCompound();
 
   // a proxy to analyze the planning trajectory
   std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;

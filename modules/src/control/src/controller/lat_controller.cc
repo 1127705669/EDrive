@@ -103,7 +103,27 @@ Result_state LatController::ComputeControlCommand(
 
   ComputeLateralErrors(trajectory_analyzer_.get());
 
+  SimpleLateralDebug *debug;
+
+  UpdateStateAnalyticalMatching(debug);
+
+  UpdateMatrix();
+
+  UpdateMatrixCompound();
+
   return State_Ok;
+}
+
+void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
+
+}
+
+void LatController::UpdateMatrix(){
+
+}
+
+void LatController::UpdateMatrixCompound(){
+
 }
 
 Result_state LatController::Reset(){
