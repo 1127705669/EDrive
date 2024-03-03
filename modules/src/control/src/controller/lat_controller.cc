@@ -97,8 +97,6 @@ Result_state LatController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
     ::control::CarlaEgoVehicleControl *control_command) {
-  VehicleStateProvider::instance()->set_linear_velocity(localization->twist.twist.linear.x);
-
   if (trajectory_analyzer_ == nullptr) {
     trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory));
   }
