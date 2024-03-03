@@ -56,6 +56,8 @@ Result_state LatController::Init(const ControlConf *control_conf) {
   matrix_r_ = Matrix::Identity(1, 1);
   matrix_q_ = Matrix::Zero(matrix_size, matrix_size);
 
+  int q_param_size = control_conf->lat_controller_conf().matrix_q_size();
+
   matrix_q_updated_ = matrix_q_;
   
   auto &lat_controller_conf = control_conf->lat_controller_conf();
@@ -101,15 +103,25 @@ Result_state LatController::ComputeControlCommand(
     trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory));
   }
 
-  ComputeLateralErrors(trajectory_analyzer_.get());
-
   SimpleLateralDebug *debug;
+
+  ComputeLateralErrors(0.0, 0.0, VehicleStateProvider::instance()->heading(),
+                         VehicleStateProvider::instance()->linear_velocity(),
+                         VehicleStateProvider::instance()->angular_velocity(),
+                         *trajectory_analyzer_, debug);
 
   UpdateStateAnalyticalMatching(debug);
 
   UpdateMatrix();
 
   UpdateMatrixCompound();
+
+  // feedback = - K * state
+  // Convert vehicle steer angle from rad to degree and then to steer degree
+  // then to 100% ratio
+  const double steer_angle_feedback = -(matrix_k_ * matrix_state_)(0, 0) * 180 /
+                                      M_PI * steer_transmission_ratio_ /
+                                      steer_single_direction_max_degree_ * 100;
 
   return State_Ok;
 }
@@ -139,7 +151,10 @@ void LatController::Stop() {
   ROS_INFO("stop");
 }
 
-void LatController::ComputeLateralErrors(const TrajectoryAnalyzer *trajectory_analyzer) {
+void LatController::ComputeLateralErrors(const double x, const double y, const double theta,
+                            const double linear_v, const double angular_v,
+                            const TrajectoryAnalyzer &trajectory_analyzer,
+                            SimpleLateralDebug *debug) {
   
 }
 

@@ -81,7 +81,10 @@ class LatController : public Controller {
 
   bool LoadControlConf(const ControlConf *control_conf);
 
-  void ComputeLateralErrors(const TrajectoryAnalyzer *trajectory_analyzer);
+  void ComputeLateralErrors(const double x, const double y, const double theta,
+                            const double linear_v, const double angular_v,
+                            const TrajectoryAnalyzer &trajectory_analyzer,
+                            SimpleLateralDebug *debug);
 
   void UpdateMatrix();
 

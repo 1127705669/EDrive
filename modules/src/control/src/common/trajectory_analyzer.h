@@ -49,6 +49,16 @@ class TrajectoryAnalyzer {
   ::common::PathPoint QueryMatchedPathPoint(const double x, const double y) const;
 
   /**
+   * @brief query a point of trajectery that its position is closest
+   * to the given position.
+   * @param x value of x-coordination in the given position
+   * @param y value of y-coordination in the given position
+   * @return a point of trajectory
+   */
+  ::common::TrajectoryPoint QueryNearestPointByPosition(const double x,
+                                                      const double y) const;
+
+  /**
    * @brief convert a position with theta and speed to trajectory frame,
    * - longitudinal and lateral direction to the trajectory
    * @param x x-value of the position
