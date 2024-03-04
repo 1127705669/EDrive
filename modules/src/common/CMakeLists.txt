@@ -96,6 +96,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/proto)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/adapters)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/vehicle_state)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/math)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/configs)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

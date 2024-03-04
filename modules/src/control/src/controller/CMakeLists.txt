@@ -43,6 +43,7 @@ target_link_libraries(lon_controller
   pid_controller
   trajectory_analyzer
   vehicle_state_provider
+  vehicle_config_helper
 )
 
 ###################################
@@ -58,6 +59,7 @@ add_library(lat_controller SHARED ${LAT_CONTROLLER_SRC})
 target_link_libraries(lat_controller 
   trajectory_analyzer
   vehicle_state_provider
+  vehicle_config_helper
 )
 
 ###################################

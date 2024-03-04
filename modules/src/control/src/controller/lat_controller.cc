@@ -8,6 +8,8 @@
 
 #include "control/src/controller/lat_controller.h"
 
+#include "common/src/configs/vehicle_config_helper.h"
+
 namespace EDrive {
 namespace control {
 
@@ -75,13 +77,16 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
     return false;
   }
 
+  const auto &vehicle_param_ =
+      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+
   ts_ = control_conf->lat_controller_conf().ts();
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
 
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
-  
+
   const double mass_fl = control_conf->lat_controller_conf().mass_fl();
   const double mass_fr = control_conf->lat_controller_conf().mass_fr();
   const double mass_rl = control_conf->lat_controller_conf().mass_rl();
