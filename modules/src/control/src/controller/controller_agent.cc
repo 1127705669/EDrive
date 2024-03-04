@@ -13,7 +13,7 @@ namespace EDrive {
 namespace control {
 
 void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
-  ROS_INFO("    Only Lon controllers as of now");
+  ROS_INFO("    Only support Lat + Lon controllers as of now");
   for (auto active_controller : control_conf_->active_controllers()) {
     switch (active_controller) {
       case ControlConf::LON_CONTROLLER:

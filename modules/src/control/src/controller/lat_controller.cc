@@ -84,7 +84,10 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
-
+  wheelbase_ = vehicle_param_.wheel_base();
+  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
+  steer_single_direction_max_degree_ =
+      vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
 
   const double mass_fl = control_conf->lat_controller_conf().mass_fl();
@@ -93,6 +96,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   const double mass_rr = control_conf->lat_controller_conf().mass_rr();
   const double mass_front = mass_fl + mass_fr;
   const double mass_rear = mass_rl + mass_rr;
+  mass_ = mass_front + mass_rear;
 
   lf_ = wheelbase_ * (1.0 - mass_front / mass_);
   lr_ = wheelbase_ * (1.0 - mass_rear / mass_);
@@ -102,7 +106,9 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   lqr_max_iteration_ = control_conf->lat_controller_conf().max_iteration();
 
   query_relative_time_ = control_conf->query_relative_time();
+
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
+
   return true;
 }
 
