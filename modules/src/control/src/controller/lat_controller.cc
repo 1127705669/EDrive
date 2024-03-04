@@ -16,6 +16,7 @@ namespace control {
 using EDrive::Result_state;
 using Matrix = Eigen::MatrixXd;
 using EDrive::common::VehicleStateProvider;
+using ::common::TrajectoryPoint;
 
 constexpr double GRA_ACC = 9.8;
 
@@ -31,7 +32,6 @@ Result_state LatController::Init(const ControlConf *control_conf) {
   if (!LoadControlConf(control_conf)) {
     ROS_ERROR("failed to load control conf");
   }
-
   // Matrix init operations.
   const int matrix_size = basic_state_size_ + preview_window_;
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
@@ -62,6 +62,10 @@ Result_state LatController::Init(const ControlConf *control_conf) {
   matrix_q_ = Matrix::Zero(matrix_size, matrix_size);
 
   int q_param_size = control_conf->lat_controller_conf().matrix_q_size();
+
+  for (int i = 0; i < q_param_size; ++i) {
+    matrix_q_(i, i) = control_conf->lat_controller_conf().matrix_q(i);
+  }
 
   matrix_q_updated_ = matrix_q_;
   
@@ -124,11 +128,6 @@ Result_state LatController::ComputeControlCommand(
 
   SimpleLateralDebug *debug;
 
-  ComputeLateralErrors(0.0, 0.0, VehicleStateProvider::instance()->heading(),
-                         VehicleStateProvider::instance()->linear_velocity(),
-                         VehicleStateProvider::instance()->angular_velocity(),
-                         *trajectory_analyzer_, debug);
-
   UpdateStateAnalyticalMatching(debug);
 
   UpdateMatrix();
@@ -146,6 +145,15 @@ Result_state LatController::ComputeControlCommand(
 }
 
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
+
+  const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
+
+  ComputeLateralErrors(com.x(), com.y(),
+                       VehicleStateProvider::instance()->linear_velocity(),
+                       VehicleStateProvider::instance()->heading(),
+                       VehicleStateProvider::instance()->angular_velocity(),
+                       *trajectory_analyzer_, debug);
+
   // State matrix update;
   // First four elements are fixed;
   matrix_state_(0, 0) = debug->lateral_error();
@@ -175,7 +183,24 @@ void LatController::ComputeLateralErrors(const double x, const double y, const d
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleLateralDebug *debug) {
-  
+  // TODO(QiL): change this to conf.
+  TrajectoryPoint target_point;
+
+  target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+
+  const double dx = x - target_point.path_point.x;
+  const double dy = y - target_point.path_point.y;
+
+  const double cos_matched_theta = std::cos(target_point.path_point.theta);
+  const double sin_matched_theta = std::sin(target_point.path_point.theta);
+
+  // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
+  // lateral_error_ = lateral_rate_filter_.Filter(raw_lateral_error);
+
+  // TODO(QiL): Code reformat when done with test
+  const double raw_lateral_error =
+      cos_matched_theta * dy - sin_matched_theta * dx;
+  debug->set_lateral_error(raw_lateral_error);
 }
 
 } // namespace control
