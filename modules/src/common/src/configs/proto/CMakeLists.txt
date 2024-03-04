@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(control_proto)
+project(vehicle_config_proto)
 
 find_package(Protobuf REQUIRED)
 
 ## Generate Protocol Buffer message
 ## set protocol buffer output address
-set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(PROTOBUF_IMPORT_DIRS "${CMAKE_SOURCE_DIR}")
+SET(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB_RECURSE proto_files ${CMAKE_CURRENT_SOURCE_DIR}/*.proto)
 
@@ -23,7 +22,6 @@ foreach(proto_file ${proto_files})
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
     ARGS --cpp_out  ${PROTO_DIR}
       -I ${PROTO_DIR}
-      -I ${PROTOBUF_IMPORT_DIRS} 
       ${proto_file}
     DEPENDS ${proto_file}
     COMMENT "Running C++ protocol buffer compiler on ${proto_file}"
@@ -33,7 +31,7 @@ endforeach()
 
 set_source_files_properties(${MESSAGE_SRC} ${MESSAGE_HDRS} PROPERTIES GENERATED TRUE)
 
-add_custom_target(generate_control_message ALL
+add_custom_target(generate_common_vehicle_config_message ALL
   DEPENDS ${MESSAGE_SRC} ${MESSAGE_HDRS}
   COMMENT "generate Protocol Buffer target"
   VERBATIM
@@ -45,12 +43,10 @@ include
   ${CMAKE_SOURCE_DIR}
 )
 
-set(ADAPTER_PROTO_SRC 
-  control_cmd.pb.cc
-  control_conf.pb.cc
-  lat_controller_conf.pb.cc
-  lon_controller_conf.pb.cc
-  pid_conf.pb.cc
+set(VEHICLE_CONFIG_SRC 
+  vehicle_config.pb.cc
 )
 
-add_library(control_proto SHARED ${ADAPTER_PROTO_SRC})
+add_library(vehicle_config_proto SHARED ${VEHICLE_CONFIG_SRC})
+
+target_link_libraries(vehicle_config_proto adapter_proto)

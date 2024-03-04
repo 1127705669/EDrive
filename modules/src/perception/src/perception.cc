@@ -31,9 +31,6 @@ EDrive::Result_state Perception::Init(){
     AdapterManager::Init(adapter_conf_file);
   }
 
-  ROS_INFO("Perception init done!");
-  ROS_INFO("Perception started");
-
   return State_Ok;
 }
 
@@ -46,9 +43,16 @@ Result_state Perception::CheckInput() {
 
 EDrive::Result_state Perception::Start(){
 
+  ROS_INFO("Perception resetting vehicle state, sleeping for 1000 ms ...");
+  ros::Duration(1.0).sleep();
+
   timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(control_perception_.perception_period()), 
                                                                 &Perception::OnTimer,
                                                                 this);
+
+  ROS_INFO("Perception init done!");
+  ROS_INFO("Perception started");
+  
   return State_Ok;
 }
 

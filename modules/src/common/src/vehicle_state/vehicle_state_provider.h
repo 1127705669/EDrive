@@ -11,15 +11,29 @@
 #include <memory>
 #include <string>
 
+#include "common/src/state.h"
+
 #include "common/src/macro.h"
 #include "common/src/vehicle_state/proto/vehicle_state.pb.h"
+#include <nav_msgs/Odometry.h>
+
+#include "common/src/math/vec2d.h"
 
 namespace EDrive {
 namespace common {
 
+using EDrive::Result_state;
+
 class VehicleStateProvider {
  public:
-    /**
+  /**
+   * @brief Constructor by information of localization and chassis.
+   * @param localization Localization information of the vehicle.
+   * @param chassis Chassis information of the vehicle.
+   */
+  Result_state Update(const nav_msgs::Odometry& localization);
+
+  /**
    * @brief Default destructor.
    */
   virtual ~VehicleStateProvider() = default;
@@ -90,8 +104,25 @@ class VehicleStateProvider {
    */
   double linear_acceleration() const;
 
+  /**
+   * @brief Set the vehicle's linear velocity.
+   * @param linear_velocity The value to set the vehicle's linear velocity.
+   */
+  void set_linear_velocity(const double linear_velocity);
+
+  /**
+   * @brief Compute the position of center of mass(COM) of the vehicle,
+   *        given the distance from rear wheels to the center of mass.
+   * @param rear_to_com_distance Distance from rear wheels to
+   *        the vehicle's center of mass.
+   * @return The position of the vehicle's center of mass.
+   */
+  math::Vec2d ComputeCOMPosition(const double rear_to_com_distance) const;
+
  private:
   common::VehicleState vehicle_state_;
+  nav_msgs::Odometry original_localization_;
+
   DECLARE_SINGLETON(VehicleStateProvider);
 };
 

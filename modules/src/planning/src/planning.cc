@@ -35,9 +35,14 @@ void Planning::RunOnce() {
   state = RegisterPlanners();
 
   ADCTrajectory trajectory_pb;
+
+  
   
   for(int i = 0; i < 180; i++) {
     ::common::TrajectoryPoint trajectory_point_;
+    trajectory_point_.path_point.x = start_point_x + 0.5*i;
+    trajectory_point_.path_point.y = start_point_y + 0.5*i;
+    
     trajectory_pb.trajectory_point.push_back(trajectory_point_);
   }
 
@@ -80,6 +85,18 @@ void Planning::Stop() {
 
 void Planning::OnTimer(const ros::TimerEvent &) {
   ros::Time begin = ros::Time::now();
+  
+  CheckInput();
+
+  if(is_initialized){
+    
+  }else{
+    start_point_x = position_.pose.pose.position.x - 2;
+    start_point_y = position_.pose.pose.position.y - 2;
+    ROS_INFO("%f     %f",start_point_x,start_point_y);
+    is_initialized = true;
+  }
+  
   RunOnce();
 }
 

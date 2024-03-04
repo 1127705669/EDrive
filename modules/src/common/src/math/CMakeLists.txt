@@ -21,6 +21,22 @@ add_library(cartesian_frenet_conversion SHARED
 )
 
 ###################################
+#            geometry             #
+###################################
+
+add_library(geometry SHARED 
+  vec2d.cc
+)
+
+###################################
+#            geometry             #
+###################################
+
+add_library(lqr SHARED 
+  linear_quadratic_regulator.cc
+)
+
+###################################
 #           math                  #
 ###################################
 
@@ -28,4 +44,6 @@ add_library(common_math INTERFACE)
 
 target_link_libraries(common_math INTERFACE
   cartesian_frenet_conversion
+  geometry
+  lqr
 )

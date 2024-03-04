@@ -3,6 +3,7 @@ syntax = "proto2";
 package EDrive.control;
 
 import "lon_controller_conf.proto";
+import "lat_controller_conf.proto";
 
 message ControlConf {
   enum ControllerType {
@@ -21,7 +22,8 @@ message ControlConf {
   optional int32 max_steering_percentage_allowed = 8;
   optional double max_status_interval_sec = 9;
 
-  optional EDrive.control.LonControllerConf lon_controller_conf = 11;
+  optional EDrive.control.LonControllerConf lon_controller_conf = 10;
+  optional EDrive.control.LatControllerConf lat_controller_conf = 11;
 
   optional double trajectory_period = 12;
   optional double chassis_period = 13;
@@ -29,6 +31,6 @@ message ControlConf {
 
   optional double minimum_speed_resolution = 15;
 
-  optional double query_relative_time = 17;
-  optional double minimum_speed_protection = 18;
+  optional double query_relative_time = 16;
+  optional double minimum_speed_protection = 17;
 }
