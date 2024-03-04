@@ -60,6 +60,11 @@ class Planning : public EDrive::common::EDriveApp {
   std::string root_path;
   std::string adapter_conf_file = "/src/planning/conf/adapter.conf";
   std::string planning_conf_file = "/src/planning/conf/planning.conf";
+
+  /* test code */
+  double start_point_x;
+  double start_point_y;
+  bool is_initialized = false;
 };
 
 } // namespace planning
