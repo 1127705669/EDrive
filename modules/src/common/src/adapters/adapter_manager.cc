@@ -75,6 +75,12 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::VIEWER_PATH:
         EnableViewerPath("/EDrive/viewer/path", config);
         break;
+      case AdapterConfig::ROAD_MARKINGS:
+        EnableRoadMarkings("/carla/ego_vehicle/semantic_segmentation_front/image", config);
+        break;
+      case AdapterConfig::ROAD_MARKER:
+        EnableRoadMarker("/EDrive/perception/road_lane", config);
+        break;
 
       default:
         ROS_INFO("Unknown adapter config type!");

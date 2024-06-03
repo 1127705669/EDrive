@@ -154,6 +154,8 @@ class AdapterManager
   REGISTER_ADAPTER(Perception);
   REGISTER_ADAPTER(Localization);
   REGISTER_ADAPTER(ViewerPath);
+  REGISTER_ADAPTER(RoadMarkings);
+  REGISTER_ADAPTER(RoadMarker);
   DECLARE_SINGLETON(AdapterManager);
 };
 
