@@ -156,6 +156,7 @@ class AdapterManager
   REGISTER_ADAPTER(ViewerPath);
   REGISTER_ADAPTER(RoadMarkings);
   REGISTER_ADAPTER(RoadMarker);
+  REGISTER_ADAPTER(VehicleLocation);
   DECLARE_SINGLETON(AdapterManager);
 };
 

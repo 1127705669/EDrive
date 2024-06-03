@@ -31,6 +31,7 @@ using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
 using ViewerAdapter = Adapter<::viewer::VisualizingData>;
 using VehicleAdapter = Adapter<nav_msgs::Odometry>;
+using VehicleLocationAdapter = Adapter<visualization_msgs::Marker>;
 using CarlaObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
 using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
 using PerceptionAdapter = Adapter<derived_object_msgs::ObjectArray>;

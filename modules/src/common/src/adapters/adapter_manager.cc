@@ -81,6 +81,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::ROAD_MARKER:
         EnableRoadMarker("/EDrive/perception/road_lane", config);
         break;
+      case AdapterConfig::VEHICLE_POSITION:
+        EnableVehicleLocation("/EDrive/localization/position/viewer", config);
+        break;
 
       default:
         ROS_INFO("Unknown adapter config type!");

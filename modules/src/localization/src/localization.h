@@ -13,6 +13,7 @@
 #include "localization/proto/localization_conf.pb.h"
 
 #include <nav_msgs/Odometry.h>
+#include <visualization_msgs/Marker.h>
 
 namespace EDrive {
 namespace localization {
@@ -41,6 +42,8 @@ class Localization : public EDrive::common::EDriveApp {
 
   void Publish();
 
+  void PositionConvert();
+
   ros::Timer timer_;
   LocalizationConf localization_conf_;
 
@@ -48,8 +51,10 @@ class Localization : public EDrive::common::EDriveApp {
   std::string adapter_conf_file = "/src/localization/conf/adapter.conf";
   std::string localization_conf_file = "/src/localization/conf/localization.conf";
 
-  nav_msgs::Odometry position_;
+  visualization_msgs::Marker position_marker_;
+  nav_msgs::Odometry position_odometry_;
+
 };
 
-} // localization
-} // EDrive
+} // namespace localization
+} // namespace EDrive

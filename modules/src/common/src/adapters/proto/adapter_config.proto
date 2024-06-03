@@ -16,6 +16,7 @@ message AdapterConfig {
     VIEWER_PATH = 9;
     ROAD_MARKINGS = 10;
     ROAD_MARKER = 11;
+    VEHICLE_POSITION = 12;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
