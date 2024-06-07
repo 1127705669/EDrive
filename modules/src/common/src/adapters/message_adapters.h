@@ -16,6 +16,7 @@
 #include <visualization_msgs/Marker.h>
 #include <nav_msgs/Path.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/PointCloud2.h>
 
 /**
  * @file message_adapters.h
@@ -39,6 +40,8 @@ using LocalizationAdapter = Adapter<nav_msgs::Odometry>;
 using ViewerPathAdapter = Adapter<nav_msgs::Path>;
 using RoadMarkingsAdapter = Adapter<sensor_msgs::Image>;
 using RoadMarkerAdapter = Adapter<visualization_msgs::Marker>;
+using VectorMapAdapter = Adapter<visualization_msgs::MarkerArray>;
+using CloudPointMapAdapter = Adapter<sensor_msgs::PointCloud2>;
 
 } // namespace adapter
 } // namespace common

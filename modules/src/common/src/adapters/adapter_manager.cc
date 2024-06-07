@@ -84,6 +84,12 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::VEHICLE_POSITION:
         EnableVehicleLocation("/EDrive/localization/position/viewer", config);
         break;
+      case AdapterConfig::VECTOR_MAP:
+        EnableVectorMap("/EDrive/localization/vector_map", config);
+        break;
+      case AdapterConfig::CLOUD_POINT_MAP:
+        EnableCloudPointMap("/EDrive/localization/cloud_point_map", config);
+        break;
 
       default:
         ROS_INFO("Unknown adapter config type!");

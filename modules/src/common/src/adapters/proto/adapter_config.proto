@@ -17,6 +17,8 @@ message AdapterConfig {
     ROAD_MARKINGS = 10;
     ROAD_MARKER = 11;
     VEHICLE_POSITION = 12;
+    VECTOR_MAP = 13;
+    CLOUD_POINT_MAP = 14;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

@@ -157,6 +157,8 @@ class AdapterManager
   REGISTER_ADAPTER(RoadMarkings);
   REGISTER_ADAPTER(RoadMarker);
   REGISTER_ADAPTER(VehicleLocation);
+  REGISTER_ADAPTER(VectorMap);
+  REGISTER_ADAPTER(CloudPointMap);
   DECLARE_SINGLETON(AdapterManager);
 };
 
