@@ -28,12 +28,35 @@ EDrive::Result_state Localization::Init(){
   AdapterManager::Init(adapter_conf_file);
 
   EDrive::common::util::GetProtoFromASIIFile(localization_conf_file, &localization_conf_);
+  
+  /*
+    * Example usage of PCDConvert function:
+    * 
+    * 1. Apply filtering and save the filtered point cloud:
+    *    localization.PCDConvert(input_file, true, true, output_file);
+    *    - input_file: Path to the input PCD file
+    *    - true: Apply filtering (true indicates that filtering should be applied)
+    *    - true: Save the filtered point cloud (true indicates that the filtered point cloud should be saved)
+    *    - output_file: Path to the output filtered PCD file
+    * 
+    * 2. Apply filtering but do not save the filtered point cloud:
+    *    localization.PCDConvert(input_file, true, false);
+    *    - input_file: Path to the input PCD file
+    *    - true: Apply filtering (true indicates that filtering should be applied)
+    *    - false: Do not save the filtered point cloud (false indicates that the filtered point cloud should not be saved)
+    * 
+    * 3. Do not apply filtering, use the original point cloud:
+    *    localization.PCDConvert(input_file, false, false);
+    *    - input_file: Path to the input PCD file
+    *    - false: Do not apply filtering (false indicates that filtering should not be applied)
+    *    - false: Do not save the filtered point cloud (this parameter is irrelevant when filtering is not applied)
+    */
+  PCDConvert(root_path + cloud_point_map_conf_file, false, false);
 
-  PCDConvert(root_path + cloud_point_map_conf_file);
-  loadAndPublishLanelet2Map(root_path + vector_map_conf_file);
+  // loadAndPublishLanelet2Map(root_path + vector_map_conf_file);
 
   AdapterManager::PublishCloudPointMap(cloud_point_map_);
-  AdapterManager::PublishVectorMap(lanelet2_map_);
+  // AdapterManager::PublishVectorMap(lanelet2_map_);
 
   return State_Ok;
 }
@@ -203,7 +226,7 @@ void Localization::addTriangleToList(std::vector<geometry_msgs::Point>& points,
     points.push_back(gp3);
 }
 
-void Localization::PCDConvert(const std::string& file_path) {
+void Localization::PCDConvert(const std::string& file_path, bool apply_filter, bool save_filtered, const std::string& save_path) {
     // Load the PCD file
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
     if (pcl::io::loadPCDFile<pcl::PointXYZ>(file_path, *cloud) == -1) {
@@ -211,32 +234,38 @@ void Localization::PCDConvert(const std::string& file_path) {
         return;
     }
 
-    // Print original point cloud size
-    std::cout << "Original point cloud size: " << cloud->points.size() << std::endl;
+    // std::cout << "Original point cloud size: " << cloud->points.size() << std::endl;
 
-    // Create the filtering objects: downsample the dataset using a smaller leaf size
-    pcl::VoxelGrid<pcl::PointXYZ> voxel_filter;
-    voxel_filter.setInputCloud(cloud);
-    voxel_filter.setLeafSize(0.2f, 0.2f, 0.2f); // 调整体素网格滤波器的分辨率
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZ>);
-    voxel_filter.filter(*cloud_filtered);
+    if (apply_filter) {
+        // Create the filtering objects: downsample the dataset using a smaller leaf size
+        pcl::VoxelGrid<pcl::PointXYZ> voxel_filter;
+        voxel_filter.setInputCloud(cloud);
+        voxel_filter.setLeafSize(0.2f, 0.2f, 0.2f); // Adjust the leaf size
+        voxel_filter.filter(*cloud_filtered);
 
-    // Print downsampled point cloud size
-    std::cout << "Downsampled point cloud size: " << cloud_filtered->points.size() << std::endl;
+        // std::cout << "Downsampled point cloud size: " << cloud_filtered->points.size() << std::endl;
 
-    // Create the filtering object: remove statistical outliers
-    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-    sor.setInputCloud(cloud_filtered);
-    sor.setMeanK(50);  // number of nearest neighbors to use for mean distance estimation
-    sor.setStddevMulThresh(1.0);  // standard deviation multiplier for distance threshold
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_denoised(new pcl::PointCloud<pcl::PointXYZ>);
-    sor.filter(*cloud_denoised);
+        // Remove statistical outliers
+        pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+        sor.setInputCloud(cloud_filtered);
+        sor.setMeanK(50);  // Number of nearest neighbors to use for mean distance estimation
+        sor.setStddevMulThresh(1.0);  // Standard deviation multiplier for distance threshold
+        sor.filter(*cloud_filtered);
 
-    // Print denoised point cloud size
-    std::cout << "Denoised point cloud size: " << cloud_denoised->points.size() << std::endl;
+        // std::cout << "Denoised point cloud size: " << cloud_filtered->points.size() << std::endl;
+
+        if (save_filtered && !save_path.empty()) {
+            // Save the filtered point cloud to a file
+            pcl::io::savePCDFileASCII(save_path, *cloud_filtered);
+            std::cout << "Saved filtered point cloud to " << save_path << std::endl;
+        }
+    } else {
+        cloud_filtered = cloud; // If not applying filter, use the original cloud
+    }
 
     // Convert to ROS data type
-    pcl::toROSMsg(*cloud_denoised, cloud_point_map_);
+    pcl::toROSMsg(*cloud_filtered, cloud_point_map_);
     cloud_point_map_.header.frame_id = "map";
 }
 

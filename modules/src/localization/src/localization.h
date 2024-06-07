@@ -64,7 +64,7 @@ class Localization : public EDrive::common::EDriveApp {
 
   void PositionConvert();
 
-  void PCDConvert(const std::string& file_path);
+  void PCDConvert(const std::string& file_path, bool apply_filter, bool save_filtered, const std::string& save_path = "");
 
   void addTriangleToList(std::vector<geometry_msgs::Point>& points,
                        const lanelet::BasicPoint2d& p1, const lanelet::BasicPoint2d& p2, const lanelet::BasicPoint2d& p3);
@@ -78,7 +78,7 @@ class Localization : public EDrive::common::EDriveApp {
   std::string adapter_conf_file = "/src/localization/conf/adapter.conf";
   std::string localization_conf_file = "/src/localization/conf/localization.conf";
   std::string vector_map_conf_file = "/src/localization/conf/Town01.osm";
-  std::string cloud_point_map_conf_file = "/src/localization/conf/Town01.pcd";
+  std::string cloud_point_map_conf_file = "/src/localization/conf/Town01filtered.pcd";
 
   visualization_msgs::Marker position_marker_;
   nav_msgs::Odometry position_odometry_;
