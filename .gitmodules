@@ -1,0 +1,3 @@
+[submodule "simulator/CARLA_0.9.13/catkin_ws/src/ros-bridge"]
+	path = simulator/CARLA_0.9.13/catkin_ws/src/ros-bridge
+	url = https://github.com/carla-simulator/ros-bridge.git
