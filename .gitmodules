@@ -1,4 +1,0 @@
-[submodule "carla"]
-    path = simulator/carla_9.12/src/ros-bridge
-    url = https://github.com/1127705669/ros-bridge
-    branch = 0.9.12
