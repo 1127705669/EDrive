@@ -25,7 +25,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: Semantic Front Image
+    SyncSource: ""
   - Class: rviz_carla_plugin/CarlaControl
     Name: CarlaControl
 Preferences:
@@ -60,7 +60,7 @@ Visualization Manager:
           Marker Topic: /EDrive/localization/position/viewer
           Name: ego_location
           Namespaces:
-            vehicle_shape: true
+            {}
           Queue Size: 100
           Value: true
         - Alpha: 1
@@ -100,33 +100,13 @@ Visualization Manager:
           Queue Size: 100
           Value: true
         - Class: rviz/MarkerArray
-          Enabled: true
+          Enabled: false
           Marker Topic: /carla/markers/static
           Name: Road
           Namespaces:
-            Bridge: false
-            Buildings: false
-            Fences: false
-            GuardRail: false
-            Poles: false
-            RailTrack: false
-            RoadLines: false
-            Roads: false
-            Sidewalks: false
-            TrafficLight: true
-            TrafficSigns: false
-            Vegetation: false
-            Walls: false
+            {}
           Queue Size: 100
-          Value: true
-        - Class: rviz/MarkerArray
-          Enabled: true
-          Marker Topic: osm_markers
-          Name: Vector_Map
-          Namespaces:
-            ways: true
-          Queue Size: 100
-          Value: true
+          Value: false
       Enabled: true
       Name: Localization
     - Class: rviz/Group
@@ -185,7 +165,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 514.3292846679688
+      Distance: 295.5909423828125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -193,17 +173,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 16.35032844543457
-        Y: 29.10218048095703
-        Z: -30.800622940063477
+        X: -103.05520629882812
+        Y: 4.681206703186035
+        Z: -12.755586624145508
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8347970247268677
+      Pitch: 0.874796986579895
       Target Frame: map
-      Yaw: 1.7390605211257935
+      Yaw: 2.9690606594085693
     Saved: ~
 Window Geometry:
   CarlaControl:

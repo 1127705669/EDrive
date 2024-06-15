@@ -54,9 +54,10 @@ EDrive::Result_state Localization::Init(){
   PCDConvert(root_path + cloud_point_map_conf_file, false, false);
 
   // loadAndPublishLanelet2Map(root_path + vector_map_conf_file);
+  auto retValue = vector_mapper_.loadMap(root_path + vector_map_conf_file, vector_map_);
 
   AdapterManager::PublishCloudPointMap(cloud_point_map_);
-  // AdapterManager::PublishVectorMap(lanelet2_map_);
+  AdapterManager::PublishVectorMap(vector_map_);
 
   return State_Ok;
 }

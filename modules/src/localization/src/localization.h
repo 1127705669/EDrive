@@ -15,6 +15,8 @@
 #include <nav_msgs/Odometry.h>
 #include <visualization_msgs/Marker.h>
 
+#include "localization/src/map/vector_map.h"
+
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
@@ -77,14 +79,15 @@ class Localization : public EDrive::common::EDriveApp {
   std::string root_path;
   std::string adapter_conf_file = "/src/localization/conf/adapter.conf";
   std::string localization_conf_file = "/src/localization/conf/localization.conf";
-  std::string vector_map_conf_file = "/src/localization/conf/Town01.osm";
+  std::string vector_map_conf_file = "/src/localization/conf/Town05.osm";
   std::string cloud_point_map_conf_file = "/src/localization/conf/Town01filtered.pcd";
 
   visualization_msgs::Marker position_marker_;
   nav_msgs::Odometry position_odometry_;
   sensor_msgs::PointCloud2 cloud_point_map_;
   visualization_msgs::MarkerArray lanelet2_map_;
-
+  visualization_msgs::MarkerArray vector_map_;
+  VectorMap vector_mapper_;
 };
 
 } // namespace localization
