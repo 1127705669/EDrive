@@ -80,7 +80,7 @@ class Localization : public EDrive::common::EDriveApp {
   std::string adapter_conf_file = "/src/localization/conf/adapter.conf";
   std::string localization_conf_file = "/src/localization/conf/localization.conf";
   std::string vector_map_conf_file = "/src/localization/conf/Town05.osm";
-  std::string cloud_point_map_conf_file = "/src/localization/conf/Town01filtered.pcd";
+  std::string cloud_point_map_conf_file = "/src/localization/conf/Town05.pcd";
 
   visualization_msgs::Marker position_marker_;
   nav_msgs::Odometry position_odometry_;
