@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include "localization/src/localization.h"
 
+#include "localization/src/common/localization_gflags.h"
 #include "common/src/util/file.h"
 #include "common/src/adapters/adapter_manager.h"
 

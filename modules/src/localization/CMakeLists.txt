@@ -104,6 +104,7 @@ generate_messages(
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/map)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/common)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -203,6 +204,7 @@ target_link_libraries(localization_lib
   ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
+  localization_common
   localization_proto
   EDrive_app
   common_adapters
