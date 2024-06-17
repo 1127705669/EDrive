@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(localization_proto)
+project(planning_proto)
 
 find_package(Protobuf REQUIRED)
 
@@ -34,7 +34,7 @@ endforeach()
 
 set_source_files_properties(${MESSAGE_SRC} ${MESSAGE_HDRS} PROPERTIES GENERATED TRUE)
 
-add_custom_target(generate_localization_message ALL
+add_custom_target(generate_planning_message ALL
   DEPENDS ${MESSAGE_SRC} ${MESSAGE_HDRS}
   COMMENT "generate Protocol Buffer target"
   VERBATIM
@@ -47,15 +47,13 @@ include
 )
 
 set(ADAPTER_PROTO_SRC 
-  ${GENERATED_PROTO_DIR}/localization/proto/localization_conf.pb.cc
-  ${GENERATED_PROTO_DIR}/localization/proto/localization.pb.cc
+  ${GENERATED_PROTO_DIR}/planning/proto/pnc_point.pb.cc
 )
 
-add_library(localization_proto SHARED ${ADAPTER_PROTO_SRC})
+add_library(planning_proto SHARED ${ADAPTER_PROTO_SRC})
 
-add_dependencies(localization_proto generate_localization_message)
+add_dependencies(planning_proto generate_planning_message)
 
-target_link_libraries(localization_proto
+target_link_libraries(planning_proto
   control_proto
-  planning_proto
 )
