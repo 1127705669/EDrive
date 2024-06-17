@@ -48,7 +48,6 @@ include
 
 set(ADAPTER_PROTO_SRC 
   ${GENERATED_PROTO_DIR}/localization/proto/localization_conf.pb.cc
-  ${GENERATED_PROTO_DIR}/localization/proto/localization.pb.cc
 )
 
 add_library(localization_proto SHARED ${ADAPTER_PROTO_SRC})

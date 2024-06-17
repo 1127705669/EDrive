@@ -2,7 +2,6 @@ syntax = "proto2";
 
 package EDrive.localization;
 
-import "localization/proto/localization.proto";
 import "planning/proto/pnc_point.proto";
 
 message LocalizationConf {
