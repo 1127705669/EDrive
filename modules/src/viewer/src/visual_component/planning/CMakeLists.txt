@@ -17,3 +17,7 @@ set(PLANNING_HANDLE_SRC
 )
 
 add_library(planning_handle SHARED ${PLANNING_HANDLE_SRC})
+add_dependencies(planning_handle ${viewer_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(planning_handle 
+
+)
