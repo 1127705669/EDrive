@@ -50,3 +50,8 @@ include_directories(
   ${CMAKE_SOURCE_DIR}
   ${GENERATED_PROTO_DIR}
 )
+
+# Link with other libraries
+target_link_libraries(localization_proto
+
+)
