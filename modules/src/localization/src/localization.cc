@@ -117,9 +117,9 @@ void Localization::PositionConvert() {
     position_marker_.pose.orientation.w = position_odometry_.pose.pose.orientation.w;
     
     // 设置 marker 的尺寸（假设车的长宽高为2m x 1m x 0.5m）
-    position_marker_.scale.x = 2.0;
-    position_marker_.scale.y = 1.0;
-    position_marker_.scale.z = 0.5;
+    position_marker_.scale.x = 4.90;
+    position_marker_.scale.y = 1.93;
+    position_marker_.scale.z = 1.62;
     
     // 设置颜色和透明度（绿色）
     position_marker_.color.r = 0.0;

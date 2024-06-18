@@ -17,3 +17,7 @@ set(ENV_HANDLE_SRC
 )
 
 add_library(env_data SHARED ${ENV_HANDLE_SRC})
+add_dependencies(env_data ${viewer_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(env_data 
+
+)

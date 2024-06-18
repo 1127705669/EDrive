@@ -49,22 +49,50 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
+# file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
 
-foreach(MSG_FOLDER ${MSG_FOLDERS})
-  message("Found msg folder: ${MSG_FOLDER}")
-  file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
+# foreach(MSG_FOLDER ${MSG_FOLDERS})
+#   message("Found msg folder: ${MSG_FOLDER}")
+#   file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
 
-  foreach(MSG_FILE ${MSG_FILES})
-    message(" Found msg file: ${MSG_FILE}")
-  endforeach()
-  add_message_files(
-    DIRECTORY msg/${MSG_FOLDER}
-    FILES
-    ${MSG_FILES}
-  )
+#   foreach(MSG_FILE ${MSG_FILES})
+#     message(" Found msg file: ${MSG_FILE}")
+#   endforeach()
+#   add_message_files(
+#     DIRECTORY msg/${MSG_FOLDER}
+#     FILES
+#     ${MSG_FILES}
+#   )
 
-endforeach()
+# endforeach()
+
+add_message_files(
+  DIRECTORY msg/control_cmd
+  FILES
+  TurnSignal.msg
+  LatencyStats.msg
+  ControlCommand.msg
+  SimpleMPCDebug.msg
+)
+
+add_message_files(
+  DIRECTORY msg/pid_conf
+  FILES
+  PidConf.msg
+)
+
+add_message_files(
+  DIRECTORY msg/lon_controller_conf
+  FILES
+  FilterConf.msg
+  LonControllerConf.msg
+)
+
+add_message_files(
+  DIRECTORY msg/simulator_carla
+  FILES
+  CarlaEgoVehicleControl.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(

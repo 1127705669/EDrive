@@ -20,4 +20,6 @@ set(ADAPTER_SRC
 
 add_library(common_adapters SHARED ${ADAPTER_SRC})
 
-target_link_libraries(common_adapters adapter_proto)
+target_link_libraries(common_adapters 
+  adapter_proto
+)

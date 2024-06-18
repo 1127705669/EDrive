@@ -17,3 +17,7 @@ set(VEHIVLE_STATE_SRC
 )
 
 add_library(vehicle_state_visualizer SHARED ${VEHIVLE_STATE_SRC})
+add_dependencies(vehicle_state_visualizer ${viewer_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(vehicle_state_visualizer 
+
+)
