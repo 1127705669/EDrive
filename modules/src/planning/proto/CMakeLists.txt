@@ -1,25 +1,26 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(localization_proto)
+project(planning_proto)
 
 find_package(Protobuf REQUIRED)
 
-## Set protocol buffer output address
+## Generate Protocol Buffer message
+## set protocol buffer output address
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(PROTOBUF_IMPORT_DIRS ${CMAKE_SOURCE_DIR})
 set(GENERATED_PROTO_DIR ${CATKIN_DEVEL_PREFIX}/include)
 
 # Ensure the output directory exists
-file(MAKE_DIRECTORY ${GENERATED_PROTO_DIR}/localization/proto)
+file(MAKE_DIRECTORY ${GENERATED_PROTO_DIR}/planning/proto)
 
-file(GLOB_RECURSE proto_files "${PROTO_DIR}/*.proto")
+file(GLOB_RECURSE proto_files ${PROTO_DIR}/*.proto)
 
 set(MESSAGE_SRC "")
 set(MESSAGE_HDRS "")
 
 foreach(proto_file ${proto_files})
   get_filename_component(FIL_WE ${proto_file} NAME_WE)
-  set(GEN_SRC "${GENERATED_PROTO_DIR}/localization/proto/${FIL_WE}.pb.cc")
-  set(GEN_HDR "${GENERATED_PROTO_DIR}/localization/proto/${FIL_WE}.pb.h")
+  set(GEN_SRC "${GENERATED_PROTO_DIR}/planning/proto/${FIL_WE}.pb.cc")
+  set(GEN_HDR "${GENERATED_PROTO_DIR}/planning/proto/${FIL_WE}.pb.h")
   list(APPEND MESSAGE_SRC ${GEN_SRC})
   list(APPEND MESSAGE_HDRS ${GEN_HDR})
   add_custom_command(
@@ -32,26 +33,24 @@ foreach(proto_file ${proto_files})
   )
 endforeach()
 
-add_custom_target(generate_localization_message ALL
+set_source_files_properties(${MESSAGE_SRC} ${MESSAGE_HDRS} PROPERTIES GENERATED TRUE)
+
+add_custom_target(generate_planning_message ALL
   DEPENDS ${MESSAGE_SRC} ${MESSAGE_HDRS}
-  COMMENT "Generating Protocol Buffer messages"
+  COMMENT "generate Protocol Buffer target"
+  VERBATIM
 )
 
 # Create an empty library target
-add_library(localization_proto SHARED)
-add_dependencies(localization_proto generate_localization_message)
+add_library(planning_proto SHARED)
+add_dependencies(planning_proto generate_planning_message)
 
 # Append source files to the target after they are generated
-target_sources(localization_proto PRIVATE ${MESSAGE_SRC} ${MESSAGE_HDRS})
+target_sources(planning_proto PRIVATE ${MESSAGE_SRC} ${MESSAGE_HDRS})
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
   ${GENERATED_PROTO_DIR}
-)
-
-# Link with other libraries
-target_link_libraries(localization_proto
-
 )
