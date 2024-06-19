@@ -11,7 +11,7 @@
 namespace EDrive {
 namespace control {
 
-using EDrive::Result_state;
+using EDrive::common::Result_state;
 using EDrive::common::adapter::AdapterManager;
 using EDrive::common::VehicleStateProvider;
 
@@ -29,11 +29,11 @@ Result_state Control::Init(){
 
   ROS_INFO("  controller init, starting...");
   EDrive::common::util::GetProtoFromASIIFile(control_conf_file, &control_conf_);
-  if(State_Ok != controller_agent_.Init(&control_conf_)) {
+  if(Result_state::State_Ok != controller_agent_.Init(&control_conf_)) {
     ROS_ERROR("    controller agent init failed, stopping...");
   }
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state Control::CheckInput() {
@@ -46,7 +46,7 @@ Result_state Control::CheckInput() {
 
   VehicleStateProvider::instance()->Update(localization_);
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state Control::Start(){
@@ -61,7 +61,7 @@ Result_state Control::Start(){
                                                                 this);
   ROS_INFO("Control init done!");
   ROS_INFO("Control started");
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {
@@ -75,10 +75,10 @@ void Control::OnTimer(const ros::TimerEvent &) {
 }
 
 Result_state Control::ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command) {
-  if(State_Ok != controller_agent_.ComputeControlCommand(&trajectory_, &localization_, control_command)) {
+  if(Result_state::State_Ok != controller_agent_.ComputeControlCommand(&trajectory_, &localization_, control_command)) {
     ROS_INFO("controller agent compute control command failed, stopping...");
   }
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void Control::Stop() {

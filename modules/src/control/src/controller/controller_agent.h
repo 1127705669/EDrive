@@ -15,8 +15,6 @@
 namespace EDrive {
 namespace control {
 
-using EDrive::Result_state;
-
 /**
  * @class ControllerAgent
  *
@@ -29,9 +27,9 @@ class ControllerAgent {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Result_state Init(const ControlConf *control_conf_);
+  EDrive::common::Result_state Init(const ControlConf *control_conf_);
 
-  Result_state ComputeControlCommand(
+  EDrive::common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory, 
       const nav_msgs::Odometry *localization,
       ::control::CarlaEgoVehicleControl *control_command);

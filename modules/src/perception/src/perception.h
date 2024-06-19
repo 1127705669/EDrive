@@ -26,16 +26,16 @@ class Perception : public EDrive::common::EDriveApp {
 
   std::string Name() const override;
 
-  EDrive::Result_state Init() override;
+  EDrive::common::Result_state Init() override;
 
-  EDrive::Result_state Start() override;
+  EDrive::common::Result_state Start() override;
 
   void Stop() override;
 
  private:
   void OnTimer(const ros::TimerEvent &);
   ros::Timer timer_;
-  EDrive::Result_state CheckInput();
+  EDrive::common::Result_state CheckInput();
   void Publish();
   PerceptionConf control_perception_;
 
@@ -48,7 +48,7 @@ class Perception : public EDrive::common::EDriveApp {
   std::string perception_conf_file = "/src/perception/conf/perception.conf";
 
  private:
-  Result_state ConvertImageToVisualization(sensor_msgs::Image& image_msg);
+  EDrive::common::Result_state ConvertImageToVisualization(sensor_msgs::Image& image_msg);
   visualization_msgs::Marker line_strip_;
 };
 

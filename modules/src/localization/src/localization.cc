@@ -12,12 +12,12 @@
 namespace EDrive {
 namespace localization {
 
-using EDrive::Result_state;
+using EDrive::common::Result_state;
 using EDrive::common::adapter::AdapterManager;
   
 std::string Localization::Name() const { return "EDrive_localization"; }
 
-EDrive::Result_state Localization::Init(){
+Result_state Localization::Init(){
 
   ROS_INFO("Localization init, starting...");
 
@@ -60,7 +60,7 @@ EDrive::Result_state Localization::Init(){
   AdapterManager::PublishCloudPointMap(cloud_point_map_);
   AdapterManager::PublishVectorMap(vector_map_);
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state Localization::CheckInput() {
@@ -68,10 +68,10 @@ Result_state Localization::CheckInput() {
   auto position_adapter = AdapterManager::GetVehicle();
   position_odometry_ = position_adapter->GetLatestObserved();
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
-EDrive::Result_state Localization::Start(){
+Result_state Localization::Start(){
 
   timer_ = common::adapter::AdapterManager::CreateTimer(ros::Duration(localization_conf_.localization_period()), 
                                                                 &Localization::OnTimer,
@@ -79,7 +79,7 @@ EDrive::Result_state Localization::Start(){
   ROS_INFO("Localization init done!");
   ROS_INFO("Localization started");
   
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void Localization::OnTimer(const ros::TimerEvent &) {

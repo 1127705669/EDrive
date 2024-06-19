@@ -29,17 +29,17 @@ class Planning_handle : public EDrive::viewer::ViewerBase{
   /**
    * @brief 
    */
-  EDrive::Result_state InterfaceMatch() override;
+  EDrive::common::Result_state InterfaceMatch() override;
 
   /**
   * @brief 
   */
-  EDrive::Result_state PublishVisualizationData() override;
+  EDrive::common::Result_state PublishVisualizationData() override;
 
   /**
   * @brief 
   */
-  EDrive::Result_state Init(const ViewerConf *viewer_conf) override;
+  EDrive::common::Result_state Init(const ViewerConf *viewer_conf) override;
 
   /**
   * @brief 
@@ -49,7 +49,7 @@ class Planning_handle : public EDrive::viewer::ViewerBase{
   /**
   * @brief 
   */
-  EDrive::Result_state Visualize() override;
+  EDrive::common::Result_state Visualize() override;
 
  private:
   ::viewer::VisualizingData *visualizing_data_ = nullptr;

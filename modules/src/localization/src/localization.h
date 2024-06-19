@@ -40,16 +40,14 @@
 namespace EDrive {
 namespace localization {
 
-using EDrive::Result_state;
-
 class Localization : public EDrive::common::EDriveApp {
  public:
 
   std::string Name() const override;
 
-  EDrive::Result_state Init() override;
+  EDrive::common::Result_state Init() override;
 
-  EDrive::Result_state Start() override;
+  EDrive::common::Result_state Start() override;
 
   void Stop() override;
 
@@ -60,7 +58,7 @@ class Localization : public EDrive::common::EDriveApp {
   /* Watch dog timer */
   void OnTimer(const ros::TimerEvent &);
 
-  EDrive::Result_state CheckInput();
+  EDrive::common::Result_state CheckInput();
 
   void Publish();
 

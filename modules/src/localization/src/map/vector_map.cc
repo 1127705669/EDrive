@@ -7,6 +7,8 @@
 namespace EDrive {
 namespace localization {
 
+using EDrive::common::Result_state;
+
 Result_state VectorMap::loadMap(const std::string &file, visualization_msgs::MarkerArray &marker_array) {
     parse_osm(file, nodes_, ways_, relations_);
     create_marker_array(nodes_, ways_, marker_array);

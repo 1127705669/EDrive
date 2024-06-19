@@ -13,7 +13,7 @@
 namespace EDrive {
 namespace control {
 
-using EDrive::Result_state;
+using EDrive::common::Result_state;
 using Matrix = Eigen::MatrixXd;
 using EDrive::common::VehicleStateProvider;
 using ::common::TrajectoryPoint;
@@ -71,7 +71,7 @@ Result_state LatController::Init(const ControlConf *control_conf) {
   
   auto &lat_controller_conf = control_conf->lat_controller_conf();
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 bool LatController::LoadControlConf(const ControlConf *control_conf) {
@@ -141,7 +141,7 @@ Result_state LatController::ComputeControlCommand(
                                       M_PI * steer_transmission_ratio_ /
                                       steer_single_direction_max_degree_ * 100;
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
@@ -172,7 +172,7 @@ void LatController::UpdateMatrixCompound(){
 }
 
 Result_state LatController::Reset(){
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void LatController::Stop() {

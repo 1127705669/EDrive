@@ -9,7 +9,7 @@
 namespace EDrive {
 namespace planning {
 
-using EDrive::Result_state;
+using EDrive::common::Result_state;
 using EDrive::common::adapter::AdapterManager;
 using ::planning::ADCTrajectory;
 
@@ -23,7 +23,7 @@ void Planning::PublishPlanningPb(ADCTrajectory* trajectory_pb) {
 
 Result_state Planning::RegisterPlanners() {
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void Planning::RunOnce() {
@@ -63,14 +63,14 @@ Result_state Planning::Init(){
 
   ROS_INFO("Planning init done!");
   ROS_INFO("Planning started");
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state Planning::Start(){
   timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(planning_period), 
                                                                 &Planning::OnTimer,
                                                                 this);
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void Planning::CheckInput(){

@@ -11,6 +11,8 @@
 namespace EDrive {
 namespace viewer {
 
+using EDrive::common::Result_state;
+
 void ViewerAgent::RegisterControllers(const ViewerConf *viewer_conf) {
   // for (auto active_viewer : viewer_conf->active_viewers()) {
   //   switch (active_viewer) {
@@ -34,7 +36,7 @@ Result_state ViewerAgent::Init(const ViewerConf *viewer_conf) {
   //     ROS_ERROR("    viewer init failed!");
   //   }
   // }
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state ViewerAgent::Visualize() {
@@ -43,7 +45,7 @@ Result_state ViewerAgent::Visualize() {
   //   viwer->Visualize(CARLA_location, CARLA_object, visualizing_data, viewer_vehicle_data);
   //   ros::Time end_timestamp = ros::Time::now();
   // }
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 } // namespace viewer

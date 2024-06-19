@@ -8,16 +8,16 @@
 namespace EDrive {
 namespace prediction {
 
-// Planning::~Planning() { Stop(); }
+using EDrive::common::Result_state;
 
 std::string Prediction::Name() const { return "prediction"; }
 
-EDrive::Result_state Prediction::Init(){
-  return State_Ok;
+Result_state Prediction::Init(){
+  return Result_state::State_Ok;
 }
 
-EDrive::Result_state Prediction::Start(){
-  return State_Ok;
+Result_state Prediction::Start(){
+  return Result_state::State_Ok;
 }
 
 void Prediction::Stop() {

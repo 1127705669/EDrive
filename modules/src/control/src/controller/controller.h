@@ -21,8 +21,6 @@
 namespace EDrive {
 namespace control {
 
-using EDrive::Result_state;
-
 /**
  * @class Controller
  *
@@ -45,7 +43,7 @@ class Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  virtual Result_state Init(const ControlConf *control_conf) = 0;
+  virtual EDrive::common::Result_state Init(const ControlConf *control_conf) = 0;
 
   /**
    * @brief compute control command based on current vehicle status
@@ -56,7 +54,7 @@ class Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  virtual Result_state ComputeControlCommand(
+  virtual EDrive::common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory, 
       const nav_msgs::Odometry *localization, 
       ::control::CarlaEgoVehicleControl *control_command) = 0;
@@ -65,7 +63,7 @@ class Controller {
    * @brief reset Controller
    * @return Status reset status
    */
-  virtual Result_state Reset() = 0;
+  virtual EDrive::common::Result_state Reset() = 0;
 
   /**
    * @brief controller name

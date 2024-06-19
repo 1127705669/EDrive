@@ -9,36 +9,37 @@
 namespace EDrive {
 namespace viewer {
 
+using EDrive::common::Result_state;
+
 Vehicle_state::Vehicle_state() {
   ROS_INFO("    registering viewer [vehicle state]...");
 }
 
-EDrive::Result_state Vehicle_state::Init(const ViewerConf *viewer_conf) {
-  return State_Ok;
+Result_state Vehicle_state::Init(const ViewerConf *viewer_conf) {
+  return Result_state::State_Ok;
 }
 
-EDrive::Result_state Vehicle_state::InterfaceMatch() {
-  return State_Ok;
+Result_state Vehicle_state::InterfaceMatch() {
+  return Result_state::State_Ok;
 }
 
-EDrive::Result_state Vehicle_state::PublishVisualizationData() {
-  return State_Ok;
+Result_state Vehicle_state::PublishVisualizationData() {
+  return Result_state::State_Ok;
 }
 
 void Vehicle_state::Stop() {
 }
 
-EDrive::Result_state Vehicle_state::Visualize(){
-  Result_state state = State_Failed;
+Result_state Vehicle_state::Visualize(){
+  Result_state state = Result_state::State_Failed;
   
-
   state = InterfaceMatch();
-  if(State_Ok != state){
+  if(Result_state::State_Ok != state){
 
   }
 
   state = PublishVisualizationData();
-  if(State_Ok != state){
+  if(Result_state::State_Ok != state){
 
   }
 

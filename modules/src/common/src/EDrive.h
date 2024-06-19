@@ -28,8 +28,8 @@ class EDriveApp {
 
  protected:
 
-  virtual EDrive::Result_state Init() = 0;
-  virtual EDrive::Result_state Start() = 0;
+  virtual EDrive::common::Result_state Init() = 0;
+  virtual EDrive::common::Result_state Start() = 0;
   virtual void Stop() = 0;
 
 };

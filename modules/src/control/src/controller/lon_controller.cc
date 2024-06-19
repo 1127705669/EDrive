@@ -10,7 +10,7 @@ using EDrive::common::VehicleStateProvider;
 namespace EDrive {
 namespace control {
 
-using EDrive::Result_state;
+using EDrive::common::Result_state;
 
 constexpr double GRA_ACC = 9.8;
 
@@ -27,7 +27,7 @@ Result_state LonController::Init(const ControlConf *control_conf) {
   if (control_conf_ == nullptr) {
     controller_initialized_ = false;
     ROS_ERROR("get_longitudinal_param() nullptr");
-    return State_Failed;
+    return Result_state::State_Failed;
   }
 
   const LonControllerConf &lon_controller_conf =
@@ -38,7 +38,7 @@ Result_state LonController::Init(const ControlConf *control_conf) {
   ROS_INFO("      speed pid controller init, staring...");
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
   
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 std::string LonController::Name() const { return name_; }
@@ -60,11 +60,11 @@ Result_state LonController::ComputeControlCommand(
   double ts = lon_controller_conf.ts();
 
   ComputeLongitudinalErrors(trajectory_analyzer_.get());
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state LonController::Reset(){
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void LonController::Stop() {

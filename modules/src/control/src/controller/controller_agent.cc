@@ -12,6 +12,8 @@
 namespace EDrive {
 namespace control {
 
+using EDrive::common::Result_state;
+
 void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
   ROS_INFO("    Only support Lat + Lon controllers as of now");
   for (auto active_controller : control_conf_->active_controllers()) {
@@ -31,11 +33,11 @@ void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
 Result_state ControllerAgent::Init(const ControlConf *control_conf_) {
   RegisterControllers(control_conf_);
   for(auto &controller : controller_list_) {
-    if (controller == NULL || EDrive::State_Ok != controller->Init(control_conf_)) {
+    if (controller == NULL || Result_state::State_Ok != controller->Init(control_conf_)) {
       ROS_ERROR("    controller init failed!");
     }
   }
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state ControllerAgent::ComputeControlCommand(
@@ -47,7 +49,7 @@ Result_state ControllerAgent::ComputeControlCommand(
     controller->ComputeControlCommand(trajectory, localization, control_command);
     ros::Time end_timestamp = ros::Time::now();
   }
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 } // namespace control

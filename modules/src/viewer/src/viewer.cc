@@ -20,7 +20,7 @@
 namespace EDrive {
 namespace viewer {
 
-using EDrive::Result_state;
+using EDrive::common::Result_state;
 using EDrive::common::adapter::AdapterManager;
 
 std::string Viewer::Name() const { return "EDrive_viewer"; }
@@ -38,7 +38,7 @@ Result_state Viewer::CheckInput() {
   auto objects_adapter = AdapterManager::GetPerception();
   objects_ = objects_adapter->GetLatestObserved();
   
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void Viewer::RegisterControllers(const ViewerConf *viewer_conf) {
@@ -75,7 +75,7 @@ Result_state Viewer::Init(){
 
   RegisterControllers(&viewer_conf_);
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state Viewer::Start(){
@@ -90,7 +90,7 @@ Result_state Viewer::Start(){
                                                               this);
   ROS_INFO("Viewer init done!");
   ROS_INFO("Viewer started");
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void Viewer::Stop() {

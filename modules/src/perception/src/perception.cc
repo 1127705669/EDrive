@@ -14,12 +14,12 @@
 namespace EDrive {
 namespace perception {
 
-using EDrive::Result_state;
+using EDrive::common::Result_state;
 using EDrive::common::adapter::AdapterManager;
 
 std::string Perception::Name() const { return "EDrive_perception"; }
 
-EDrive::Result_state Perception::Init(){
+Result_state Perception::Init(){
   ROS_INFO("Perception init, starting...");
 
   root_path = EDrive::common::util::GetRootPath();
@@ -34,7 +34,7 @@ EDrive::Result_state Perception::Init(){
     AdapterManager::Init(adapter_conf_file);
   }
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state Perception::CheckInput() {
@@ -48,7 +48,7 @@ Result_state Perception::CheckInput() {
 
   ConvertImageToVisualization(Carla_image_);
 
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 Result_state Perception::ConvertImageToVisualization(sensor_msgs::Image& image_msg) {
@@ -57,7 +57,7 @@ Result_state Perception::ConvertImageToVisualization(sensor_msgs::Image& image_m
         cv_ptr = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8);
     } catch (cv_bridge::Exception& e) {
         ROS_ERROR("cv_bridge exception: %s", e.what());
-        return State_Failed;
+        return Result_state::State_Failed;
     }
 
     // 在窗口中显示图像
@@ -99,10 +99,10 @@ Result_state Perception::ConvertImageToVisualization(sensor_msgs::Image& image_m
         ROS_WARN("No points added to the marker.");
     }
 
-    return State_Ok;
+    return Result_state::State_Ok;
 }
 
-EDrive::Result_state Perception::Start(){
+Result_state Perception::Start(){
 
   ROS_INFO("Perception resetting vehicle state, sleeping for 1000 ms ...");
   ros::Duration(1.0).sleep();
@@ -114,7 +114,7 @@ EDrive::Result_state Perception::Start(){
   ROS_INFO("Perception init done!");
   ROS_INFO("Perception started");
   
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
 void Perception::OnTimer(const ros::TimerEvent &) {

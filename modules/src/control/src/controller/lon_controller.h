@@ -13,8 +13,6 @@
 namespace EDrive {
 namespace control {
 
-using EDrive::Result_state;
-
 /**
  * @class LonController
  *
@@ -37,7 +35,7 @@ class LonController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  Result_state Init(const ControlConf *control_conf) override;
+  EDrive::common::Result_state Init(const ControlConf *control_conf) override;
 
    /**
    * @brief compute control command based on current vehicle status
@@ -48,7 +46,7 @@ class LonController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  Result_state ComputeControlCommand(
+  EDrive::common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory,
       const nav_msgs::Odometry *localization,
       ::control::CarlaEgoVehicleControl *control_command) override;
@@ -57,7 +55,7 @@ class LonController : public Controller {
    * @brief reset Controller
    * @return Status reset status
    */
-  Result_state Reset() override;
+  EDrive::common::Result_state Reset() override;
 
   /**
    * @brief controller name

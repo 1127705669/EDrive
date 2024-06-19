@@ -26,16 +26,14 @@
 namespace EDrive {
 namespace control {
 
-using EDrive::Result_state;
-
 class Control : public EDrive::common::EDriveApp {
  public:
 
   std::string Name() const override;
 
-  Result_state Init() override;
+  EDrive::common::Result_state Init() override;
 
-  Result_state Start() override;
+  EDrive::common::Result_state Start() override;
 
   void Stop() override;
 
@@ -46,11 +44,11 @@ class Control : public EDrive::common::EDriveApp {
  // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
-  EDrive::Result_state CheckInput();
+  EDrive::common::Result_state CheckInput();
 
   void SendCmd(::control::CarlaEgoVehicleControl *control_command);
 
-  Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
+  EDrive::common::Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
 
   ros::Timer timer_;
   ros::Time init_time_;

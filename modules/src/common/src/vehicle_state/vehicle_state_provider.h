@@ -22,8 +22,6 @@
 namespace EDrive {
 namespace common {
 
-using EDrive::Result_state;
-
 class VehicleStateProvider {
  public:
   /**

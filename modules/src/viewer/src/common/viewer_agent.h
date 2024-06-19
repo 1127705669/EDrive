@@ -26,9 +26,9 @@ class ViewerAgent {
    * @param viewer_conf_ control configurations
    * @return Status initialization status
    */
-  Result_state Init(const ViewerConf *viewer_conf);
+  EDrive::common::Result_state Init(const ViewerConf *viewer_conf);
 
-  Result_state Visualize();
+  EDrive::common::Result_state Visualize();
 
  private:
   /**

@@ -25,15 +25,15 @@ class ViewerBase {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  virtual Result_state Init(const ViewerConf *viewer_conf) = 0;
+  virtual EDrive::common::Result_state Init(const ViewerConf *viewer_conf) = 0;
   
   virtual ~ViewerBase() = default;
 
-  virtual EDrive::Result_state InterfaceMatch() = 0;
+  virtual EDrive::common::Result_state InterfaceMatch() = 0;
 
-  virtual EDrive::Result_state PublishVisualizationData() = 0;
+  virtual EDrive::common::Result_state PublishVisualizationData() = 0;
 
-  virtual EDrive::Result_state Visualize() = 0;
+  virtual EDrive::common::Result_state Visualize() = 0;
 
   virtual void Stop() = 0;
 

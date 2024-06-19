@@ -9,17 +9,19 @@
 namespace EDrive {
 namespace viewer {
 
+using EDrive::common::Result_state;
+
 Env_handle::Env_handle(derived_object_msgs::ObjectArray *objects, visualization_msgs::MarkerArray *objects_marker_array) {
   ROS_INFO("    registering viewer [environment data]...");
   objects_ = objects;
   objects_marker_array_ = objects_marker_array;
 }
 
-EDrive::Result_state Env_handle::Init(const ViewerConf *viewer_conf) {
-  return State_Ok;
+Result_state Env_handle::Init(const ViewerConf *viewer_conf) {
+  return Result_state::State_Ok;
 }
 
-EDrive::Result_state Env_handle::InterfaceMatch() {
+Result_state Env_handle::InterfaceMatch() {
 
   int id = 0; // Unique ID for each marker
 
@@ -59,26 +61,26 @@ EDrive::Result_state Env_handle::InterfaceMatch() {
 
     objects_marker_array_->markers.push_back(marker);
   }
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
-EDrive::Result_state Env_handle::PublishVisualizationData() {
-  return State_Ok;
+Result_state Env_handle::PublishVisualizationData() {
+  return Result_state::State_Ok;
 }
 
 void Env_handle::Stop() {
 }
 
-EDrive::Result_state Env_handle::Visualize(){
-  Result_state state = State_Failed;
+Result_state Env_handle::Visualize(){
+  Result_state state = Result_state::State_Failed;
 
   state = InterfaceMatch();
-  if(State_Ok != state){
+  if(Result_state::State_Ok != state){
 
   }
 
   state = PublishVisualizationData();
-  if(State_Ok != state){
+  if(Result_state::State_Ok != state){
 
   }
 

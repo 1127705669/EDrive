@@ -9,17 +9,19 @@
 namespace EDrive {
 namespace viewer {
 
+using EDrive::common::Result_state;
+
 Planning_handle::Planning_handle(::planning::ADCTrajectory *trajectory, nav_msgs::Path *trajectory_path) {
   ROS_INFO("    registering viewer [path data]...");
   trajectory_ = trajectory;
   trajectory_path_ = trajectory_path;
 }
 
-EDrive::Result_state Planning_handle::Init(const ViewerConf *viewer_conf) {
-  return State_Ok;
+Result_state Planning_handle::Init(const ViewerConf *viewer_conf) {
+  return Result_state::State_Ok;
 }
 
-EDrive::Result_state Planning_handle::InterfaceMatch() {
+Result_state Planning_handle::InterfaceMatch() {
 
   trajectory_path_->header.frame_id = "map";
 
@@ -45,26 +47,26 @@ EDrive::Result_state Planning_handle::InterfaceMatch() {
     // Add this point to the path
     trajectory_path_->poses.push_back(pose_stamped);
   }
-  return State_Ok;
+  return Result_state::State_Ok;
 }
 
-EDrive::Result_state Planning_handle::PublishVisualizationData() {
-  return State_Ok;
+Result_state Planning_handle::PublishVisualizationData() {
+  return Result_state::State_Ok;
 }
 
 void Planning_handle::Stop() {
 }
 
-EDrive::Result_state Planning_handle::Visualize(){
-  Result_state state = State_Failed;
+Result_state Planning_handle::Visualize(){
+  Result_state state = Result_state::State_Failed;
 
   state = InterfaceMatch();
-  if(State_Ok != state){
+  if(Result_state::State_Ok != state){
 
   }
 
   state = PublishVisualizationData();
-  if(State_Ok != state){
+  if(Result_state::State_Ok != state){
 
   }
 
