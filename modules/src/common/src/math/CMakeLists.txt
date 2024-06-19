@@ -12,6 +12,8 @@ include
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/qp_solver)
+
 ###################################
 #   cartesian_frenet_conversion   #
 ###################################
@@ -29,11 +31,24 @@ add_library(geometry SHARED
 )
 
 ###################################
-#            geometry             #
+#               lqr               #
 ###################################
 
 add_library(lqr SHARED 
   linear_quadratic_regulator.cc
+)
+
+###################################
+#               mpc               #
+###################################
+
+add_library(mpc SHARED
+  mpc_solver.cc
+)
+
+target_link_libraries(mpc
+  qp_solver
+  active_set_qp_solver
 )
 
 ###################################
