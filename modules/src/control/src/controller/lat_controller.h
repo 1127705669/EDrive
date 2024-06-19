@@ -35,7 +35,7 @@ class LatController : public Controller {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  EDrive::common::Result_state Init(const ControlConf *control_conf) override;
+  common::Result_state Init(const ControlConf *control_conf) override;
 
   /**
    * @brief compute steering target based on current vehicle status
@@ -46,7 +46,7 @@ class LatController : public Controller {
    * @param cmd control command
    * @return Status computation status
    */
-  EDrive::common::Result_state ComputeControlCommand(
+  common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory,
       const nav_msgs::Odometry *localization,
       ::control::CarlaEgoVehicleControl *control_command) override;
@@ -55,7 +55,7 @@ class LatController : public Controller {
    * @brief reset Lateral Controller
    * @return Status reset status
    */
-  EDrive::common::Result_state Reset() override;
+  common::Result_state Reset() override;
 
   /**
    * @brief stop Lateral controller

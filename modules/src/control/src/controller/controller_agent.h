@@ -27,9 +27,9 @@ class ControllerAgent {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  EDrive::common::Result_state Init(const ControlConf *control_conf_);
+  common::Result_state Init(const ControlConf *control_conf_);
 
-  EDrive::common::Result_state ComputeControlCommand(
+  common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory, 
       const nav_msgs::Odometry *localization,
       ::control::CarlaEgoVehicleControl *control_command);

@@ -34,7 +34,7 @@ public:
   ~VectorMap() = default;
 
   // 公共函数用于加载和解析OSM文件
-  EDrive::common::Result_state loadMap(const std::string &file, visualization_msgs::MarkerArray &marker_array);
+  common::Result_state loadMap(const std::string &file, visualization_msgs::MarkerArray &marker_array);
 
 private:
   struct Node {
