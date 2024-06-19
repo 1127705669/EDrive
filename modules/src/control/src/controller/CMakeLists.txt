@@ -63,6 +63,22 @@ target_link_libraries(lat_controller
 )
 
 ###################################
+#         mpc_controller          #
+###################################
+
+set(MPC_CONTROLLER_SRC 
+  mpc_controller.cc
+)
+
+add_library(mpc_controller SHARED ${MPC_CONTROLLER_SRC})
+
+target_link_libraries(mpc_controller 
+  trajectory_analyzer
+  vehicle_state_provider
+  vehicle_config_helper
+)
+
+###################################
 #    controller                   #
 ###################################
 
@@ -72,4 +88,5 @@ target_link_libraries(controller INTERFACE
   controller_agent
   lon_controller
   lat_controller
+  mpc_controller
 )
