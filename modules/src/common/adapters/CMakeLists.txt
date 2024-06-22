@@ -20,6 +20,13 @@ set(ADAPTER_SRC
 
 add_library(common_adapters SHARED ${ADAPTER_SRC})
 
+add_dependencies(common_adapters 
+  planning_generate_messages_cpp
+  control_generate_messages_cpp
+  perception_generate_messages_cpp
+  localization_generate_messages_cpp
+)
+
 target_link_libraries(common_adapters 
   adapter_proto
 )
