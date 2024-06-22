@@ -8,7 +8,7 @@
 #include "common/src/EDrive.h"
 #include "common/src/state.h"
 
-#include "common/src/adapters/adapter_manager.h"
+#include "common/adapters/adapter_manager.h"
 
 #include "planning/ADCTrajectory.h"
 

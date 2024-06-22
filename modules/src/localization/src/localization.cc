@@ -7,7 +7,7 @@
 
 #include "localization/src/common/localization_gflags.h"
 #include "common/src/util/file.h"
-#include "common/src/adapters/adapter_manager.h"
+#include "common/adapters/adapter_manager.h"
 
 namespace EDrive {
 namespace localization {

@@ -7,7 +7,7 @@
 #include <derived_object_msgs/ObjectArray.h>
 #include <nav_msgs/Odometry.h>
 // #include "control/proto/control_cmd.pb.h"
-#include "common/src/adapters/adapter.h"
+#include "common/adapters/adapter.h"
 #include "control/ControlCommand.h"
 #include "control/CarlaEgoVehicleControl.h"
 #include "planning/ADCTrajectory.h"

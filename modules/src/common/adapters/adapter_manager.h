@@ -12,10 +12,10 @@
 
 #include <ros/ros.h>
 
-#include "common/src/adapters/adapter.h"
+#include "common/adapters/adapter.h"
 #include "common/src/macro.h"
-#include "common/src/adapters/proto/adapter_config.pb.h"
-#include "common/src/adapters/message_adapters.h"
+#include "common/adapters/proto/adapter_config.pb.h"
+#include "common/adapters/message_adapters.h"
 
 namespace EDrive {
 namespace common {

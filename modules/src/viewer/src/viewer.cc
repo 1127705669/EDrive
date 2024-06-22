@@ -5,7 +5,7 @@
 #include <ros/ros.h>
 #include "viewer/src/viewer.h"
 
-#include "common/src/adapters/adapter_manager.h"
+#include "viewer/src/common/adapters/adapter_manager.h"
 #include "viewer/src/common/viewer_agent.h"
 #include "common/src/util/file.h"
 
@@ -21,7 +21,7 @@ namespace EDrive {
 namespace viewer {
 
 using EDrive::common::Result_state;
-using EDrive::common::adapter::AdapterManager;
+using EDrive::viewer::adapter::AdapterManager;
 
 std::string Viewer::Name() const { return "EDrive_viewer"; }
 
