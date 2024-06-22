@@ -2,7 +2,7 @@
  * Copyright 2023 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "control/src/common/trajectory_analyzer.h"
+#include "control/common/trajectory_analyzer.h"
 
 using ::common::PathPoint;
 using ::common::TrajectoryPoint;

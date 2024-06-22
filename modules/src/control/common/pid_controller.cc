@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "control/src/common/pid_controller.h"
+#include "control/common/pid_controller.h"
 
 namespace EDrive {
 namespace control {

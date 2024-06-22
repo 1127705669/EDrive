@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "control/src/common/pid_controller.h"
-#include "control/src/common/trajectory_analyzer.h"
+#include "control/common/pid_controller.h"
+#include "control/common/trajectory_analyzer.h"
 #include "common/vehicle_state/vehicle_state_provider.h"
 
 #include "control/src/controller/controller.h"

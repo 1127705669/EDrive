@@ -6,7 +6,7 @@
 
 #include "control/src/controller/controller.h"
 
-#include "control/src/common/trajectory_analyzer.h"
+#include "control/common/trajectory_analyzer.h"
 
 #include <eigen3/Eigen/Core>
 

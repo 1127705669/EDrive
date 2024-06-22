@@ -2,7 +2,7 @@
  * Copyright 2024 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "control/src/common/interpolation_2d.h"
+#include "control/common/interpolation_2d.h"
 
 #include <cmath>
 #include <ros/ros.h>
