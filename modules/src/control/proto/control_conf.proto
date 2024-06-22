@@ -4,6 +4,7 @@ package EDrive.control;
 
 import "lon_controller_conf.proto";
 import "lat_controller_conf.proto";
+import "mpc_controller_conf.proto";
 
 message ControlConf {
   enum ControllerType {
@@ -31,6 +32,8 @@ message ControlConf {
 
   optional double minimum_speed_resolution = 15;
 
-  optional double query_relative_time = 16;
-  optional double minimum_speed_protection = 17;
+  optional EDrive.control.MPCControllerConf mpc_controller_conf = 16;
+
+  optional double query_relative_time = 17;
+  optional double minimum_speed_protection = 18;
 }

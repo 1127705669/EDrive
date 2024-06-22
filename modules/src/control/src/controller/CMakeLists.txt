@@ -27,6 +27,7 @@ add_library(controller_agent SHARED
 target_link_libraries(controller_agent 
   lon_controller
   lat_controller
+  mpc_controller
 )
 
 ###################################
@@ -76,6 +77,7 @@ target_link_libraries(mpc_controller
   trajectory_analyzer
   vehicle_state_provider
   vehicle_config_helper
+  geometry
 )
 
 ###################################

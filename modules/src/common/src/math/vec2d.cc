@@ -4,6 +4,10 @@
 
 #include "common/src/math/vec2d.h"
 
+#include <cmath>
+
+// #include "common/src/log.h"
+
 namespace EDrive {
 namespace common {
 namespace math {
@@ -85,6 +89,10 @@ bool Vec2d::operator==(const Vec2d &other) const {
 }
 
 Vec2d operator*(const double ratio, const Vec2d &vec) { return vec * ratio; }
+
+std::string Vec2d::DebugString() const {
+  return "vec2d";
+}
 
 }  // namespace math
 }  // namespace common

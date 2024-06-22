@@ -27,6 +27,7 @@ add_library(cartesian_frenet_conversion SHARED
 ###################################
 
 add_library(geometry SHARED 
+  math_utils.cc
   vec2d.cc
 )
 

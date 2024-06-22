@@ -4,6 +4,7 @@
 
 #include "control/src/controller/lon_controller.h"
 #include "control/src/controller/lat_controller.h"
+#include "control/src/controller/mpc_controller.h"
 
 #include "control/src/controller/controller_agent.h"
 
@@ -24,6 +25,8 @@ void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
       case ControlConf::LAT_CONTROLLER:
         controller_list_.emplace_back(std::move(new LatController()));
         break;
+      case ControlConf::MPC_CONTROLLER:
+        controller_list_.emplace_back(std::move(new MPCController()));
       default:
         ROS_ERROR("    Unknown active controller type: ");
     }

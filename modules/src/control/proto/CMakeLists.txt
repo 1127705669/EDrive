@@ -51,6 +51,7 @@ set(ADAPTER_PROTO_SRC
   lat_controller_conf.pb.cc
   lon_controller_conf.pb.cc
   pid_conf.pb.cc
+  mpc_controller_conf.pb.cc
 )
 
 add_library(control_proto SHARED ${ADAPTER_PROTO_SRC})
