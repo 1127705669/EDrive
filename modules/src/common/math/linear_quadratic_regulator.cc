@@ -19,7 +19,7 @@
 #include <eigen3/Eigen/Dense>
 #include <ros/ros.h>
 
-#include "common/src/math/linear_quadratic_regulator.h"
+#include "common/math/linear_quadratic_regulator.h"
 
 namespace EDrive {
 namespace common {

@@ -6,7 +6,7 @@
  * @file
  **/
 
-#include "common/src/math/cartesian_frenet_conversion.h"
+#include "common/math/cartesian_frenet_conversion.h"
 
 #include <cmath>
 

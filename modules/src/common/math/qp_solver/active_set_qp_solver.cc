@@ -6,13 +6,13 @@
  * @file: active_set_qp_solver.cc
  **/
 
-#include "common/src/math/qp_solver/active_set_qp_solver.h"
+#include "common/math/qp_solver/active_set_qp_solver.h"
 
 #include <algorithm>
 #include <climits>
 #include <vector>
 
-#include "common/src/math/qp_solver/qp_solver_gflags.h"
+#include "common/math/qp_solver/qp_solver_gflags.h"
 
 namespace EDrive {
 namespace common {

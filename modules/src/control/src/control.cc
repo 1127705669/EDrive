@@ -6,7 +6,7 @@
 
 #include "common/adapters/adapter_manager.h"
 #include "common/util/file.h"
-#include "common/src/vehicle_state/vehicle_state_provider.h"
+#include "common/vehicle_state/vehicle_state_provider.h"
 
 namespace EDrive {
 namespace control {

@@ -7,7 +7,7 @@
 #include <vector>
 #include <ros/ros.h>
 
-#include "common/src/vehicle_state/vehicle_state_provider.h"
+#include "common/vehicle_state/vehicle_state_provider.h"
 
 #include "planning/ADCTrajectory.h"
 

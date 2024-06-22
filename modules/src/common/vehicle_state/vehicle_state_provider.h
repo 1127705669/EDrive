@@ -14,10 +14,10 @@
 #include "common/src/state.h"
 
 #include "common/src/macro.h"
-#include "common/src/vehicle_state/proto/vehicle_state.pb.h"
+#include "common/vehicle_state/proto/vehicle_state.pb.h"
 #include <nav_msgs/Odometry.h>
 
-#include "common/src/math/vec2d.h"
+#include "common/math/vec2d.h"
 
 namespace EDrive {
 namespace common {

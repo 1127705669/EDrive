@@ -6,7 +6,7 @@
  * @file: qp_solver.cc
  **/
 
-#include "common/src/math/qp_solver/qp_solver.h"
+#include "common/math/qp_solver/qp_solver.h"
 
 namespace EDrive {
 namespace common {

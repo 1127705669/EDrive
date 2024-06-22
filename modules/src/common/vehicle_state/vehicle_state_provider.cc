@@ -2,7 +2,7 @@
  * Copyright 2023 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "common/src/vehicle_state/vehicle_state_provider.h"
+#include "common/vehicle_state/vehicle_state_provider.h"
 
 #include <eigen3/Eigen/Core>
 

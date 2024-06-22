@@ -2,7 +2,7 @@
  * Copyright 2024 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "common/src/math/qp_solver/qp_solver_gflags.h"
+#include "common/math/qp_solver/qp_solver_gflags.h"
 
 // math : active set solver
 DEFINE_double(default_active_set_eps_num, -1e-7,

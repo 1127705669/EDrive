@@ -2,7 +2,7 @@
  * Copyright 2024 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "common/src/math/math_utils.h"
+#include "common/math/math_utils.h"
 
 #include <cmath>
 #include <utility>

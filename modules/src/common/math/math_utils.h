@@ -12,7 +12,7 @@
 #include <limits>
 #include <utility>
 
-#include "common/src/math/vec2d.h"
+#include "common/math/vec2d.h"
 
 /**
  * @namespace EDrive::common::math

@@ -2,13 +2,13 @@
  * Copyright 2024 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "common/src/math/mpc_solver.h"
+#include "common/math/mpc_solver.h"
 
 #include <algorithm>
 #include <memory>
 
-#include "common/src/math/qp_solver/active_set_qp_solver.h"
-#include "common/src/math/qp_solver/qp_solver.h"
+#include "common/math/qp_solver/active_set_qp_solver.h"
+#include "common/math/qp_solver/qp_solver.h"
 
 namespace EDrive {
 namespace common {
