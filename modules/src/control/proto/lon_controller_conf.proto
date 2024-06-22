@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package EDrive.control;
 
-import "pid_conf.proto";
+import "control/proto/pid_conf.proto";
 
 message FilterConf {
   optional int32 cutoff_freq = 1;

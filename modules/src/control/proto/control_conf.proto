@@ -2,9 +2,9 @@ syntax = "proto2";
 
 package EDrive.control;
 
-import "lon_controller_conf.proto";
-import "lat_controller_conf.proto";
-import "mpc_controller_conf.proto";
+import "control/proto/lon_controller_conf.proto";
+import "control/proto/lat_controller_conf.proto";
+import "control/proto/mpc_controller_conf.proto";
 
 message ControlConf {
   enum ControllerType {
