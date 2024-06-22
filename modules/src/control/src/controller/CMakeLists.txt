@@ -73,7 +73,8 @@ set(MPC_CONTROLLER_SRC
 
 add_library(mpc_controller SHARED ${MPC_CONTROLLER_SRC})
 
-target_link_libraries(mpc_controller 
+target_link_libraries(mpc_controller
+  interpolation_2d
   trajectory_analyzer
   vehicle_state_provider
   vehicle_config_helper

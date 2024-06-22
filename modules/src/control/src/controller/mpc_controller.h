@@ -18,6 +18,7 @@
 #include "control/src/controller/controller.h"
 #include "control/src/common/trajectory_analyzer.h"
 #include "control/src/controller/controller.h"
+#include "control/src/common/interpolation_2d.h"
 
 /**
  * @namespace EDrive::control
@@ -106,7 +107,12 @@ class MPCController : public Controller {
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
 
+  void LoadControlCalibrationTable(
+      const MPCControllerConf &mpc_controller_conf);
+
   void LoadMPCGainScheduler(const MPCControllerConf &mpc_controller_conf);
+
+  std::unique_ptr<Interpolation2D> control_interpolation_;
 
   // the following parameters are vehicle physics related.
   // control time interval

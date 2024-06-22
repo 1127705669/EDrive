@@ -43,6 +43,25 @@ MPCController::MPCController() : name_("MPC Controller") {
   ROS_INFO("    registering MPC controller...");
 }
 
+void MPCController::LoadControlCalibrationTable(
+    const MPCControllerConf &mpc_controller_conf) {
+  const auto &control_table = mpc_controller_conf.calibration_table();
+  
+  ROS_INFO("Control calibration table loaded");
+  ROS_INFO("Control calibration table size is %d", control_table.calibration_size());
+
+  Interpolation2D::DataType xyz;
+  for (const auto &calibration : control_table.calibration()) {
+    xyz.push_back(std::make_tuple(calibration.speed(),
+                                  calibration.acceleration(),
+                                  calibration.command()));
+  }
+  control_interpolation_.reset(new Interpolation2D);
+  if(!control_interpolation_->Init(xyz)){
+    ROS_ERROR("Fail to load control calibration table");
+  }
+}
+
 void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
   const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(),
@@ -134,7 +153,11 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
       VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
-  // CHECK_GT(ts_, 0.0) << "[MPCController] Invalid control update interval.";
+
+  if(ts_ <= 0.0){
+    ROS_ERROR("[MPCController] Invalid control update interval.");
+  }
+  
   cf_ = control_conf->mpc_controller_conf().cf();
   cr_ = control_conf->mpc_controller_conf().cr();
   wheelbase_ = vehicle_param_.wheel_base();
@@ -166,8 +189,9 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   standstill_acceleration_ =
       control_conf->mpc_controller_conf().standstill_acceleration();
 
-  // LoadControlCalibrationTable(control_conf->mpc_controller_conf());
-  // AINFO << "MPC conf loaded";
+  LoadControlCalibrationTable(control_conf->mpc_controller_conf());
+
+  ROS_INFO("MPC conf loaded");
   return true;
 }
 
