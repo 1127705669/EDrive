@@ -159,6 +159,7 @@ class AdapterManager
   REGISTER_ADAPTER(VehicleLocation);
   REGISTER_ADAPTER(VectorMap);
   REGISTER_ADAPTER(CloudPointMap);
+  REGISTER_ADAPTER(FixedPath);
   DECLARE_SINGLETON(AdapterManager);
 };
 

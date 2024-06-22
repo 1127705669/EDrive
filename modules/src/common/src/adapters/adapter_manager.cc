@@ -90,7 +90,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::CLOUD_POINT_MAP:
         EnableCloudPointMap("/EDrive/localization/cloud_point_map", config);
         break;
-
+      case AdapterConfig::FIXED_PATH:
+        EnableFixedPath("/EDrive/planning/fixed_path", config);
+        break;
       default:
         ROS_INFO("Unknown adapter config type!");
         break;

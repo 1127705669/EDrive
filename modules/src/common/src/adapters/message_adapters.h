@@ -42,6 +42,7 @@ using RoadMarkingsAdapter = Adapter<sensor_msgs::Image>;
 using RoadMarkerAdapter = Adapter<visualization_msgs::Marker>;
 using VectorMapAdapter = Adapter<visualization_msgs::MarkerArray>;
 using CloudPointMapAdapter = Adapter<sensor_msgs::PointCloud2>;
+using FixedPathAdapter = Adapter<visualization_msgs::MarkerArray>;
 
 } // namespace adapter
 } // namespace common
