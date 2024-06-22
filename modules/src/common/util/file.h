@@ -38,7 +38,7 @@ void GetProtoFromASIIFile(const std::string &adapter_config_filename, MessageTyp
 
   int file_descriptor = open(adapter_config_filename.c_str(), O_RDONLY);
   if (file_descriptor < 0) {
-    ROS_ERROR("Failed to open file in text mode.");
+    ROS_ERROR("Failed to open file in text mode %s.", adapter_config_filename.c_str());
   }
 
   ZeroCopyInputStream *input = new FileInputStream(file_descriptor);

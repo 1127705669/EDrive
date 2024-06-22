@@ -16,7 +16,7 @@ namespace control {
 using EDrive::common::Result_state;
 
 void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
-  ROS_INFO("    Only support Lat + Lon controllers as of now");
+  ROS_INFO("    Only support MPC controller or Lat + Lon controllers as of now");
   for (auto active_controller : control_conf_->active_controllers()) {
     switch (active_controller) {
       case ControlConf::LON_CONTROLLER:
@@ -27,6 +27,7 @@ void ControllerAgent::RegisterControllers(const ControlConf *control_conf_) {
         break;
       case ControlConf::MPC_CONTROLLER:
         controller_list_.emplace_back(std::move(new MPCController()));
+        break;
       default:
         ROS_ERROR("    Unknown active controller type: ");
     }

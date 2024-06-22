@@ -40,7 +40,7 @@ void WriteHeaders(std::ofstream &file_stream) {}
 }  // namespace
 
 MPCController::MPCController() : name_("MPC Controller") {
-  ROS_INFO("    registering Lat controller...");
+  ROS_INFO("    registering MPC controller...");
 }
 
 void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
