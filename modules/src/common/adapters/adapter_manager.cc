@@ -54,9 +54,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning("/EDrive/planning/trajectory", config);
         break;
-      case AdapterConfig::VIEWER:
-        EnableViewer("/EDrive/viewer", config);
-        break;
+      // case AdapterConfig::VIEWER:
+      //   EnableViewer("/EDrive/viewer", config);
+      //   break;
       case AdapterConfig::VEHICLE_DATA:
         EnableVehicle("/carla/ego_vehicle/odometry", config);
         break;

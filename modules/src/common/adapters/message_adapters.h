@@ -11,7 +11,7 @@
 #include "control/ControlCommand.h"
 #include "control/CarlaEgoVehicleControl.h"
 #include "planning/ADCTrajectory.h"
-#include "viewer/VisualizingData.h"
+// #include "viewer/VisualizingData.h"
 #include <visualization_msgs/MarkerArray.h>
 #include <visualization_msgs/Marker.h>
 #include <nav_msgs/Path.h>
@@ -30,7 +30,7 @@ namespace adapter {
 
 using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
-using ViewerAdapter = Adapter<::viewer::VisualizingData>;
+// using ViewerAdapter = Adapter<::viewer::VisualizingData>;
 using VehicleAdapter = Adapter<nav_msgs::Odometry>;
 using VehicleLocationAdapter = Adapter<visualization_msgs::Marker>;
 using CarlaObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
