@@ -8,7 +8,7 @@
 
 #include "control/src/controller/controller_agent.h"
 
-#include "common/src/util/file.h"
+#include "common/util/file.h"
 
 namespace EDrive {
 namespace control {

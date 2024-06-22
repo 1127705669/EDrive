@@ -7,7 +7,7 @@
 
 #include "viewer/src/common/adapters/adapter_manager.h"
 #include "viewer/src/common/viewer_agent.h"
-#include "common/src/util/file.h"
+#include "common/util/file.h"
 
 #include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
