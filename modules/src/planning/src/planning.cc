@@ -67,6 +67,12 @@ Result_state Planning::Init(){
 }
 
 Result_state Planning::Start(){
+  // set initial vehicle state by cmd
+  // need to sleep, because advertised channel is not ready immediately
+  // simple test shows a short delay of 80 ms or so
+  ROS_INFO("Planning resetting vehicle state, sleeping for 1000 ms ...");
+  ros::Duration(1.0).sleep();
+
   timer_ = EDrive::common::adapter::AdapterManager::CreateTimer(ros::Duration(planning_period), 
                                                                 &Planning::OnTimer,
                                                                 this);
