@@ -2,6 +2,9 @@ syntax = "proto2";
 
 package EDrive.control;
 
+import "control/proto/gain_scheduler_conf.proto";
+import "control/proto/calibration_table.proto";
+
 // simple optimal steer control param
 message MPCControllerConf {
   optional double ts = 1;            // sample time (dt) 0.01 now, configurable
@@ -22,4 +25,9 @@ message MPCControllerConf {
   optional double standstill_acceleration = 15;
   optional double throttle_deadzone = 16;
   optional double brake_deadzone = 17;
+  optional EDrive.control.GainScheduler lat_err_gain_scheduler = 18;
+  optional EDrive.control.GainScheduler heading_err_gain_scheduler = 19;
+  optional EDrive.control.GainScheduler steer_weight_gain_scheduler = 20;
+  optional EDrive.control.GainScheduler feedforwardterm_gain_scheduler = 21;
+  optional calibrationtable.ControlCalibrationTable calibration_table = 22;
 }
