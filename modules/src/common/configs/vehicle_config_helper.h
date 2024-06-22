@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include "common/src/configs/proto/vehicle_config.pb.h"
+#include "common/configs/proto/vehicle_config.pb.h"
 #include "common/src/macro.h"
 
 /**

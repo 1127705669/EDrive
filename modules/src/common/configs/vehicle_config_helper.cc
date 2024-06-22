@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "common/src/configs/vehicle_config_helper.h"
+#include "common/configs/vehicle_config_helper.h"
 
 #include <algorithm>
 #include <cmath>

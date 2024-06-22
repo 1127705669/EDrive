@@ -13,7 +13,7 @@
 
 #include "eigen3/Eigen/LU"
 
-#include "common/src/configs/vehicle_config_helper.h"
+#include "common/configs/vehicle_config_helper.h"
 #include "common/src/math/math_utils.h"
 
 namespace EDrive {

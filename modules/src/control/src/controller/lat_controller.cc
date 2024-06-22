@@ -8,7 +8,7 @@
 
 #include "control/src/controller/lat_controller.h"
 
-#include "common/src/configs/vehicle_config_helper.h"
+#include "common/configs/vehicle_config_helper.h"
 
 namespace EDrive {
 namespace control {
