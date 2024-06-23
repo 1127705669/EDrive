@@ -1,0 +1,24 @@
+ros noetic
+gflags
+CARLA 0.9.13
+qpOASES
+ros-noetic-derived-object-msgs
+
+
+#conda
+empy==3.3.2
+pip install empy==3.3.2
+
+catkin_pkg
+pip install catkin_pkg
+
+yaml
+pip install PyYAML
+
+pip3 install carla==0.9.13
+
+ackermann_msgs
+sudo apt-get install ros-noetic-ackermann-msgs
+
+rospkg
+pip install rospkg catkin_pkg
