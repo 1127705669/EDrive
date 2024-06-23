@@ -25,16 +25,6 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 
-#include <lanelet2_io/Io.h>
-#include <lanelet2_io/Exceptions.h>
-#include <lanelet2_core/primitives/Lanelet.h>
-#include <lanelet2_core/primitives/LineString.h>
-#include <lanelet2_core/primitives/Point.h>
-#include <lanelet2_projection/UTM.h>
-#include <lanelet2_routing/RoutingGraph.h>
-#include <lanelet2_traffic_rules/TrafficRulesFactory.h>
-#include <lanelet2_traffic_rules/TrafficRules.h>
-
 #include <visualization_msgs/MarkerArray.h>
 
 namespace EDrive {
@@ -65,11 +55,6 @@ class Localization : public EDrive::common::EDriveApp {
   void PositionConvert();
 
   void PCDConvert(const std::string& file_path, bool apply_filter, bool save_filtered, const std::string& save_path = "");
-
-  void addTriangleToList(std::vector<geometry_msgs::Point>& points,
-                       const lanelet::BasicPoint2d& p1, const lanelet::BasicPoint2d& p2, const lanelet::BasicPoint2d& p3);
-
-  void loadAndPublishLanelet2Map(const std::string& map_file);
 
   ros::Timer timer_;
   LocalizationConf localization_conf_;
