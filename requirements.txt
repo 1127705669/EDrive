@@ -22,3 +22,19 @@ sudo apt-get install ros-noetic-ackermann-msgs
 
 rospkg
 pip install rospkg catkin_pkg
+
+numpy
+pip install numpy
+
+transforms3d
+pip install transforms3d
+
+cv2
+pip install opencv-python
+
+pygame
+pip install pygame
+
+sudo apt-get install libffi7
+
+conda install -c conda-forge opencv

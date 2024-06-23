@@ -8,7 +8,7 @@
 #include "control/common/trajectory_analyzer.h"
 #include "common/vehicle_state/vehicle_state_provider.h"
 
-#include "control/src/controller/controller.h"
+#include "control/controller/controller.h"
 
 namespace EDrive {
 namespace control {

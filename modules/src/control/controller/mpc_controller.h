@@ -15,9 +15,8 @@
 
 #include <eigen3/Eigen/Dense>
 
-#include "control/src/controller/controller.h"
+#include "control/controller/controller.h"
 #include "control/common/trajectory_analyzer.h"
-#include "control/src/controller/controller.h"
 #include "control/common/interpolation_2d.h"
 
 /**

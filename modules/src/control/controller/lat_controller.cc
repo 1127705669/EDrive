@@ -6,7 +6,7 @@
 
 #include <algorithm> 
 
-#include "control/src/controller/lat_controller.h"
+#include "control/controller/lat_controller.h"
 
 #include "common/configs/vehicle_config_helper.h"
 

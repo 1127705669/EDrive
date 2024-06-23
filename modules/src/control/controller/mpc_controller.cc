@@ -2,7 +2,7 @@
  * Copyright 2024 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "control/src/controller/mpc_controller.h"
+#include "control/controller/mpc_controller.h"
 
 #include <algorithm>
 #include <cmath>

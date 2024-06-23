@@ -2,11 +2,11 @@
  * Copyright 2023 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
-#include "control/src/controller/lon_controller.h"
-#include "control/src/controller/lat_controller.h"
-#include "control/src/controller/mpc_controller.h"
+#include "control/controller/lon_controller.h"
+#include "control/controller/lat_controller.h"
+#include "control/controller/mpc_controller.h"
 
-#include "control/src/controller/controller_agent.h"
+#include "control/controller/controller_agent.h"
 
 #include "common/util/file.h"
 

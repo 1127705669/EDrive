@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "control/src/controller/controller.h"
+#include "control/controller/controller.h"
 
 #include "control/common/trajectory_analyzer.h"
 

@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 #include <ros/ros.h>
-#include "control/src/controller/lon_controller.h"
+#include "control/controller/lon_controller.h"
 
 using EDrive::common::VehicleStateProvider;
 

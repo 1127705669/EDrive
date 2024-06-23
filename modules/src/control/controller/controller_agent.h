@@ -6,7 +6,7 @@
 
 #include <ros/ros.h>
 
-#include "control/src/controller/controller.h"
+#include "control/controller/controller.h"
 #include "control/proto/control_conf.pb.h"
 #include "control/CarlaEgoVehicleControl.h"
 

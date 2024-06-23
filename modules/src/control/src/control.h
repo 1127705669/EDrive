@@ -11,7 +11,7 @@
 
 #include "common/src/EDrive.h"
 
-#include "controller/controller_agent.h"
+#include "control/controller/controller_agent.h"
 
 #include "control/ControlCommand.h"
 
