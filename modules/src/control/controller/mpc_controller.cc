@@ -195,6 +195,19 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   return true;
 }
 
+void MPCController::InitializeFilters(const ControlConf *control_conf) {
+  // Low pass filter
+  std::vector<double> den(3, 0.0);
+  std::vector<double> num(3, 0.0);
+  // common::LpfCoefficients(
+  //     ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den, &num);
+  // digital_filter_.set_coefficients(den, num);
+  // lateral_error_filter_ = common::MeanFilter(
+  //     control_conf->mpc_controller_conf().mean_filter_window_size());
+  // heading_error_filter_ = common::MeanFilter(
+  //     control_conf->mpc_controller_conf().mean_filter_window_size());
+}
+
 Result_state MPCController::Init(const ControlConf *control_conf) {
   if (!LoadControlConf(control_conf)) {
     ROS_ERROR("failed to load control conf");
@@ -242,7 +255,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
     matrix_r_(i, i) = control_conf->mpc_controller_conf().matrix_r(i);
   }
 
-  // int q_param_size = control_conf->mpc_controller_conf().matrix_q_size();
+  int q_param_size = control_conf->mpc_controller_conf().matrix_q_size();
   // if (basic_state_size_ != q_param_size) {
   //   const auto error_msg = common::util::StrCat(
   //       "MPC controller error: matrix_q size: ", q_param_size,
@@ -251,18 +264,18 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   //   AERROR << error_msg;
   //   return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   // }
-  // for (int i = 0; i < q_param_size; ++i) {
-  //   matrix_q_(i, i) = control_conf->mpc_controller_conf().matrix_q(i);
-  // }
+  for (int i = 0; i < q_param_size; ++i) {
+    matrix_q_(i, i) = control_conf->mpc_controller_conf().matrix_q(i);
+  }
 
-  // // Update matrix_q_updated_ and matrix_r_updated_
-  // matrix_r_updated_ = matrix_r_;
-  // matrix_q_updated_ = matrix_q_;
+  // Update matrix_q_updated_ and matrix_r_updated_
+  matrix_r_updated_ = matrix_r_;
+  matrix_q_updated_ = matrix_q_;
 
-  // InitializeFilters(control_conf);
+  InitializeFilters(control_conf);
   // LoadMPCGainScheduler(control_conf->mpc_controller_conf());
   // LogInitParameters();
-  // AINFO << "[MPCController] init done!";
+  ROS_INFO("[MPCController] init done!");
   return Result_state::State_Ok;
 }
 
