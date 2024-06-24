@@ -18,9 +18,9 @@ class Routing : public EDrive::common::EDriveApp {
 
   std::string Name() const override;
 
-  EDrive::common::Result_state Init() override;
+  common::Result_state Init() override;
 
-  EDrive::common::Result_state Start() override;
+  common::Result_state Start() override;
 
   void Stop() override;
 };

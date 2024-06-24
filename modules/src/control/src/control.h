@@ -11,7 +11,7 @@
 
 #include "common/src/EDrive.h"
 
-#include "controller/controller_agent.h"
+#include "control/controller/controller_agent.h"
 
 #include "control/ControlCommand.h"
 
@@ -31,9 +31,9 @@ class Control : public EDrive::common::EDriveApp {
 
   std::string Name() const override;
 
-  EDrive::common::Result_state Init() override;
+  common::Result_state Init() override;
 
-  EDrive::common::Result_state Start() override;
+  common::Result_state Start() override;
 
   void Stop() override;
 
@@ -44,11 +44,11 @@ class Control : public EDrive::common::EDriveApp {
  // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
-  EDrive::common::Result_state CheckInput();
+  common::Result_state CheckInput();
 
   void SendCmd(::control::CarlaEgoVehicleControl *control_command);
 
-  EDrive::common::Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
+  common::Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
 
   ros::Timer timer_;
   ros::Time init_time_;

@@ -14,6 +14,8 @@
 #include <geometry_msgs/Point.h>
 #include <tinyxml2.h>
 
+#include <initializer_list>
+
 /**
  * @namespace EDrive::localization
  * @brief EDrive::localization
@@ -34,7 +36,8 @@ public:
   ~VectorMap() = default;
 
   // 公共函数用于加载和解析OSM文件
-  EDrive::common::Result_state loadMap(const std::string &file, visualization_msgs::MarkerArray &marker_array);
+  common::Result_state loadMap(const std::string &file, visualization_msgs::MarkerArray &marker_array);
+  void publishMiddlePath(std::initializer_list<int> relation_ids, visualization_msgs::MarkerArray &path);
 
 private:
   struct Node {

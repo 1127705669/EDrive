@@ -71,6 +71,107 @@ void VectorMap::parse_osm(const std::string &file, std::unordered_map<int, Node>
     }
 }
 
+void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visualization_msgs::MarkerArray &path) {
+    int marker_id = 0;
+    for (int relation_id : relation_ids) {
+        auto it = std::find_if(relations_.begin(), relations_.end(), [relation_id](const Relation& rel) {
+            return rel.id == relation_id;
+        });
+
+        if (it == relations_.end()) {
+            ROS_ERROR("Relation ID %d not found", relation_id);
+            return;
+        }
+
+        const Relation& relation = *it;
+        if (relation.left_refs.size() != relation.right_refs.size()) {
+            ROS_WARN("Mismatch in sizes of left_refs and right_refs for relation ID %d", relation_id);
+        }
+
+        size_t min_size = std::min(relation.left_refs.size(), relation.right_refs.size());
+
+        std::vector<geometry_msgs::Point> middle_points;
+        for (size_t i = 0; i < min_size; ++i) {
+            int left_way_id = relation.left_refs[i];
+            int right_way_id = relation.right_refs[i];
+
+            // 检查这两个way ID是否存在于ways_中
+            if (ways_.find(left_way_id) == ways_.end()) {
+                ROS_ERROR("Left way ID %d not found", left_way_id);
+                continue;
+            }
+            if (ways_.find(right_way_id) == ways_.end()) {
+                ROS_ERROR("Right way ID %d not found", right_way_id);
+                continue;
+            }
+
+            const Way& left_way = ways_.at(left_way_id);
+            const Way& right_way = ways_.at(right_way_id);
+
+            // // 打印left_way的节点ID
+            // std::cout << "Left Way ID " << left_way_id << " contains nodes: ";
+            // for (int node_id : left_way.node_refs) {
+            //     std::cout << node_id << " ";
+            // }
+            // std::cout << std::endl;
+
+            // // 打印right_way的节点ID
+            // std::cout << "Right Way ID " << right_way_id << " contains nodes: ";
+            // for (int node_id : right_way.node_refs) {
+            //     std::cout << node_id << " ";
+            // }
+            // std::cout << std::endl;
+
+            size_t min_nodes_size = std::min(left_way.node_refs.size(), right_way.node_refs.size());
+            for (size_t j = 0; j < min_nodes_size; ++j) {
+                int left_node_id = left_way.node_refs[j];
+                int right_node_id = right_way.node_refs[j];
+
+                if (nodes_.find(left_node_id) == nodes_.end() || nodes_.find(right_node_id) == nodes_.end()) {
+                    ROS_ERROR("Node ref %d or %d not found", left_node_id, right_node_id);
+                    continue;
+                }
+
+                const Node& left_node = nodes_.at(left_node_id);
+                const Node& right_node = nodes_.at(right_node_id);
+
+                geometry_msgs::Point mid_point;
+                mid_point.x = (left_node.local_x + right_node.local_x) / 2.0;
+                mid_point.y = (left_node.local_y + right_node.local_y) / 2.0;
+                mid_point.z = (left_node.ele + right_node.ele) / 2.0;
+
+                visualization_msgs::Marker marker;
+                marker.header.frame_id = "map";
+                marker.header.stamp = ros::Time::now();
+                marker.ns = "middle_points";
+                marker.id = marker_id++;
+                marker.type = visualization_msgs::Marker::SPHERE;
+                marker.action = visualization_msgs::Marker::ADD;
+                
+                marker.pose.position.x = mid_point.x;
+                marker.pose.position.y = mid_point.y;
+                marker.pose.position.z = mid_point.z;
+
+                marker.pose.orientation.x = 0.0;
+                marker.pose.orientation.y = 0.0;
+                marker.pose.orientation.z = 0.0;
+                marker.pose.orientation.w = 1.0;
+
+                marker.scale.x = 0.5;  // 设定 marker 的大小
+                marker.scale.y = 0.5;
+                marker.scale.z = 0.5;
+                marker.color.a = 1.0; // 透明度
+                marker.color.r = 0.0;
+                marker.color.g = 1.0;
+                marker.color.b = 0.0;
+
+                path.markers.push_back(marker);
+            }
+        }
+    }
+    
+}
+
 void VectorMap::create_marker_array(const std::unordered_map<int, Node> &nodes, const std::unordered_map<int, Way> &ways, visualization_msgs::MarkerArray &marker_array) {
     int marker_id = 0;
 

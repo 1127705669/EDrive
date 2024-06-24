@@ -16,13 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   pcl_ros
   pcl_conversions
-  lanelet2_core
-  lanelet2_io
-  lanelet2_maps
-  lanelet2_projection
-  lanelet2_routing
-  lanelet2_traffic_rules
-  lanelet2_validation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -154,13 +147,6 @@ include
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${PCL_INCLUDE_DIRS}
-  ${lanelet2_core_INCLUDE_DIRS}
-  ${lanelet2_io_INCLUDE_DIRS}
-  ${lanelet2_maps_INCLUDE_DIRS}
-  ${lanelet2_projection_INCLUDE_DIRS}
-  ${lanelet2_routing_INCLUDE_DIRS}
-  ${lanelet2_traffic_rules_INCLUDE_DIRS}
-  ${lanelet2_validation_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library

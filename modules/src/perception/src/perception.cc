@@ -4,9 +4,9 @@
 
 #include "perception/src/perception.h"
 
-#include "common/src/adapters/adapter_manager.h"
+#include "common/adapters/adapter_manager.h"
 
-#include "common/src/util/file.h"
+#include "common/util/file.h"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>

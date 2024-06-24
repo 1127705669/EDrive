@@ -8,7 +8,7 @@
 #include "common/src/EDrive.h"
 #include "common/src/state.h"
 
-#include "common/src/adapters/adapter_manager.h"
+#include "common/adapters/adapter_manager.h"
 
 #include "planning/ADCTrajectory.h"
 
@@ -24,9 +24,9 @@ class Planning : public EDrive::common::EDriveApp {
 
   std::string Name() const override;
 
-  EDrive::common::Result_state Init() override;
+  common::Result_state Init() override;
 
-  EDrive::common::Result_state Start() override;
+  common::Result_state Start() override;
 
   void Stop() override;
 
@@ -48,7 +48,7 @@ class Planning : public EDrive::common::EDriveApp {
   // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
-  EDrive::common::Result_state RegisterPlanners();
+  common::Result_state RegisterPlanners();
 
   void CheckInput();
 

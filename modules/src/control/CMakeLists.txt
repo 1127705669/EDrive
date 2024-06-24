@@ -115,8 +115,9 @@ generate_messages(
 )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/common)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/controller)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/common)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/controller)
+
 
 ###################################
 ## catkin specific configuration ##
