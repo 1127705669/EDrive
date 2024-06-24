@@ -3,6 +3,7 @@ project(math)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  Eigen3
 )
 
 include_directories(
@@ -39,6 +40,10 @@ add_library(lqr SHARED
   linear_quadratic_regulator.cc
 )
 
+target_link_libraries(lqr
+  Eigen3::Eigen
+)
+
 ###################################
 #               mpc               #
 ###################################
@@ -50,6 +55,7 @@ add_library(mpc SHARED
 target_link_libraries(mpc
   qp_solver
   active_set_qp_solver
+  Eigen3::Eigen
 )
 
 ###################################
