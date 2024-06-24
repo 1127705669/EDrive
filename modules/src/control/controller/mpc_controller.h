@@ -15,6 +15,8 @@
 
 #include <Eigen/Dense>
 
+#include "common/configs/proto/vehicle_config.pb.h"
+
 #include "common/filters/digital_filter.h"
 #include "common/filters/digital_filter_coefficients.h"
 #include "common/filters/mean_filter.h"
@@ -109,6 +111,9 @@ class MPCController : public Controller {
   void LogInitParameters();
 
   void CloseLogFile();
+
+  // vehicle parameter
+  common::VehicleParam vehicle_param_;
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;

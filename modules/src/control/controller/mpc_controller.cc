@@ -249,6 +249,53 @@ Result_state MPCController::ComputeControlCommand(
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
+  steer_angle = digital_filter_.Filter(steer_angle);
+    control_command->set_steering_target(steer_angle);
+
+  debug->set_acceleration_cmd_closeloop(control[0](1, 0));
+
+  double acceleration_cmd = control[0](1, 0) + debug->acceleration_reference();
+  // TODO(QiL): add pitch angle feedforward to accomendate for 3D control
+
+  debug->set_acceleration_cmd(acceleration_cmd);
+
+  double calibration_value = 0.0;
+  calibration_value = control_interpolation_->Interpolate(std::make_pair(
+        VehicleStateProvider::instance()->linear_velocity(), acceleration_cmd));
+
+  debug->set_calibration_value(calibration_value);
+
+  double throttle_cmd = 0.0;
+  double brake_cmd = 0.0;
+  if (calibration_value >= 0) {
+    throttle_cmd = calibration_value > throttle_deadzone_ ? calibration_value
+                                                          : throttle_deadzone_;
+    brake_cmd = 0.0;
+  } else {
+    throttle_cmd = 0.0;
+    brake_cmd = -calibration_value > brake_deadzone_ ? -calibration_value
+                                                     : brake_deadzone_;
+  }
+
+  // control_command->set_steering_rate(FLAGS_steer_angle_rate);
+  control_command->set_throttle(throttle_cmd);
+  control_command->set_brake(brake_cmd);
+
+  debug->set_heading(VehicleStateProvider::instance()->heading());
+  debug->set_steer_angle(steer_angle);
+  debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
+  debug->set_steer_angle_feedback(steer_angle_feedback);
+  // debug->set_steering_position(chassis->steering_percentage());
+
+  // if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
+  //         vehicle_param_.max_abs_speed_when_stopped() ||
+  //     chassis->gear_location() == planning_published_trajectory->gear() ||
+  //     chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
+  //   control_command->set_gear_location(planning_published_trajectory->gear());
+  // } else {
+  //   control_command->set_gear_location(chassis->gear_location());
+  // }
+
   EINFO("SPEED: %f", 3.6*velocity_magnitude);
   return Result_state::State_Ok;
 }
