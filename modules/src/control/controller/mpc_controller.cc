@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "eigen3/Eigen/LU"
+#include "Eigen/LU"
 
 #include "common/configs/vehicle_config_helper.h"
 #include "common/math/math_utils.h"

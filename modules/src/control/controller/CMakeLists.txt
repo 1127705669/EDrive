@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(controller)
 
+find_package(Eigen3 REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
@@ -61,6 +63,7 @@ target_link_libraries(lat_controller
   trajectory_analyzer
   vehicle_state_provider
   vehicle_config_helper
+  Eigen3::Eigen
 )
 
 ###################################
@@ -83,6 +86,7 @@ target_link_libraries(mpc_controller
   digital_filter
   mean_filter
   geometry
+  Eigen3::Eigen
 )
 
 ###################################

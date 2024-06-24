@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 #include "common/filters/digital_filter.h"
 #include "common/filters/digital_filter_coefficients.h"

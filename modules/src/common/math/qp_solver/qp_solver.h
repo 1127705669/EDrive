@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include "eigen3/Eigen/Core"
-#include "eigen3/Eigen/LU"
+#include "Eigen/Core"
+#include "Eigen/LU"
 
 namespace EDrive {
 namespace common {

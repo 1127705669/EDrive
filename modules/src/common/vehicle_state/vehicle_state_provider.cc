@@ -4,7 +4,7 @@
 
 #include "common/vehicle_state/vehicle_state_provider.h"
 
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 
 namespace EDrive {
 namespace common {

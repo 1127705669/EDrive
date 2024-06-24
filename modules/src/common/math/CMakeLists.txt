@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(math)
 
+find_package(Eigen3 REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  Eigen3
 )
 
 include_directories(

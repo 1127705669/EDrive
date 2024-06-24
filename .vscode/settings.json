@@ -71,6 +71,7 @@
         "variant": "cpp",
         "bit": "cpp",
         "*.ipp": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "core": "cpp"
     }
 }
