@@ -57,7 +57,7 @@ class Controller {
   virtual common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory, 
       const nav_msgs::Odometry *localization, 
-      ::control::CarlaEgoVehicleControl *control_command) = 0;
+      control::ControlCommand *control_command) = 0;
 
   /**
    * @brief reset Controller

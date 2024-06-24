@@ -67,7 +67,7 @@ class MPCController : public Controller {
   common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory,
       const nav_msgs::Odometry *localization,
-      ::control::CarlaEgoVehicleControl *control_command) override;
+      ControlCommand *control_command) override;
 
   /**
    * @brief reset MPC Controller

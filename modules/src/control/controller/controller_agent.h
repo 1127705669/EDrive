@@ -32,7 +32,7 @@ class ControllerAgent {
   common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory, 
       const nav_msgs::Odometry *localization,
-      ::control::CarlaEgoVehicleControl *control_command);
+      control::ControlCommand *control_command);
 
  private:
   /**

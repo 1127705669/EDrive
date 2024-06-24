@@ -14,7 +14,9 @@
 #include "Eigen/LU"
 
 #include "common/configs/vehicle_config_helper.h"
+#include "common/src/log.h"
 #include "common/math/math_utils.h"
+#include "common/math/mpc_solver.h"
 
 #include "common/src/log.h"
 
@@ -175,10 +177,79 @@ void MPCController::LoadMPCGainScheduler(
 Result_state MPCController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
-    ::control::CarlaEgoVehicleControl *control_command) {
+    ControlCommand *control_command) {
+  double vx = localization->twist.twist.linear.x;
+  double vy = localization->twist.twist.linear.y;
+  double velocity_magnitude = std::sqrt(vx * vx + vy * vy);
+  VehicleStateProvider::instance()->set_linear_velocity(velocity_magnitude);
 
+  trajectory_analyzer_ =
+      std::move(TrajectoryAnalyzer(trajectory));
 
+  SimpleMPCDebug *debug = control_command->mutable_debug()->mutable_simple_mpc_debug();
+  debug->Clear();
 
+  // Update state
+  UpdateStateAnalyticalMatching(debug);
+
+  UpdateMatrix(debug);
+
+  FeedforwardUpdate(debug);
+
+  // Add gain sheduler for higher speed steering
+  matrix_q_updated_ = matrix_q_;
+  matrix_r_updated_ = matrix_r_;
+  steer_angle_feedforwardterm_updated_ = steer_angle_feedforwardterm_;
+
+  debug->add_matrix_q_updated(matrix_q_updated_(0, 0));
+  debug->add_matrix_q_updated(matrix_q_updated_(1, 1));
+  debug->add_matrix_q_updated(matrix_q_updated_(2, 2));
+  debug->add_matrix_q_updated(matrix_q_updated_(3, 3));
+
+  debug->add_matrix_r_updated(matrix_r_updated_(0, 0));
+  debug->add_matrix_r_updated(matrix_r_updated_(1, 1));
+
+  Eigen::MatrixXd control_matrix(controls_, 1);
+  control_matrix << 0, 0;
+
+  Eigen::MatrixXd reference_state(basic_state_size_, 1);
+  reference_state << 0, 0, 0, 0, 0, 0;
+
+  std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
+
+  Eigen::MatrixXd lower_bound(controls_, 1);
+  lower_bound << -steer_single_direction_max_degree_, max_deceleration_;
+
+  Eigen::MatrixXd upper_bound(controls_, 1);
+  upper_bound << steer_single_direction_max_degree_, max_acceleration_;
+
+  std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
+
+  ros::Time mpc_start_timestamp = ros::Time::now();
+
+  // if (common::math::SolveLinearMPC(
+  //         matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
+  //         matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
+  //         mpc_eps_, mpc_max_iteration_, &control) != true) {
+  //   EERROR("MPC solver failed");
+  // } else {
+  //   EINFO("MPC problem solved! ");
+  // }
+
+  ros::Time mpc_end_timestamp = ros::Time::now();
+
+  // TODO(QiL): evaluate whether need to add spline smoothing after the result
+
+  double steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
+                                steer_transmission_ratio_ /
+                                steer_single_direction_max_degree_ * 100;
+  double steer_angle =
+      steer_angle_feedback + steer_angle_feedforwardterm_updated_;
+
+  // Clamp the steer angle to -100.0 to 100.0
+  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
+
+  EINFO("SPEED: %f", 3.6*velocity_magnitude);
   return Result_state::State_Ok;
 }
 

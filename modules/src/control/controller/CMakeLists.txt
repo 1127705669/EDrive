@@ -87,6 +87,7 @@ target_link_libraries(mpc_controller
   mean_filter
   geometry
   Eigen3::Eigen
+  mpc
 )
 
 ###################################
