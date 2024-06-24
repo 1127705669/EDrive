@@ -296,7 +296,6 @@ Result_state MPCController::ComputeControlCommand(
   //   control_command->set_gear_location(chassis->gear_location());
   // }
 
-  EINFO("SPEED: %f", 3.6*velocity_magnitude);
   return Result_state::State_Ok;
 }
 
@@ -304,7 +303,7 @@ MPCController::~MPCController() {}
 
 bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
-    ROS_ERROR("[MPCController] control_conf == nullptr");
+    EERROR("[MPCController] control_conf == nullptr");
     return false;
   }
   const auto &vehicle_param_ =
