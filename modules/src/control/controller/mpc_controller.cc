@@ -235,6 +235,15 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   return true;
 }
 
+void MPCController::LogInitParameters() {
+  // AINFO << name_ << " begin.";
+  // AINFO << "[MPCController parameters]"
+  //       << " mass_: " << mass_ << ","
+  //       << " iz_: " << iz_ << ","
+  //       << " lf_: " << lf_ << ","
+  //       << " lr_: " << lr_;
+}
+
 void MPCController::InitializeFilters(const ControlConf *control_conf) {
   // Low pass filter
   std::vector<double> den(3, 0.0);
@@ -314,7 +323,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
 
   InitializeFilters(control_conf);
   LoadMPCGainScheduler(control_conf->mpc_controller_conf());
-  // LogInitParameters();
+  LogInitParameters();
   ROS_INFO("[MPCController] init done!");
   return Result_state::State_Ok;
 }

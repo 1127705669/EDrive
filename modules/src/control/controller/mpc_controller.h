@@ -106,6 +106,7 @@ class MPCController : public Controller {
                                  SimpleMPCDebug *debug);
   bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
+  void LogInitParameters();
 
   void CloseLogFile();
 
