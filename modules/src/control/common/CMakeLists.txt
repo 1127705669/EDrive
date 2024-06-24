@@ -36,7 +36,7 @@ add_library(trajectory_analyzer SHARED
   ${TARJECTORY_ANALYZER_SRC}
 )
 
-add_dependencies(trajectory_analyzer ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(trajectory_analyzer planning_generate_messages_cpp)
 
 target_link_libraries(trajectory_analyzer
   ${PROTOBUF_LIBRARIES}

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(controller)
 
+find_package(Eigen3 REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
@@ -57,10 +59,11 @@ set(LAT_CONTROLLER_SRC
 
 add_library(lat_controller SHARED ${LAT_CONTROLLER_SRC})
 
-target_link_libraries(lat_controller 
+target_link_libraries(lat_controller
   trajectory_analyzer
   vehicle_state_provider
   vehicle_config_helper
+  Eigen3::Eigen
 )
 
 ###################################

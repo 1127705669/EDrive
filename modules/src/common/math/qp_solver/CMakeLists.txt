@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(qp_solver)
 
+find_package(Eigen3 REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
-
-find_package(Eigen3 REQUIRED)
 
 include_directories(
 include

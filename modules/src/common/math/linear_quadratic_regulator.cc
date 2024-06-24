@@ -16,7 +16,7 @@
 
 #include <limits>
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <ros/ros.h>
 
 #include "common/math/linear_quadratic_regulator.h"

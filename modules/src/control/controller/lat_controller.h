@@ -8,7 +8,7 @@
 
 #include "control/common/trajectory_analyzer.h"
 
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 
 namespace EDrive {
 namespace control {
