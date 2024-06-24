@@ -189,6 +189,8 @@ Result_state MPCController::ComputeControlCommand(
   SimpleMPCDebug *debug = control_command->mutable_debug()->mutable_simple_mpc_debug();
   debug->Clear();
 
+  ComputeLongitudinalErrors(&trajectory_analyzer_, debug);
+
   // Update state
   UpdateStateAnalyticalMatching(debug);
 
@@ -233,7 +235,7 @@ Result_state MPCController::ComputeControlCommand(
           mpc_eps_, mpc_max_iteration_, &control) != true) {
     EERROR("MPC solver failed");
   } else {
-    EINFO("MPC problem solved! ");
+    // EINFO("MPC problem solved! ");
   }
 
   ros::Time mpc_end_timestamp = ros::Time::now();
@@ -277,7 +279,7 @@ Result_state MPCController::ComputeControlCommand(
                                                      : brake_deadzone_;
   }
 
-  // control_command->set_steering_rate(FLAGS_steer_angle_rate);
+  control_command->set_steering_rate(100.0);
   control_command->set_throttle(throttle_cmd);
   control_command->set_brake(brake_cmd);
 
@@ -310,11 +312,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
       VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
-
-  if(ts_ <= 0.0){
-    ROS_ERROR("[MPCController] Invalid control update interval.");
-  }
-  
+  ECHECK_GT(ts_, 0.0);
   cf_ = control_conf->mpc_controller_conf().cf();
   cr_ = control_conf->mpc_controller_conf().cr();
   wheelbase_ = vehicle_param_.wheel_base();
@@ -485,6 +483,49 @@ void MPCController::FeedforwardUpdate(SimpleMPCDebug *debug) {
   steer_angle_feedforwardterm_ = (wheelbase_ * debug->curvature()) * 180 /
                                  M_PI * steer_transmission_ratio_ /
                                  steer_single_direction_max_degree_ * 100;
+}
+
+void MPCController::ComputeLongitudinalErrors(
+    const TrajectoryAnalyzer *trajectory_analyzer, SimpleMPCDebug *debug) {
+  // the decomposed vehicle motion onto Frenet frame
+  // s: longitudinal accumulated distance along reference trajectory
+  // s_dot: longitudinal velocity along reference trajectory
+  // d: lateral distance w.r.t. reference trajectory
+  // d_dot: lateral distance change rate, i.e. dd/dt
+  double s_matched = 0.0;
+  double s_dot_matched = 0.0;
+  double d_matched = 0.0;
+  double d_dot_matched = 0.0;
+
+  const auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
+      VehicleStateProvider::instance()->x(),
+      VehicleStateProvider::instance()->y());
+
+  trajectory_analyzer->ToTrajectoryFrame(
+      VehicleStateProvider::instance()->x(),
+      VehicleStateProvider::instance()->y(),
+      VehicleStateProvider::instance()->heading(),
+      VehicleStateProvider::instance()->linear_velocity(), matched_point,
+      &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
+
+  ros::Time current_control_time = ros::Time::now();
+
+  TrajectoryPoint reference_point =
+      trajectory_analyzer->QueryNearestPointByAbsoluteTime(
+          current_control_time.toSec());
+
+  // ADEBUG << "matched point:" << matched_point.DebugString();
+  // ADEBUG << "reference point:" << reference_point.DebugString();
+  debug->set_station_error(reference_point.path_point.s - s_matched);
+  debug->set_speed_error(reference_point.v - s_dot_matched);
+
+  debug->set_station_reference(reference_point.path_point.s);
+  debug->set_speed_reference(reference_point.v);
+  debug->set_acceleration_reference(reference_point.a);
+
+  debug->set_station_feedback(s_matched);
+  debug->set_speed_feedback(
+      VehicleStateProvider::instance()->linear_velocity());
 }
 
 }  // namespace control

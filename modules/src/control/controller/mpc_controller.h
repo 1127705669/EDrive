@@ -106,6 +106,7 @@ class MPCController : public Controller {
 
   void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
                                  SimpleMPCDebug *debug);
+                                 
   bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
   void LogInitParameters();

@@ -65,6 +65,13 @@ foreach(MSG_FOLDER ${MSG_FOLDERS})
 
 endforeach()
 
+add_message_files(
+  DIRECTORY msg/carla_msgs
+  FILES
+  CarlaEgoVehicleControl.msg
+  CarlaEgoVehicleStatus.msg
+)
+
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
@@ -90,6 +97,7 @@ endforeach()
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)

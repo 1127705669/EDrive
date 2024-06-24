@@ -20,6 +20,7 @@ message AdapterConfig {
     VECTOR_MAP = 13;
     CLOUD_POINT_MAP = 14;
     FIXED_PATH = 15;
+    VEHICLE_STATUS = 16;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

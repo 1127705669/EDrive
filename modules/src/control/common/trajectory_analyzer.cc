@@ -4,6 +4,7 @@
 
 #include "control/common/trajectory_analyzer.h"
 
+namespace math = EDrive::common::math;
 using ::common::PathPoint;
 using ::common::TrajectoryPoint;
 
@@ -11,7 +12,8 @@ namespace EDrive {
 namespace control {
 
 TrajectoryAnalyzer::TrajectoryAnalyzer(const planning::ADCTrajectory *planning_published_trajectory) {
-
+  header_time_ = planning_published_trajectory->header.stamp.toSec();
+  seq_num_ = planning_published_trajectory->header.seq;
   for (int i = 0; i < planning_published_trajectory->trajectory_point.size();
        ++i) {
     trajectory_points_.push_back(
@@ -57,6 +59,36 @@ PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
   }
 
   return trajectory_points_[index_min].path_point;
+}
+
+TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByAbsoluteTime(
+    const double t) const {
+  return QueryNearestPointByRelativeTime(t - header_time_);
+}
+
+TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
+    const double t) const {
+  auto func_comp = [](const TrajectoryPoint &point,
+                      const double relative_time) {
+    return point.relative_time < relative_time;
+  };
+
+  auto it_low = std::lower_bound(trajectory_points_.begin(),
+                                 trajectory_points_.end(), t, func_comp);
+
+  if (it_low == trajectory_points_.begin()) {
+    return trajectory_points_.front();
+  }
+
+  if (it_low == trajectory_points_.end()) {
+    return trajectory_points_.back();
+  }
+
+  auto it_lower = it_low - 1;
+  if (it_low->relative_time - t < t - it_lower->relative_time) {
+    return *it_low;
+  }
+  return *it_lower;
 }
 
 TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByPosition(
