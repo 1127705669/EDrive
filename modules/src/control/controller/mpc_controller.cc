@@ -227,14 +227,14 @@ Result_state MPCController::ComputeControlCommand(
 
   ros::Time mpc_start_timestamp = ros::Time::now();
 
-  // if (common::math::SolveLinearMPC(
-  //         matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
-  //         matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
-  //         mpc_eps_, mpc_max_iteration_, &control) != true) {
-  //   EERROR("MPC solver failed");
-  // } else {
-  //   EINFO("MPC problem solved! ");
-  // }
+  if (common::math::SolveLinearMPC(
+          matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
+          matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
+          mpc_eps_, mpc_max_iteration_, &control) != true) {
+    EERROR("MPC solver failed");
+  } else {
+    EINFO("MPC problem solved! ");
+  }
 
   ros::Time mpc_end_timestamp = ros::Time::now();
 
