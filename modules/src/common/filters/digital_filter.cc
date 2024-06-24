@@ -14,7 +14,7 @@ const double kDoubleEpsilon = 1.0e-6;
 
 }  // namespace
 
-namespace EDirve {
+namespace EDrive {
 namespace common {
 
 DigitalFilter::DigitalFilter(const std::vector<double> &denominators,

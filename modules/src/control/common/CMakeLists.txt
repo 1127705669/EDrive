@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(common)
 
+# find_package(Eigen3 REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  Eigen3
 )
 
 include_directories(
@@ -10,6 +13,7 @@ include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${EIGEN3_INCLUDE_DIR}
 )
 
 ###################################
@@ -57,6 +61,21 @@ add_library(interpolation_2d SHARED
 )
 
 ###################################
+#       interpolation_1d          #
+###################################
+set(INTERPOLATION_1D
+  interpolation_1d.cc
+)
+
+add_library(interpolation_1d SHARED 
+  ${INTERPOLATION_1D}
+)
+
+target_link_libraries(interpolation_1d
+  Eigen3::Eigen
+)
+
+###################################
 #         control_common          #
 ###################################
 
@@ -66,4 +85,5 @@ target_link_libraries(control_common INTERFACE
   interpolation_2d
   pid_controller
   trajectory_analyzer
+  interpolation_1d
 )

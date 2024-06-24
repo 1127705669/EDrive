@@ -16,7 +16,7 @@
  * @namespace EDirve::common
  * @brief EDirve::common
  */
-namespace EDirve {
+namespace EDrive {
 namespace common {
 
 /**

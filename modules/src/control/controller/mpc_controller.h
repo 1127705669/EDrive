@@ -15,8 +15,13 @@
 
 #include <eigen3/Eigen/Dense>
 
+#include "common/filters/digital_filter.h"
+#include "common/filters/digital_filter_coefficients.h"
+#include "common/filters/mean_filter.h"
+
 #include "control/controller/controller.h"
 #include "control/common/trajectory_analyzer.h"
+#include "control/common/interpolation_1d.h"
 #include "control/common/interpolation_2d.h"
 
 /**
@@ -188,6 +193,16 @@ class MPCController : public Controller {
   // parameters for mpc solver; threshold for computation
   double mpc_eps_ = 0.0;
 
+  common::DigitalFilter digital_filter_;
+
+  std::unique_ptr<Interpolation1D> lat_err_interpolation_;
+
+  std::unique_ptr<Interpolation1D> heading_err_interpolation_;
+
+  std::unique_ptr<Interpolation1D> feedforwardterm_interpolation_;
+
+  std::unique_ptr<Interpolation1D> steer_weight_interpolation_;
+
   // for logging purpose
   std::ofstream mpc_log_file_;
 
@@ -206,6 +221,12 @@ class MPCController : public Controller {
   double max_acceleration_ = 0.0;
 
   double max_deceleration_ = 0.0;
+
+  // MeanFilter heading_error_filter_;
+  common::MeanFilter lateral_error_filter_;
+
+  // MeanFilter lateral_error_filter;
+  common::MeanFilter heading_error_filter_;
 
   double minimum_speed_protection_ = 0.1;
 };

@@ -16,6 +16,8 @@
 #include "common/configs/vehicle_config_helper.h"
 #include "common/math/math_utils.h"
 
+#include "common/src/log.h"
+
 namespace EDrive {
 namespace control {
 
@@ -132,6 +134,44 @@ void MPCController::ComputeLateralErrors(
 
 std::string MPCController::Name() const { return name_; }
 
+void MPCController::LoadMPCGainScheduler(
+    const MPCControllerConf &mpc_controller_conf) {
+  const auto &lat_err_gain_scheduler =
+      mpc_controller_conf.lat_err_gain_scheduler();
+  const auto &heading_err_gain_scheduler =
+      mpc_controller_conf.heading_err_gain_scheduler();
+  const auto &feedforwardterm_gain_scheduler =
+      mpc_controller_conf.feedforwardterm_gain_scheduler();
+  const auto &steer_weight_gain_scheduler =
+      mpc_controller_conf.steer_weight_gain_scheduler();
+  EINFO("MPC control gain scheduler loaded");
+  Interpolation1D::DataType xy1, xy2, xy3, xy4;
+  for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
+    xy1.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+  for (const auto &scheduler : heading_err_gain_scheduler.scheduler()) {
+    xy2.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+  for (const auto &scheduler : feedforwardterm_gain_scheduler.scheduler()) {
+    xy3.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+  for (const auto &scheduler : steer_weight_gain_scheduler.scheduler()) {
+    xy4.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
+  }
+
+  lat_err_interpolation_.reset(new Interpolation1D);
+  ECHECK(lat_err_interpolation_->Init(xy1));
+
+  heading_err_interpolation_.reset(new Interpolation1D);
+  ECHECK(heading_err_interpolation_->Init(xy2));
+
+  feedforwardterm_interpolation_.reset(new Interpolation1D);
+  ECHECK(feedforwardterm_interpolation_->Init(xy2));
+
+  steer_weight_interpolation_.reset(new Interpolation1D);
+  ECHECK(steer_weight_interpolation_->Init(xy2));
+}
+
 Result_state MPCController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
@@ -199,13 +239,13 @@ void MPCController::InitializeFilters(const ControlConf *control_conf) {
   // Low pass filter
   std::vector<double> den(3, 0.0);
   std::vector<double> num(3, 0.0);
-  // common::LpfCoefficients(
-  //     ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den, &num);
-  // digital_filter_.set_coefficients(den, num);
-  // lateral_error_filter_ = common::MeanFilter(
-  //     control_conf->mpc_controller_conf().mean_filter_window_size());
-  // heading_error_filter_ = common::MeanFilter(
-  //     control_conf->mpc_controller_conf().mean_filter_window_size());
+  common::LpfCoefficients(
+      ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den, &num);
+  digital_filter_.set_coefficients(den, num);
+  lateral_error_filter_ = common::MeanFilter(
+      control_conf->mpc_controller_conf().mean_filter_window_size());
+  heading_error_filter_ = common::MeanFilter(
+      control_conf->mpc_controller_conf().mean_filter_window_size());
 }
 
 Result_state MPCController::Init(const ControlConf *control_conf) {
@@ -273,7 +313,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   matrix_q_updated_ = matrix_q_;
 
   InitializeFilters(control_conf);
-  // LoadMPCGainScheduler(control_conf->mpc_controller_conf());
+  LoadMPCGainScheduler(control_conf->mpc_controller_conf());
   // LogInitParameters();
   ROS_INFO("[MPCController] init done!");
   return Result_state::State_Ok;
