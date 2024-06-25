@@ -97,8 +97,8 @@ void Planning::OnTimer(const ros::TimerEvent &) {
   if(is_initialized){
     
   }else{
-    start_point_x = position_.pose.pose.position.x - 2;
-    start_point_y = position_.pose.pose.position.y - 2;
+    start_point_x = position_.pose.pose.position.x;
+    start_point_y = position_.pose.pose.position.y;
     ROS_INFO("%f     %f",start_point_x,start_point_y);
     is_initialized = true;
   }

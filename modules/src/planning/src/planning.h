@@ -41,7 +41,7 @@ class Planning : public EDrive::common::EDriveApp {
    */
   void Publish(::planning::ADCTrajectory* trajectory) {
     
-    AdapterManager::PublishPlanning(*trajectory);
+    // AdapterManager::PublishPlanning(*trajectory);
   }
 
  private:

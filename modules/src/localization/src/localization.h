@@ -72,6 +72,7 @@ class Localization : public EDrive::common::EDriveApp {
   visualization_msgs::MarkerArray vector_map_;
   VectorMap vector_mapper_;
   visualization_msgs::MarkerArray path_;
+  ::planning::ADCTrajectory trajectory_pb_;
 };
 
 } // namespace localization

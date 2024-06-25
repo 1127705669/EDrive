@@ -71,7 +71,7 @@ void VectorMap::parse_osm(const std::string &file, std::unordered_map<int, Node>
     }
 }
 
-void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visualization_msgs::MarkerArray &path) {
+void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visualization_msgs::MarkerArray &path, ::planning::ADCTrajectory& trajectory_pb) {
     int marker_id = 0;
     for (int relation_id : relation_ids) {
         auto it = std::find_if(relations_.begin(), relations_.end(), [relation_id](const Relation& rel) {
@@ -124,6 +124,7 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
 
             size_t min_nodes_size = std::min(left_way.node_refs.size(), right_way.node_refs.size());
             for (size_t j = 0; j < min_nodes_size; ++j) {
+                ::common::TrajectoryPoint trajectory_point_;
                 int left_node_id = left_way.node_refs[j];
                 int right_node_id = right_way.node_refs[j];
 
@@ -139,6 +140,12 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
                 mid_point.x = (left_node.local_x + right_node.local_x) / 2.0;
                 mid_point.y = (left_node.local_y + right_node.local_y) / 2.0;
                 mid_point.z = (left_node.ele + right_node.ele) / 2.0;
+
+                trajectory_point_.path_point.x = mid_point.x;
+                trajectory_point_.path_point.y = mid_point.y;
+                trajectory_point_.path_point.z = mid_point.z;
+
+                trajectory_pb.trajectory_point.push_back(trajectory_point_);
 
                 visualization_msgs::Marker marker;
                 marker.header.frame_id = "map";

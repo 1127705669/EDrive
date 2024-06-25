@@ -252,7 +252,7 @@ Result_state MPCController::ComputeControlCommand(
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
   steer_angle = digital_filter_.Filter(steer_angle);
-    control_command->set_steering_target(steer_angle);
+  control_command->set_steering_target(steer_angle);
 
   debug->set_acceleration_cmd_closeloop(control[0](1, 0));
 
@@ -287,6 +287,8 @@ Result_state MPCController::ComputeControlCommand(
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
   debug->set_steer_angle_feedback(steer_angle_feedback);
+
+  EINFO("%f",steer_angle);
   // debug->set_steering_position(chassis->steering_percentage());
 
   // if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=

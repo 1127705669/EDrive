@@ -56,10 +56,11 @@ Result_state Localization::Init(){
 
   // loadAndPublishLanelet2Map(root_path + vector_map_conf_file);
   auto retValue = vector_mapper_.loadMap(root_path + vector_map_conf_file, vector_map_);
+
   vector_mapper_.publishMiddlePath(
     {21960, 24426, 21623, 34728, 21311, 27800, 20942, 29426, 20507, 32319, 20200, 3715, 23683, 3624, 22666, 30336, 22329,32908}, 
-    path_);
-
+    path_, trajectory_pb_);
+    
   AdapterManager::PublishCloudPointMap(cloud_point_map_);
   AdapterManager::PublishVectorMap(vector_map_);
 
@@ -135,6 +136,7 @@ void Localization::Publish(){
   AdapterManager::PublishLocalization(position_odometry_);
   AdapterManager::PublishVehicleLocation(position_marker_);
   AdapterManager::PublishFixedPath(path_);
+  AdapterManager::PublishPlanning(trajectory_pb_);
 }
 
 void Localization::Stop() {
