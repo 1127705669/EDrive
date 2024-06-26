@@ -98,7 +98,7 @@ void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
 
   matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
   matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
-  matrix_cd_ = matrix_c_ * debug->heading_error_rate() * ts_;
+  matrix_cd_ = matrix_c_ * debug->ref_heading_rate() * ts_;
 }
 
 void MPCController::ComputeLateralErrors(
@@ -518,6 +518,10 @@ void MPCController::CloseLogFile() {
   
 }
 
+double MPCController::Wheel2SteerPct(const double wheel_angle) {
+  return wheel_angle / wheel_single_direction_max_degree_ * 100;
+}
+
 void MPCController::Stop() {
   CloseLogFile();
 }
@@ -545,9 +549,11 @@ double MPCController::GetLateralError(const common::math::Vec2d &point,
 }
 
 void MPCController::FeedforwardUpdate(SimpleMPCDebug *debug) {
-  steer_angle_feedforwardterm_ = (wheelbase_ * debug->curvature()) * 180 /
-                                 M_PI * steer_ratio_ /
-                                 steer_single_direction_max_degree_ * 100;
+  const double v = VehicleStateProvider::instance()->linear_velocity();
+  const double kv =
+      lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 2 / cr_ / wheelbase_;
+  steer_angle_feedforwardterm_ = Wheel2SteerPct(
+      wheelbase_ * debug->curvature() + kv * v * v * debug->curvature());
 }
 
 void MPCController::ComputeLongitudinalErrors(

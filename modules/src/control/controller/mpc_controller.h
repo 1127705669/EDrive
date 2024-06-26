@@ -114,6 +114,8 @@ class MPCController : public Controller {
 
   void CloseLogFile();
 
+  double Wheel2SteerPct(const double wheel_angle);
+
   // vehicle parameter
   common::VehicleParam vehicle_param_;
 
