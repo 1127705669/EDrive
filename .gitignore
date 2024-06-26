@@ -1,3 +1,4 @@
 /.pydevproject
 build
 bin
+/modules/src/common/data/*.flags
