@@ -26,10 +26,13 @@ class EDriveApp {
 
   // virtual ~EDriveApp() = default;
   
-
   uint32_t callback_thread_num_ = 1;
 
  private:
+  /**
+   * @brief Export flag values to <FLAGS_log_dir>/<name>.flags.
+   */
+  void ExportFlags() const;
 
  protected:
 
