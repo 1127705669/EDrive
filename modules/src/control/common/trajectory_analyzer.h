@@ -99,6 +99,7 @@ class TrajectoryAnalyzer {
                          double *ptr_d_dot) const;
 
  private:
+  void PublishPoint(const ::common::TrajectoryPoint point) const;
   std::vector<::common::TrajectoryPoint> trajectory_points_;
 
   double header_time_ = 0.0;

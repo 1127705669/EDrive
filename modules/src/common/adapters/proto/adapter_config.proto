@@ -21,6 +21,7 @@ message AdapterConfig {
     CLOUD_POINT_MAP = 14;
     FIXED_PATH = 15;
     VEHICLE_STATUS = 16;
+    MARKER_DEBUG_POINT = 17;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

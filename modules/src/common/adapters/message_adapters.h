@@ -45,6 +45,7 @@ using VectorMapAdapter = Adapter<visualization_msgs::MarkerArray>;
 using CloudPointMapAdapter = Adapter<sensor_msgs::PointCloud2>;
 using FixedPathAdapter = Adapter<visualization_msgs::MarkerArray>;
 using VehicleStatusAdapter = Adapter<::common::CarlaEgoVehicleStatus>;
+using MarkerDebugPointAdapter = Adapter<visualization_msgs::Marker>;
 
 } // namespace adapter
 } // namespace common
