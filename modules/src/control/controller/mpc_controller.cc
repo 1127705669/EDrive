@@ -44,15 +44,15 @@ void WriteHeaders(std::ofstream &file_stream) {}
 }  // namespace
 
 MPCController::MPCController() : name_("MPC Controller") {
-  ROS_INFO("    registering MPC controller...");
+  EINFO("    registering MPC controller...");
 }
 
 void MPCController::LoadControlCalibrationTable(
     const MPCControllerConf &mpc_controller_conf) {
   const auto &control_table = mpc_controller_conf.calibration_table();
   
-  ROS_INFO("Control calibration table loaded");
-  ROS_INFO("Control calibration table size is %d", control_table.calibration_size());
+  EINFO("Control calibration table loaded");
+  EINFO("Control calibration table size is %d", control_table.calibration_size());
 
   Interpolation2D::DataType xyz;
   for (const auto &calibration : control_table.calibration()) {
@@ -66,12 +66,13 @@ void MPCController::LoadControlCalibrationTable(
   }
 }
 
-void MPCController::UpdateStateAnalyticalMatching(SimpleMPCDebug *debug) {
+void MPCController::UpdateState(SimpleMPCDebug *debug) {
   const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
   ComputeLateralErrors(com.x(), com.y(),
                        VehicleStateProvider::instance()->heading(),
                        VehicleStateProvider::instance()->linear_velocity(),
                        VehicleStateProvider::instance()->angular_velocity(),
+                       VehicleStateProvider::instance()->linear_acceleration(),
                        trajectory_analyzer_, debug);
 
   // State matrix update;
@@ -102,8 +103,8 @@ void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
 
 void MPCController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
-    const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
-    SimpleMPCDebug *debug) {
+    const double angular_v, const double linear_a,
+    const TrajectoryAnalyzer &trajectory_analyzer, SimpleMPCDebug *debug) {
   const auto matched_point =
       trajectory_analyzer.QueryNearestPointByPosition(x, y);
 
@@ -115,23 +116,53 @@ void MPCController::ComputeLateralErrors(
   // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
   debug->set_lateral_error(cos_matched_theta * dy - sin_matched_theta * dx);
 
+  // matched_theta = matched_point.path_point().theta();
+  debug->set_ref_heading(matched_point.path_point.theta);
+
   const double delta_theta =
-      EDrive::common::math::NormalizeAngle(theta - matched_point.path_point.theta);
+      EDrive::common::math::NormalizeAngle(theta - debug->ref_heading());
+  debug->set_heading_error(delta_theta);
+
   const double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = chassis_v * sin_delta_theta;
-  debug->set_lateral_error_rate(linear_v * sin_delta_theta);
+  double lateral_error_dot = linear_v * sin_delta_theta;
+  double lateral_error_dot_dot = linear_a * sin_delta_theta;
 
+  debug->set_lateral_error_rate(lateral_error_dot);
+  debug->set_lateral_acceleration(lateral_error_dot_dot);
+  debug->set_lateral_jerk(
+      (debug->lateral_acceleration() - previous_lateral_acceleration_) / ts_);
+  previous_lateral_acceleration_ = debug->lateral_acceleration();
+
+  // matched_kappa = matched_point.path_point().kappa();
+  debug->set_curvature(matched_point.path_point.kappa);
   // theta_error = delta_theta;
   debug->set_heading_error(delta_theta);
   // theta_error_dot = angular_v - matched_point.path_point().kappa() *
   // matched_point.v();
-  debug->set_heading_error_rate(angular_v - matched_point.path_point.kappa *
-                                                matched_point.v);
+  debug->set_heading_rate(angular_v);
+  debug->set_ref_heading_rate(debug->curvature() * matched_point.v);
+  debug->set_heading_error_rate(debug->heading_rate() -
+                                debug->ref_heading_rate());
 
-  // matched_theta = matched_point.path_point().theta();
-  debug->set_ref_heading(matched_point.path_point.theta);
-  // matched_kappa = matched_point.path_point().kappa();
-  debug->set_curvature(matched_point.path_point.kappa);
+  debug->set_heading_acceleration(
+      (debug->heading_rate() - previous_heading_rate_) / ts_);
+  debug->set_ref_heading_acceleration(
+      (debug->ref_heading_rate() - previous_ref_heading_rate_) / ts_);
+  debug->set_heading_error_acceleration(debug->heading_acceleration() -
+                                        debug->ref_heading_acceleration());
+  previous_heading_rate_ = debug->heading_rate();
+  previous_ref_heading_rate_ = debug->ref_heading_rate();
+
+  debug->set_heading_jerk(
+      (debug->heading_acceleration() - previous_heading_acceleration_) / ts_);
+  debug->set_ref_heading_jerk(
+      (debug->ref_heading_acceleration() - previous_ref_heading_acceleration_) /
+      ts_);
+  debug->set_heading_error_jerk(debug->heading_jerk() -
+                                debug->ref_heading_jerk());
+  previous_heading_acceleration_ = debug->heading_acceleration();
+  previous_ref_heading_acceleration_ = debug->ref_heading_acceleration();
 }
 
 std::string MPCController::Name() const { return name_; }
@@ -177,7 +208,7 @@ void MPCController::LoadMPCGainScheduler(
 Result_state MPCController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
-    ControlCommand *control_command) {
+    ControlCommand *cmd) {
   double vx = localization->twist.twist.linear.x;
   double vy = localization->twist.twist.linear.y;
   double velocity_magnitude = std::sqrt(vx * vx + vy * vy);
@@ -186,13 +217,13 @@ Result_state MPCController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(trajectory));
 
-  SimpleMPCDebug *debug = control_command->mutable_debug()->mutable_simple_mpc_debug();
+  SimpleMPCDebug *debug = cmd->mutable_debug()->mutable_simple_mpc_debug();
   debug->Clear();
 
   ComputeLongitudinalErrors(&trajectory_analyzer_, debug);
 
   // Update state
-  UpdateStateAnalyticalMatching(debug);
+  UpdateState(debug);
 
   UpdateMatrix(debug);
 
@@ -252,7 +283,7 @@ Result_state MPCController::ComputeControlCommand(
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
   steer_angle = digital_filter_.Filter(steer_angle);
-  control_command->set_steering_target(steer_angle);
+  cmd->set_steering_target(steer_angle);
 
   debug->set_acceleration_cmd_closeloop(control[0](1, 0));
 
@@ -279,9 +310,9 @@ Result_state MPCController::ComputeControlCommand(
                                                      : brake_deadzone_;
   }
 
-  control_command->set_steering_rate(100.0);
-  control_command->set_throttle(throttle_cmd);
-  control_command->set_brake(brake_cmd);
+  cmd->set_steering_rate(100.0);
+  cmd->set_throttle(throttle_cmd);
+  cmd->set_brake(brake_cmd);
 
   debug->set_heading(VehicleStateProvider::instance()->heading());
   debug->set_steer_angle(steer_angle);
@@ -295,9 +326,9 @@ Result_state MPCController::ComputeControlCommand(
   //         vehicle_param_.max_abs_speed_when_stopped() ||
   //     chassis->gear_location() == planning_published_trajectory->gear() ||
   //     chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
-  //   control_command->set_gear_location(planning_published_trajectory->gear());
+  //   cmd->set_gear_location(planning_published_trajectory->gear());
   // } else {
-  //   control_command->set_gear_location(chassis->gear_location());
+  //   cmd->set_gear_location(chassis->gear_location());
   // }
 
   return Result_state::State_Ok;
@@ -359,33 +390,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
 
-  ROS_INFO("Configuration Parameters:");
-  ROS_INFO("Front cornering stiffness (cf_): %f", cf_);
-  ROS_INFO("Rear cornering stiffness (cr_): %f", cr_);
-  ROS_INFO("Wheelbase (wheelbase_): %f", wheelbase_);
-  ROS_INFO("Max steer angle (max_steer_angle): %f", vehicle_param_.max_steer_angle());
-  ROS_INFO("Steering transmission ratio (steer_ratio_): %f", steer_ratio_);
-  ROS_INFO("Max steering angle in degrees (steer_single_direction_max_degree_): %f", steer_single_direction_max_degree_);
-  ROS_INFO("Max wheel angle in degrees (wheel_single_direction_max_degree_): %f", wheel_single_direction_max_degree_);
-  ROS_INFO("Max lateral acceleration (max_lat_acc_): %f", max_lat_acc_);
-  ROS_INFO("Max acceleration (max_acceleration_): %f", max_acceleration_);
-  ROS_INFO("Max deceleration (max_deceleration_): %f", max_deceleration_);
-  ROS_INFO("Front left mass (mass_fl): %f", mass_fl);
-  ROS_INFO("Front right mass (mass_fr): %f", mass_fr);
-  ROS_INFO("Rear left mass (mass_rl): %f", mass_rl);
-  ROS_INFO("Rear right mass (mass_rr): %f", mass_rr);
-  ROS_INFO("Total mass (mass_): %f", mass_);
-  ROS_INFO("Front axle to center distance (lf_): %f", lf_);
-  ROS_INFO("Rear axle to center distance (lr_): %f", lr_);
-  ROS_INFO("Moment of inertia about Z-axis (iz_): %f", iz_);
-  ROS_INFO("MPC epsilon (mpc_eps_): %f", mpc_eps_);
-  ROS_INFO("MPC max iteration (mpc_max_iteration_): %d", mpc_max_iteration_);
-  ROS_INFO("Throttle deadzone (throttle_deadzone_): %f", throttle_deadzone_);
-  ROS_INFO("Brake deadzone (brake_deadzone_): %f", brake_deadzone_);
-  ROS_INFO("Minimum speed protection (minimum_speed_protection_): %f", minimum_speed_protection_);
-  ROS_INFO("Standstill acceleration (standstill_acceleration_): %f", standstill_acceleration_);
-
-  ROS_INFO("MPC conf loaded");
+  EINFO("MPC conf loaded");
   return true;
 }
 
@@ -396,6 +401,28 @@ void MPCController::LogInitParameters() {
   //       << " iz_: " << iz_ << ","
   //       << " lf_: " << lf_ << ","
   //       << " lr_: " << lr_;
+
+  EINFO("Configuration Parameters:");
+  EINFO("Front cornering stiffness (cf_): %f", cf_);
+  EINFO("Rear cornering stiffness (cr_): %f", cr_);
+  EINFO("Wheelbase (wheelbase_): %f", wheelbase_);
+  EINFO("Max steer angle (max_steer_angle): %f", vehicle_param_.max_steer_angle());
+  EINFO("Steering transmission ratio (steer_ratio_): %f", steer_ratio_);
+  EINFO("Max steering angle in degrees (steer_single_direction_max_degree_): %f", steer_single_direction_max_degree_);
+  EINFO("Max wheel angle in degrees (wheel_single_direction_max_degree_): %f", wheel_single_direction_max_degree_);
+  EINFO("Max lateral acceleration (max_lat_acc_): %f", max_lat_acc_);
+  EINFO("Max acceleration (max_acceleration_): %f", max_acceleration_);
+  EINFO("Max deceleration (max_deceleration_): %f", max_deceleration_);
+  EINFO("Total mass (mass_): %f", mass_);
+  EINFO("Front axle to center distance (lf_): %f", lf_);
+  EINFO("Rear axle to center distance (lr_): %f", lr_);
+  EINFO("Moment of inertia about Z-axis (iz_): %f", iz_);
+  EINFO("MPC epsilon (mpc_eps_): %f", mpc_eps_);
+  EINFO("MPC max iteration (mpc_max_iteration_): %d", mpc_max_iteration_);
+  EINFO("Throttle deadzone (throttle_deadzone_): %f", throttle_deadzone_);
+  EINFO("Brake deadzone (brake_deadzone_): %f", brake_deadzone_);
+  EINFO("Minimum speed protection (minimum_speed_protection_): %f", minimum_speed_protection_);
+  EINFO("Standstill acceleration (standstill_acceleration_): %f", standstill_acceleration_);
 }
 
 void MPCController::InitializeFilters(const ControlConf *control_conf) {
@@ -477,7 +504,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   InitializeFilters(control_conf);
   LoadMPCGainScheduler(control_conf->mpc_controller_conf());
   LogInitParameters();
-  ROS_INFO("[MPCController] init done!");
+  EINFO("[MPCController] init done!");
   return Result_state::State_Ok;
 }
 

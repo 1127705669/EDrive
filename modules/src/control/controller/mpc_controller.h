@@ -21,10 +21,10 @@
 #include "common/filters/digital_filter_coefficients.h"
 #include "common/filters/mean_filter.h"
 
-#include "control/controller/controller.h"
-#include "control/common/trajectory_analyzer.h"
 #include "control/common/interpolation_1d.h"
 #include "control/common/interpolation_2d.h"
+#include "control/controller/controller.h"
+#include "control/common/trajectory_analyzer.h"
 
 /**
  * @namespace EDrive::control
@@ -89,7 +89,7 @@ class MPCController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateStateAnalyticalMatching(SimpleMPCDebug *debug);
+  void UpdateState(SimpleMPCDebug *debug);
 
   void UpdateMatrix(SimpleMPCDebug *debug);
 
@@ -101,6 +101,7 @@ class MPCController : public Controller {
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
+                            const double linear_a,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleMPCDebug *debug);
 
@@ -196,6 +197,21 @@ class MPCController : public Controller {
   double previous_heading_error_ = 0.0;
   // lateral distance to reference trajectory of last control cycle
   double previous_lateral_error_ = 0.0;
+
+  // lateral dynamic variables for computing the differential valute to
+  // estimate acceleration and jerk
+  double previous_lateral_acceleration_ = 0.0;
+
+  double previous_heading_rate_ = 0.0;
+  double previous_ref_heading_rate_ = 0.0;
+
+  double previous_heading_acceleration_ = 0.0;
+  double previous_ref_heading_acceleration_ = 0.0;
+
+  // longitudinal dynamic variables for computing the differential valute to
+  // estimate acceleration and jerk
+  double previous_acceleration_ = 0.0;
+  double previous_acceleration_reference_ = 0.0;
 
   // parameters for mpc solver; number of iterations
   int mpc_max_iteration_ = 0;
