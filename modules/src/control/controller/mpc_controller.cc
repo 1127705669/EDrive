@@ -405,10 +405,10 @@ void MPCController::InitializeFilters(const ControlConf *control_conf) {
   common::LpfCoefficients(
       ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den, &num);
   digital_filter_.set_coefficients(den, num);
-  lateral_error_filter_ = common::MeanFilter(
-      control_conf->mpc_controller_conf().mean_filter_window_size());
-  heading_error_filter_ = common::MeanFilter(
-      control_conf->mpc_controller_conf().mean_filter_window_size());
+  lateral_error_filter_ = common::MeanFilter(static_cast<std::uint_fast8_t>(
+      control_conf->mpc_controller_conf().mean_filter_window_size()));
+  heading_error_filter_ = common::MeanFilter(static_cast<std::uint_fast8_t>(
+      control_conf->mpc_controller_conf().mean_filter_window_size()));
 }
 
 Result_state MPCController::Init(const ControlConf *control_conf) {
@@ -443,7 +443,6 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   matrix_bd_ = matrix_b_ * ts_;
 
   matrix_c_ = Matrix::Zero(basic_state_size_, 1);
-  matrix_c_(5, 0) = 1.0;
   matrix_cd_ = Matrix::Zero(basic_state_size_, 1);
 
   matrix_state_ = Matrix::Zero(basic_state_size_, 1);
@@ -459,14 +458,14 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   }
 
   int q_param_size = control_conf->mpc_controller_conf().matrix_q_size();
-  // if (basic_state_size_ != q_param_size) {
-  //   const auto error_msg = common::util::StrCat(
-  //       "MPC controller error: matrix_q size: ", q_param_size,
-  //       " in parameter file not equal to basic_state_size_: ",
-  //       basic_state_size_);
-  //   AERROR << error_msg;
-  //   return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
-  // }
+  if (basic_state_size_ != q_param_size) {
+    // const auto error_msg = common::util::StrCat(
+    //     "MPC controller error: matrix_q size: ", q_param_size,
+    //     " in parameter file not equal to basic_state_size_: ",
+    //     basic_state_size_);
+    EERROR("MPC controller error: matrix_q size: %d", q_param_size);
+    return Result_state::State_Failed;
+  }
   for (int i = 0; i < q_param_size; ++i) {
     matrix_q_(i, i) = control_conf->mpc_controller_conf().matrix_q(i);
   }
