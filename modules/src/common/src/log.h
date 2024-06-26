@@ -11,40 +11,69 @@
 #include <ros/ros.h>
 #include <cstdlib> // For std::abort()
 
-// Define logging macros to encapsulate ROS logging macros
-#define EINFO(...) ROS_INFO(__VA_ARGS__)
-#define EWARN(...) ROS_WARN(__VA_ARGS__)
-#define EERROR(...) ROS_ERROR(__VA_ARGS__)
-#define EFATAL(...) ROS_FATAL(__VA_ARGS__)
+#include "glog/logging.h"
+#include "glog/raw_logging.h"
 
-// Define conditional logging macros
-#define EINFO_IF(cond, ...) if (cond) { ROS_INFO(__VA_ARGS__); }
-#define EERROR_IF(cond, ...) if (cond) { ROS_ERROR(__VA_ARGS__); }
+// Define the MODULE_NAME macro if not already defined
+#ifndef MODULE_NAME
+#define MODULE_NAME "EDrive"
+#endif
 
-// Define check macros
-#define ECHECK(cond) \
-  if (!(cond)) { \
-    ROS_FATAL("Check failed: %s", #cond); \
-    std::abort(); \
-  }
+// Define brackets for consistent formatting
+#define LEFT_BRACKET "["
+#define RIGHT_BRACKET "]"
 
-#define CHECK_OP(name, op, val1, val2) \
-  if (!((val1) op (val2))) { \
-    ROS_FATAL("Check failed: %s %s %s (%zu vs. %zu)", #val1, #op, #val2, (size_t)(val1), (size_t)(val2)); \
-    std::abort(); \
-  }
+// Define the EDEBUG_MODULE macro to use Google VLOG for logging
+#define EDEBUG_MODULE(module) \
+  VLOG(4) << LEFT_BRACKET << module << RIGHT_BRACKET << "[DEBUG] "
+#define EDEBUG EDEBUG_MODULE(MODULE_NAME)
+#define EINFO ELOG_MODULE(MODULE_NAME, INFO)
+#define EWARN ELOG_MODULE(MODULE_NAME, WARN)
+#define EERROR ELOG_MODULE(MODULE_NAME, ERROR)
+#define EFATAL ELOG_MODULE(MODULE_NAME, FATAL)
 
-#define ECHECK_EQ(val1, val2) CHECK_OP(_EQ, ==, val1, val2)
-#define ECHECK_NE(val1, val2) CHECK_OP(_NE, !=, val1, val2)
-#define ECHECK_LE(val1, val2) CHECK_OP(_LE, <=, val1, val2)
-#define ECHECK_LT(val1, val2) CHECK_OP(_LT, < , val1, val2)
-#define ECHECK_GE(val1, val2) CHECK_OP(_GE, >=, val1, val2)
-#define ECHECK_GT(val1, val2) CHECK_OP(_GT, > , val1, val2)
+#ifndef ELOG_MODULE_STREAM
+#define ELOG_MODULE_STREAM(log_severity) ELOG_MODULE_STREAM_##log_severity
+#endif
 
-// Define frequency logging macros
-#define EINFO_EVERY(freq, ...) do { static int count = 0; if (++count % (freq) == 0) { ROS_INFO(__VA_ARGS__); } } while (0)
-#define EWARN_EVERY(freq, ...) do { static int count = 0; if (++count % (freq) == 0) { ROS_WARN(__VA_ARGS__); } } while (0)
-#define EERROR_EVERY(freq, ...) do { static int count = 0; if (++count % (freq) == 0) { ROS_ERROR(__VA_ARGS__); } } while (0)
+#ifndef ELOG_MODULE
+#define ELOG_MODULE(module, log_severity) \
+  ELOG_MODULE_STREAM(log_severity)(module)
+#endif
+
+#define ELOG_MODULE_STREAM_INFO(module)                         \
+  google::LogMessage(__FILE__, __LINE__, google::INFO).stream() \
+      << LEFT_BRACKET << module << RIGHT_BRACKET
+
+#define ELOG_MODULE_STREAM_WARN(module)                            \
+  google::LogMessage(__FILE__, __LINE__, google::WARNING).stream() \
+      << LEFT_BRACKET << module << RIGHT_BRACKET
+
+#define ELOG_MODULE_STREAM_ERROR(module)                         \
+  google::LogMessage(__FILE__, __LINE__, google::ERROR).stream() \
+      << LEFT_BRACKET << module << RIGHT_BRACKET
+
+#define ELOG_MODULE_STREAM_FATAL(module)                         \
+  google::LogMessage(__FILE__, __LINE__, google::FATAL).stream() \
+      << LEFT_BRACKET << module << RIGHT_BRACKET
+
+#define EINFO_IF(cond) ELOG_IF(INFO, cond, MODULE_NAME)
+#define EWARN_IF(cond) ELOG_IF(WARN, cond, MODULE_NAME)
+#define EERROR_IF(cond) ELOG_IF(ERROR, cond, MODULE_NAME)
+#define EFATAL_IF(cond) ELOG_IF(FATAL, cond, MODULE_NAME)
+#define ELOG_IF(severity, cond, module) \
+  !(cond) ? (void)0                     \
+          : google::LogMessageVoidify() & ELOG_MODULE(module, severity)
+
+#define ECHECK(cond) CHECK(cond) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+
+#define EINFO_EVERY(freq) \
+  LOG_EVERY_N(INFO, freq) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+#define EWARN_EVERY(freq) \
+  LOG_EVERY_N(WARNING, freq) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+#define EERROR_EVERY(freq) \
+  LOG_EVERY_N(ERROR, freq) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+
 
 // Define return condition macros
 #define RETURN_IF_NULL(ptr)               \

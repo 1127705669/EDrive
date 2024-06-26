@@ -22,7 +22,7 @@ VehicleStateProvider::VehicleStateProvider() {}
 Result_state VehicleStateProvider::Update(const nav_msgs::Odometry& localization){
   original_localization_ = localization;
   if (!ConstructExceptLinearVelocity(localization)) {
-    EERROR("Fail to update because ConstructExceptLinearVelocity error.");
+    EERROR << "Fail to update because ConstructExceptLinearVelocity error.";
     return State_Failed;
   }
   vehicle_state_.set_timestamp(localization.header.stamp.toSec());

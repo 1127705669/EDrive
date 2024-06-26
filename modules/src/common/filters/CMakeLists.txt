@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(filters)
 
+
+find_package(PkgConfig)
+pkg_check_modules(GLOG REQUIRED libglog)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
@@ -10,6 +14,7 @@ include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${GLOG_INCLUDE_DIRS}
 )
 
 ###################################
@@ -48,7 +53,7 @@ set(MEAN_FILTER_SRC
 add_library(mean_filter SHARED ${MEAN_FILTER_SRC})
 
 target_link_libraries(mean_filter 
-  
+  glog
 )
 
 

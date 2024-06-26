@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(math)
 
 find_package(Eigen3 REQUIRED)
+find_package(osqp REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -57,6 +58,19 @@ target_link_libraries(mpc
   qp_solver
   active_set_qp_solver
   Eigen3::Eigen
+)
+
+###################################
+#            mpc_osqp             #
+###################################
+add_library(mpc_osqp SHARED
+  mpc_osqp.cc
+)
+
+target_link_libraries(mpc_osqp
+  ${catkin_LIBRARIES}
+  Eigen3::Eigen
+  osqp::osqp
 )
 
 ###################################

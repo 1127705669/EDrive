@@ -40,12 +40,12 @@ void DigitalFilter::set_coefficients(const std::vector<double> &denominators,
 
 void DigitalFilter::set_dead_zone(const double deadzone) {
   dead_zone_ = std::abs(deadzone);
-  EINFO("Setting digital filter dead zone = %f", dead_zone_);
+  EINFO << "Setting digital filter dead zone = " << dead_zone_;
 }
 
 double DigitalFilter::Filter(const double x_insert) {
   if (denominators_.empty() || numerators_.empty()) {
-    EERROR("Empty denominators or numerators");
+    EERROR << "Empty denominators or numerators";
     return 0.0;
   }
 
@@ -82,11 +82,11 @@ double DigitalFilter::Compute(const std::deque<double> &values,
                               const std::size_t coeff_start,
                               const std::size_t coeff_end) {
   if (coeff_start > coeff_end || coeff_end >= coefficients.size()) {
-    EERROR("Invalid inputs.");
+    EERROR << "Invalid inputs.";
     return 0.0;
   }
   if (coeff_end - coeff_start + 1 != values.size()) {
-    EERROR("Sizes not match.");
+    EERROR << "Sizes not match.";
     return 0.0;
   }
   double sum = 0.0;

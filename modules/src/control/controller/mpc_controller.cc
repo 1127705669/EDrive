@@ -44,15 +44,15 @@ void WriteHeaders(std::ofstream &file_stream) {}
 }  // namespace
 
 MPCController::MPCController() : name_("MPC Controller") {
-  EINFO("    registering MPC controller...");
+  EINFO << "    registering MPC controller...";
 }
 
 void MPCController::LoadControlCalibrationTable(
     const MPCControllerConf &mpc_controller_conf) {
   const auto &control_table = mpc_controller_conf.calibration_table();
   
-  EINFO("Control calibration table loaded");
-  EINFO("Control calibration table size is %d", control_table.calibration_size());
+  EINFO << "Control calibration table loaded";
+  EINFO << "Control calibration table size is " << control_table.calibration_size();
 
   Interpolation2D::DataType xyz;
   for (const auto &calibration : control_table.calibration()) {
@@ -177,7 +177,7 @@ void MPCController::LoadMPCGainScheduler(
       mpc_controller_conf.feedforwardterm_gain_scheduler();
   const auto &steer_weight_gain_scheduler =
       mpc_controller_conf.steer_weight_gain_scheduler();
-  EINFO("MPC control gain scheduler loaded");
+  EINFO << "MPC control gain scheduler loaded";
   Interpolation1D::DataType xy1, xy2, xy3, xy4;
   for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
     xy1.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
@@ -264,7 +264,7 @@ Result_state MPCController::ComputeControlCommand(
           matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
           matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
           mpc_eps_, mpc_max_iteration_, &control) != true) {
-    EERROR("MPC solver failed");
+    EERROR << "MPC solver failed";
   } else {
     // EINFO("MPC problem solved! ");
   }
@@ -319,7 +319,7 @@ Result_state MPCController::ComputeControlCommand(
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
   debug->set_steer_angle_feedback(steer_angle_feedback);
 
-  EINFO("%f",steer_angle);
+  // EINFO("%f",steer_angle);
   // debug->set_steering_position(chassis->steering_percentage());
 
   // if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
@@ -338,14 +338,14 @@ MPCController::~MPCController() {}
 
 bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
-    EERROR("[MPCController] control_conf == nullptr");
+    EERROR << "[MPCController] control_conf == nullptr";
     return false;
   }
   vehicle_param_ = VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
   if(ts_ <= 0.0) {
-    EERROR("[MPCController] Invalid control update interval.");
+    EERROR << "[MPCController] Invalid control update interval.";
     return false;
   }
   cf_ = control_conf->mpc_controller_conf().cf();
@@ -359,7 +359,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   // steering ratio should be positive
   static constexpr double kEpsilon = 1e-6;
   if (std::isnan(steer_ratio_) || steer_ratio_ < kEpsilon) {
-    EERROR("[MPCController] steer_ratio = 0");
+    EERROR << "[MPCController] steer_ratio = 0";
     return false;
   }
   wheel_single_direction_max_degree_ =
@@ -390,7 +390,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
 
-  EINFO("MPC conf loaded");
+  EINFO << "MPC conf loaded";
   return true;
 }
 
@@ -402,27 +402,28 @@ void MPCController::LogInitParameters() {
   //       << " lf_: " << lf_ << ","
   //       << " lr_: " << lr_;
 
-  EINFO("Configuration Parameters:");
-  EINFO("Front cornering stiffness (cf_): %f", cf_);
-  EINFO("Rear cornering stiffness (cr_): %f", cr_);
-  EINFO("Wheelbase (wheelbase_): %f", wheelbase_);
-  EINFO("Max steer angle (max_steer_angle): %f", vehicle_param_.max_steer_angle());
-  EINFO("Steering transmission ratio (steer_ratio_): %f", steer_ratio_);
-  EINFO("Max steering angle in degrees (steer_single_direction_max_degree_): %f", steer_single_direction_max_degree_);
-  EINFO("Max wheel angle in degrees (wheel_single_direction_max_degree_): %f", wheel_single_direction_max_degree_);
-  EINFO("Max lateral acceleration (max_lat_acc_): %f", max_lat_acc_);
-  EINFO("Max acceleration (max_acceleration_): %f", max_acceleration_);
-  EINFO("Max deceleration (max_deceleration_): %f", max_deceleration_);
-  EINFO("Total mass (mass_): %f", mass_);
-  EINFO("Front axle to center distance (lf_): %f", lf_);
-  EINFO("Rear axle to center distance (lr_): %f", lr_);
-  EINFO("Moment of inertia about Z-axis (iz_): %f", iz_);
-  EINFO("MPC epsilon (mpc_eps_): %f", mpc_eps_);
-  EINFO("MPC max iteration (mpc_max_iteration_): %d", mpc_max_iteration_);
-  EINFO("Throttle deadzone (throttle_deadzone_): %f", throttle_deadzone_);
-  EINFO("Brake deadzone (brake_deadzone_): %f", brake_deadzone_);
-  EINFO("Minimum speed protection (minimum_speed_protection_): %f", minimum_speed_protection_);
-  EINFO("Standstill acceleration (standstill_acceleration_): %f", standstill_acceleration_);
+  EINFO << "Configuration Parameters:";
+  EINFO << "Front cornering stiffness (cf_): " << cf_;
+  EINFO << "Rear cornering stiffness (cr_): " << cr_;
+  EINFO << "Wheelbase (wheelbase_): " << wheelbase_;
+  EINFO << "Max steer angle (max_steer_angle): " << vehicle_param_.max_steer_angle();
+  EINFO << "Steering transmission ratio (steer_ratio_): " << steer_ratio_;
+  EINFO << "Max steering angle in degrees (steer_single_direction_max_degree_): " << steer_single_direction_max_degree_;
+  EINFO << "Max wheel angle in degrees (wheel_single_direction_max_degree_): " << wheel_single_direction_max_degree_;
+  EINFO << "Max lateral acceleration (max_lat_acc_): " << max_lat_acc_;
+  EINFO << "Max acceleration (max_acceleration_): " << max_acceleration_;
+  EINFO << "Max deceleration (max_deceleration_): " << max_deceleration_;
+  EINFO << "Total mass (mass_): " << mass_;
+  EINFO << "Front axle to center distance (lf_): " << lf_;
+  EINFO << "Rear axle to center distance (lr_): " << lr_;
+  EINFO << "Moment of inertia about Z-axis (iz_): " << iz_;
+  EINFO << "MPC epsilon (mpc_eps_): " << mpc_eps_;
+  EINFO << "MPC max iteration (mpc_max_iteration_): " << mpc_max_iteration_;
+  EINFO << "Throttle deadzone (throttle_deadzone_): " << throttle_deadzone_;
+  EINFO << "Brake deadzone (brake_deadzone_): " << brake_deadzone_;
+  EINFO << "Minimum speed protection (minimum_speed_protection_): " << minimum_speed_protection_;
+  EINFO << "Standstill acceleration (standstill_acceleration_): " << standstill_acceleration_;
+
 }
 
 void MPCController::InitializeFilters(const ControlConf *control_conf) {
@@ -490,7 +491,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
     //     "MPC controller error: matrix_q size: ", q_param_size,
     //     " in parameter file not equal to basic_state_size_: ",
     //     basic_state_size_);
-    EERROR("MPC controller error: matrix_q size: %d", q_param_size);
+    EERROR << "MPC controller error: matrix_q size: " << q_param_size;
     return Result_state::State_Failed;
   }
   for (int i = 0; i < q_param_size; ++i) {
@@ -504,7 +505,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   InitializeFilters(control_conf);
   LoadMPCGainScheduler(control_conf->mpc_controller_conf());
   LogInitParameters();
-  EINFO("[MPCController] init done!");
+  EINFO << "[MPCController] init done!";
   return Result_state::State_Ok;
 }
 

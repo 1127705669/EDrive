@@ -14,7 +14,7 @@ const double kDoubleEpsilon = 1e-6;
 
 bool Interpolation1D::Init(const DataType& xy) {
   if (xy.empty()) {
-    EERROR("empty input.");
+    EERROR << "empty input.";
     return false;
   }
   auto data(xy);
