@@ -17,6 +17,7 @@
 #include "common/src/log.h"
 #include "common/math/math_utils.h"
 #include "common/math/mpc_solver.h"
+#include "common/math/mpc_osqp.h"
 
 #include "common/src/log.h"
 
@@ -242,53 +243,105 @@ Result_state MPCController::ComputeControlCommand(
   debug->add_matrix_r_updated(matrix_r_updated_(0, 0));
   debug->add_matrix_r_updated(matrix_r_updated_(1, 1));
 
-  Eigen::MatrixXd control_matrix(controls_, 1);
-  control_matrix << 0, 0;
+  Matrix control_matrix = Matrix::Zero(controls_, 1);
+  std::vector<Matrix> control(horizon_, control_matrix);
 
-  Eigen::MatrixXd reference_state(basic_state_size_, 1);
-  reference_state << 0, 0, 0, 0, 0, 0;
+  Matrix control_gain_matrix = Matrix::Zero(controls_, basic_state_size_);
+  std::vector<Matrix> control_gain(horizon_, control_gain_matrix);
 
-  std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
+  Matrix addition_gain_matrix = Matrix::Zero(controls_, 1);
+  std::vector<Matrix> addition_gain(horizon_, addition_gain_matrix);
 
-  Eigen::MatrixXd lower_bound(controls_, 1);
-  lower_bound << -steer_single_direction_max_degree_, max_deceleration_;
+  Matrix reference_state = Matrix::Zero(basic_state_size_, 1);
+  std::vector<Matrix> reference(horizon_, reference_state);
 
-  Eigen::MatrixXd upper_bound(controls_, 1);
-  upper_bound << steer_single_direction_max_degree_, max_acceleration_;
+  Matrix lower_bound(controls_, 1);
+  lower_bound << -wheel_single_direction_max_degree_, max_deceleration_;
 
-  std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
+  Matrix upper_bound(controls_, 1);
+  upper_bound << wheel_single_direction_max_degree_, max_acceleration_;
+
+  const double max = std::numeric_limits<double>::max();
+  Matrix lower_state_bound(basic_state_size_, 1);
+  Matrix upper_state_bound(basic_state_size_, 1);
+
+  // lateral_error, lateral_error_rate, heading_error, heading_error_rate
+  // station_error, station_error_rate
+  lower_state_bound << -1.0 * max, -1.0 * max, -1.0 * M_PI, -1.0 * max,
+      -1.0 * max, -1.0 * max;
+  upper_state_bound << max, max, M_PI, max, max, max;
 
   ros::Time mpc_start_timestamp = ros::Time::now();
+  double steer_angle_feedback = 0.0;
+  double acc_feedback = 0.0;
+  double steer_angle_ff_compensation = 0.0;
+  double unconstrained_control_diff = 0.0;
+  double control_gain_truncation_ratio = 0.0;
+  double unconstrained_control = 0.0;
+  const double v = VehicleStateProvider::instance()->linear_velocity();
 
-  if (common::math::SolveLinearMPC(
-          matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
-          matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
-          mpc_eps_, mpc_max_iteration_, &control) != true) {
-    EERROR << "MPC solver failed";
+  std::vector<double> control_cmd(controls_, 0);
+
+  EDrive::common::math::MpcOsqp mpc_osqp(
+      matrix_ad_, matrix_bd_, matrix_q_updated_, matrix_r_updated_,
+      matrix_state_, lower_bound, upper_bound, lower_state_bound,
+      upper_state_bound, reference_state, mpc_max_iteration_, horizon_,
+      mpc_eps_);
+  if (!mpc_osqp.Solve(&control_cmd)) {
+    EERROR << "MPC OSQP solver failed";
   } else {
-    // EINFO("MPC problem solved! ");
+    EDEBUG << "MPC OSQP problem solved! ";
+    control[0](0, 0) = control_cmd.at(0);
+    control[0](1, 0) = control_cmd.at(1);
+  }
+
+  steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
+  acc_feedback = control[0](1, 0);
+  for (int i = 0; i < basic_state_size_; ++i) {
+    unconstrained_control += control_gain[0](0, i) * matrix_state_(i, 0);
+  }
+  unconstrained_control += addition_gain[0](0, 0) * v * debug->curvature();
+  if (enable_mpc_feedforward_compensation_) {
+    unconstrained_control_diff =
+        Wheel2SteerPct(control[0](0, 0) - unconstrained_control);
+    if (fabs(unconstrained_control_diff) <= unconstrained_control_diff_limit_) {
+      steer_angle_ff_compensation =
+          Wheel2SteerPct(debug->curvature() *
+                         (control_gain[0](0, 2) *
+                              (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+                          addition_gain[0](0, 0) * v));
+    } else {
+      control_gain_truncation_ratio = control[0](0, 0) / unconstrained_control;
+      steer_angle_ff_compensation =
+          Wheel2SteerPct(debug->curvature() *
+                         (control_gain[0](0, 2) *
+                              (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+                          addition_gain[0](0, 0) * v) *
+                         control_gain_truncation_ratio);
+    }
+  } else {
+    steer_angle_ff_compensation = 0.0;
   }
 
   ros::Time mpc_end_timestamp = ros::Time::now();
 
+  EDEBUG << "MPC core algorithm: calculation time is: "
+         << (mpc_end_timestamp.toSec() - mpc_start_timestamp.toSec()) * 1000 << " ms.";
+
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
-
-  double steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
-                                steer_ratio_ /
-                                steer_single_direction_max_degree_ * 100;
-  double steer_angle =
-      steer_angle_feedback + steer_angle_feedforwardterm_updated_;
-
-  // Clamp the steer angle to -100.0 to 100.0
-  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
+  double steer_angle = steer_angle_feedback +
+                       steer_angle_feedforwardterm_updated_ +
+                       steer_angle_ff_compensation;
 
   steer_angle = digital_filter_.Filter(steer_angle);
+  // Clamp the steer angle to -100.0 to 100.0
+  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
   cmd->set_steering_target(steer_angle);
 
-  debug->set_acceleration_cmd_closeloop(control[0](1, 0));
+  debug->set_acceleration_cmd_closeloop(acc_feedback);
 
-  double acceleration_cmd = control[0](1, 0) + debug->acceleration_reference();
-  // TODO(QiL): add pitch angle feedforward to accomendate for 3D control
+  double acceleration_cmd = acc_feedback + debug->acceleration_reference();
+  // TODO(QiL): add pitch angle feed forward to accommodate for 3D control
 
   debug->set_acceleration_cmd(acceleration_cmd);
 
@@ -301,23 +354,116 @@ Result_state MPCController::ComputeControlCommand(
   double throttle_cmd = 0.0;
   double brake_cmd = 0.0;
   if (calibration_value >= 0) {
-    throttle_cmd = calibration_value > throttle_deadzone_ ? calibration_value
-                                                          : throttle_deadzone_;
+    throttle_cmd = std::max(calibration_value, throttle_deadzone_);
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
-    brake_cmd = -calibration_value > brake_deadzone_ ? -calibration_value
-                                                     : brake_deadzone_;
+    brake_cmd = std::max(-calibration_value, brake_deadzone_);
   }
 
   cmd->set_steering_rate(100.0);
+  // if the car is driven by acceleration, disgard the cmd->throttle and brake
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
+  cmd->set_acceleration(acceleration_cmd);
 
   debug->set_heading(VehicleStateProvider::instance()->heading());
+  // debug->set_steering_position(chassis->steering_percentage());
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
+  debug->set_steer_angle_feedforward_compensation(steer_angle_ff_compensation);
+  debug->set_steer_unconstrained_control_diff(unconstrained_control_diff);
   debug->set_steer_angle_feedback(steer_angle_feedback);
+
+  ROS_INFO("WWWWWW  %f", steer_angle);
+  ROS_INFO("ZZZ %f", throttle_cmd);
+  // debug->set_steering_position(chassis->steering_percentage());
+
+  // if (std::fabs(VehicleStateProvider::instance()->linear_velocity()) <=
+  //         vehicle_param_.max_abs_speed_when_stopped() ||
+  //     chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
+  //   cmd->set_gear_location(planning_published_trajectory->gear());
+  // } else {
+  //   cmd->set_gear_location(chassis->gear_location());
+  // }
+
+
+  // Eigen::MatrixXd control_matrix(controls_, 1);
+  // control_matrix << 0, 0;
+
+  // Eigen::MatrixXd reference_state(basic_state_size_, 1);
+  // reference_state << 0, 0, 0, 0, 0, 0;
+
+  // std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
+
+  // Eigen::MatrixXd lower_bound(controls_, 1);
+  // lower_bound << -steer_single_direction_max_degree_, max_deceleration_;
+
+  // Eigen::MatrixXd upper_bound(controls_, 1);
+  // upper_bound << steer_single_direction_max_degree_, max_acceleration_;
+
+  // std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
+
+  // ros::Time mpc_start_timestamp = ros::Time::now();
+
+  // if (common::math::SolveLinearMPC(
+  //         matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
+  //         matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
+  //         mpc_eps_, mpc_max_iteration_, &control) != true) {
+  //   EERROR << "MPC solver failed";
+  // } else {
+  //   // EINFO("MPC problem solved! ");
+  // }
+
+  // ros::Time mpc_end_timestamp = ros::Time::now();
+
+  // // TODO(QiL): evaluate whether need to add spline smoothing after the result
+
+  // double steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
+  //                               steer_ratio_ /
+  //                               steer_single_direction_max_degree_ * 100;
+  // double steer_angle =
+  //     steer_angle_feedback + steer_angle_feedforwardterm_updated_;
+
+  // // Clamp the steer angle to -100.0 to 100.0
+  // steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
+
+  // steer_angle = digital_filter_.Filter(steer_angle);
+  // cmd->set_steering_target(steer_angle);
+
+  // debug->set_acceleration_cmd_closeloop(control[0](1, 0));
+
+  // double acceleration_cmd = control[0](1, 0) + debug->acceleration_reference();
+  // // TODO(QiL): add pitch angle feedforward to accomendate for 3D control
+
+  // debug->set_acceleration_cmd(acceleration_cmd);
+
+  // double calibration_value = 0.0;
+  // calibration_value = control_interpolation_->Interpolate(std::make_pair(
+  //       VehicleStateProvider::instance()->linear_velocity(), acceleration_cmd));
+
+  // debug->set_calibration_value(calibration_value);
+
+  // double throttle_cmd = 0.0;
+  // double brake_cmd = 0.0;
+  // if (calibration_value >= 0) {
+  //   throttle_cmd = calibration_value > throttle_deadzone_ ? calibration_value
+  //                                                         : throttle_deadzone_;
+  //   brake_cmd = 0.0;
+  // } else {
+  //   throttle_cmd = 0.0;
+  //   brake_cmd = -calibration_value > brake_deadzone_ ? -calibration_value
+  //                                                    : brake_deadzone_;
+  // }
+
+  // cmd->set_steering_rate(100.0);
+  // cmd->set_throttle(throttle_cmd);
+  // cmd->set_brake(brake_cmd);
+
+  // debug->set_heading(VehicleStateProvider::instance()->heading());
+  // debug->set_steer_angle(steer_angle);
+  // debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
+  // debug->set_steer_angle_feedback(steer_angle_feedback);
 
   // EINFO("%f",steer_angle);
   // debug->set_steering_position(chassis->steering_percentage());
@@ -387,6 +533,12 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
   standstill_acceleration_ =
       control_conf->mpc_controller_conf().standstill_acceleration();
+
+  enable_mpc_feedforward_compensation_ =
+      control_conf->mpc_controller_conf().enable_mpc_feedforward_compensation();
+
+  unconstrained_control_diff_limit_ =
+      control_conf->mpc_controller_conf().unconstrained_control_diff_limit();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
 

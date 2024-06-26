@@ -5,9 +5,14 @@
 #ifndef EDRIVE_APP_EDRIVE_H_
 #define EDRIVE_APP_EDRIVE_H_
 
-#include <ros/ros.h>
+#include <csignal>
+#include <string>
 
+#include "gflags/gflags.h"
+#include "common/src/log.h"
 #include "common/src/state.h"
+
+#include <ros/ros.h>
 
 namespace EDrive {
 namespace common {
@@ -39,6 +44,8 @@ class EDriveApp {
 
 #define EDRIVE_MAIN(APP)                                       \
   int main(int argc, char *argv[]) {                           \
+    google::InitGoogleLogging(argv[0]);                        \
+    google::ParseCommandLineFlags(&argc, &argv, true);         \
     APP edrive_app_;                                           \
     ros::init(argc, argv, edrive_app_.Name());                 \
     edrive_app_.Spin();                                        \
