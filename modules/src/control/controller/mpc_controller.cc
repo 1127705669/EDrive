@@ -243,7 +243,7 @@ Result_state MPCController::ComputeControlCommand(
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
 
   double steer_angle_feedback = control[0](0, 0) * 180 / M_PI *
-                                steer_transmission_ratio_ /
+                                steer_ratio_ /
                                 steer_single_direction_max_degree_ * 100;
   double steer_angle =
       steer_angle_feedback + steer_angle_feedforwardterm_updated_;
@@ -310,18 +310,29 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
     EERROR("[MPCController] control_conf == nullptr");
     return false;
   }
-  const auto &vehicle_param_ =
-      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  vehicle_param_ = VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
-  ECHECK_GT(ts_, 0.0);
+  if(ts_ <= 0.0) {
+    EERROR("[MPCController] Invalid control update interval.");
+    return false;
+  }
   cf_ = control_conf->mpc_controller_conf().cf();
   cr_ = control_conf->mpc_controller_conf().cr();
   wheelbase_ = vehicle_param_.wheel_base();
-  steer_transmission_ratio_ = vehicle_param_.steer_ratio();
+  steer_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
-      vehicle_param_.max_steer_angle() / steer_transmission_ratio_ / 180 * M_PI;
+      vehicle_param_.max_steer_angle() * 180 / M_PI;
   max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
+
+  // steering ratio should be positive
+  static constexpr double kEpsilon = 1e-6;
+  if (std::isnan(steer_ratio_) || steer_ratio_ < kEpsilon) {
+    EERROR("[MPCController] steer_ratio = 0");
+    return false;
+  }
+  wheel_single_direction_max_degree_ =
+      steer_single_direction_max_degree_ / steer_ratio_ / 180 * M_PI;
   max_acceleration_ = vehicle_param_.max_acceleration();
   max_deceleration_ = vehicle_param_.max_deceleration();
 
@@ -347,6 +358,32 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
       control_conf->mpc_controller_conf().standstill_acceleration();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
+
+  ROS_INFO("Configuration Parameters:");
+  ROS_INFO("Front cornering stiffness (cf_): %f", cf_);
+  ROS_INFO("Rear cornering stiffness (cr_): %f", cr_);
+  ROS_INFO("Wheelbase (wheelbase_): %f", wheelbase_);
+  ROS_INFO("Max steer angle (max_steer_angle): %f", vehicle_param_.max_steer_angle());
+  ROS_INFO("Steering transmission ratio (steer_ratio_): %f", steer_ratio_);
+  ROS_INFO("Max steering angle in degrees (steer_single_direction_max_degree_): %f", steer_single_direction_max_degree_);
+  ROS_INFO("Max wheel angle in degrees (wheel_single_direction_max_degree_): %f", wheel_single_direction_max_degree_);
+  ROS_INFO("Max lateral acceleration (max_lat_acc_): %f", max_lat_acc_);
+  ROS_INFO("Max acceleration (max_acceleration_): %f", max_acceleration_);
+  ROS_INFO("Max deceleration (max_deceleration_): %f", max_deceleration_);
+  ROS_INFO("Front left mass (mass_fl): %f", mass_fl);
+  ROS_INFO("Front right mass (mass_fr): %f", mass_fr);
+  ROS_INFO("Rear left mass (mass_rl): %f", mass_rl);
+  ROS_INFO("Rear right mass (mass_rr): %f", mass_rr);
+  ROS_INFO("Total mass (mass_): %f", mass_);
+  ROS_INFO("Front axle to center distance (lf_): %f", lf_);
+  ROS_INFO("Rear axle to center distance (lr_): %f", lr_);
+  ROS_INFO("Moment of inertia about Z-axis (iz_): %f", iz_);
+  ROS_INFO("MPC epsilon (mpc_eps_): %f", mpc_eps_);
+  ROS_INFO("MPC max iteration (mpc_max_iteration_): %d", mpc_max_iteration_);
+  ROS_INFO("Throttle deadzone (throttle_deadzone_): %f", throttle_deadzone_);
+  ROS_INFO("Brake deadzone (brake_deadzone_): %f", brake_deadzone_);
+  ROS_INFO("Minimum speed protection (minimum_speed_protection_): %f", minimum_speed_protection_);
+  ROS_INFO("Standstill acceleration (standstill_acceleration_): %f", standstill_acceleration_);
 
   ROS_INFO("MPC conf loaded");
   return true;
@@ -483,7 +520,7 @@ double MPCController::GetLateralError(const common::math::Vec2d &point,
 
 void MPCController::FeedforwardUpdate(SimpleMPCDebug *debug) {
   steer_angle_feedforwardterm_ = (wheelbase_ * debug->curvature()) * 180 /
-                                 M_PI * steer_transmission_ratio_ /
+                                 M_PI * steer_ratio_ /
                                  steer_single_direction_max_degree_ * 100;
 }
 
