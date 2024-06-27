@@ -32,6 +32,10 @@ Result_state VehicleStateProvider::Update(const nav_msgs::Odometry& localization
   return State_Ok;
 }
 
+double VehicleStateProvider::QuaternionToHeading(double w, double x, double y, double z) {
+    return std::atan2(2.0 * (w * z + x * y), 1 - 2 * (y * y + z * z));
+}
+
 bool VehicleStateProvider::ConstructExceptLinearVelocity(const nav_msgs::Odometry& localization) {
   vehicle_state_.set_x(localization.pose.pose.position.x);
   vehicle_state_.set_y(localization.pose.pose.position.y);
@@ -40,8 +44,8 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(const nav_msgs::Odometr
   const auto &orientation = localization.pose.pose.orientation;
 
   vehicle_state_.set_heading(
-        math::QuaternionToHeading(orientation.w, orientation.x,
-                                  orientation.y, orientation.z));
+        QuaternionToHeading(orientation.w, orientation.x,
+                            orientation.y, orientation.z));
   
   vehicle_state_.set_angular_velocity(
       localization.twist.twist.angular.z);

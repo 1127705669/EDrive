@@ -119,6 +119,7 @@ class VehicleStateProvider {
 
   private:
   bool ConstructExceptLinearVelocity(const nav_msgs::Odometry& localization);
+  double QuaternionToHeading(double w, double x, double y, double z);
 
   common::VehicleState vehicle_state_;
   nav_msgs::Odometry original_localization_;

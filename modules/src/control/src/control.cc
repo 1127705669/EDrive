@@ -67,7 +67,8 @@ Result_state Control::Start(){
 void Control::ConvertControlCommandToSimulator(
     const ControlCommand& control_command, 
     ::control::CarlaEgoVehicleControl& simulator_control_command) {
-  // simulator_control_command.steer = control_command.steering_target
+  simulator_control_command.steer = -control_command.steering_target()/100;
+  simulator_control_command.throttle = 0.3;
 
 }
 
