@@ -95,7 +95,6 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
             int left_way_id = relation.left_refs[i];
             int right_way_id = relation.right_refs[i];
 
-            // 检查这两个way ID是否存在于ways_中
             if (ways_.find(left_way_id) == ways_.end()) {
                 ROS_ERROR("Left way ID %d not found", left_way_id);
                 continue;
@@ -107,20 +106,6 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
 
             const Way& left_way = ways_.at(left_way_id);
             const Way& right_way = ways_.at(right_way_id);
-
-            // // 打印left_way的节点ID
-            // std::cout << "Left Way ID " << left_way_id << " contains nodes: ";
-            // for (int node_id : left_way.node_refs) {
-            //     std::cout << node_id << " ";
-            // }
-            // std::cout << std::endl;
-
-            // // 打印right_way的节点ID
-            // std::cout << "Right Way ID " << right_way_id << " contains nodes: ";
-            // for (int node_id : right_way.node_refs) {
-            //     std::cout << node_id << " ";
-            // }
-            // std::cout << std::endl;
 
             size_t min_nodes_size = std::min(left_way.node_refs.size(), right_way.node_refs.size());
             for (size_t j = 0; j < min_nodes_size; ++j) {
@@ -145,6 +130,22 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
                 trajectory_point_.path_point.y = mid_point.y;
                 trajectory_point_.path_point.z = mid_point.z;
 
+                middle_points.push_back(mid_point);
+
+                // Calculate heading angle here and update trajectory_point_
+                if (middle_points.size() > 1) {
+                    double dx = middle_points.back().x - middle_points[middle_points.size() - 2].x;
+                    double dy = middle_points.back().y - middle_points[middle_points.size() - 2].y;
+                    double theta = std::atan2(dy, dx);
+                    trajectory_point_.path_point.theta = theta;
+                } else if (middle_points.size() == 1 && trajectory_pb.trajectory_point.size() > 0) {
+                    // Use the previous trajectory point's theta value
+                    trajectory_point_.path_point.theta = trajectory_pb.trajectory_point.back().path_point.theta;
+                } else if (middle_points.size() == 1) {
+                    // If it's the first point and there's no previous point, temporarily set to 0.0 and fix later
+                    trajectory_point_.path_point.theta = 0.0;
+                }
+
                 trajectory_pb.trajectory_point.push_back(trajectory_point_);
 
                 visualization_msgs::Marker marker;
@@ -154,7 +155,7 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
                 marker.id = marker_id++;
                 marker.type = visualization_msgs::Marker::SPHERE;
                 marker.action = visualization_msgs::Marker::ADD;
-                
+
                 marker.pose.position.x = mid_point.x;
                 marker.pose.position.y = mid_point.y;
                 marker.pose.position.z = mid_point.z;
@@ -164,10 +165,10 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
                 marker.pose.orientation.z = 0.0;
                 marker.pose.orientation.w = 1.0;
 
-                marker.scale.x = 0.5;  // 设定 marker 的大小
+                marker.scale.x = 0.5;
                 marker.scale.y = 0.5;
                 marker.scale.z = 0.5;
-                marker.color.a = 1.0; // 透明度
+                marker.color.a = 1.0;
                 marker.color.r = 0.0;
                 marker.color.g = 1.0;
                 marker.color.b = 0.0;
@@ -175,8 +176,12 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
                 path.markers.push_back(marker);
             }
         }
+
+        // Correct the heading angle of the first point if there are more than one middle points
+        if (middle_points.size() > 1) {
+            trajectory_pb.trajectory_point.front().path_point.theta = trajectory_pb.trajectory_point[1].path_point.theta;
+        }
     }
-    
 }
 
 void VectorMap::create_marker_array(const std::unordered_map<int, Node> &nodes, const std::unordered_map<int, Way> &ways, visualization_msgs::MarkerArray &marker_array) {

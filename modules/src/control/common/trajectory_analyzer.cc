@@ -48,44 +48,45 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
 }
 
 void TrajectoryAnalyzer::PublishPoint(const ::common::TrajectoryPoint point) const {
-  // 创建一个 marker 消息
+  // Create a marker message
   visualization_msgs::Marker marker;
 
-  // 设置 marker 的帧 ID 和时间戳
+  // Set the marker's frame ID and timestamp
   marker.header.frame_id = "map";
   marker.header.stamp = ros::Time::now();
 
-  // 设置 marker 的 namespace 和 id
+  // Set the marker's namespace and ID
   marker.ns = "trajectory_point";
   marker.id = 0;
 
-  // 设置 marker 的类型为 SPHERE
+  // Set the marker type to SPHERE
   marker.type = visualization_msgs::Marker::SPHERE;
 
-  // 设置 marker 的动作为 ADD
+  // Set the marker action to ADD
   marker.action = visualization_msgs::Marker::ADD;
 
-  // 设置 marker 的位置
+  // Set the marker's position
   marker.pose.position.x = point.path_point.x;
   marker.pose.position.y = point.path_point.y;
   marker.pose.position.z = point.path_point.z;
 
-  // 设置 marker 的方向（无旋转）
+  // Set the marker's orientation (no rotation)
   marker.pose.orientation.x = 0.0;
   marker.pose.orientation.y = 0.0;
   marker.pose.orientation.z = 0.0;
   marker.pose.orientation.w = 1.0;
 
-  // 设置 marker 的尺寸（直径为 0.2）
+  // Set the marker's scale (diameter 0.8)
   marker.scale.x = 0.8;
   marker.scale.y = 0.8;
   marker.scale.z = 0.8;
 
-  // 设置 marker 的颜色（红色，不透明）
+// Set the marker's color (red, fully opaque)
   marker.color.r = 1.0f;
   marker.color.g = 0.0f;
   marker.color.b = 0.0f;
   marker.color.a = 1.0;
+  
   AdapterManager::PublishMarkerDebugPoint(marker);
 }
 
