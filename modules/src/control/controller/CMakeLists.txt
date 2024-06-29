@@ -63,7 +63,11 @@ target_link_libraries(lat_controller
   trajectory_analyzer
   vehicle_state_provider
   vehicle_config_helper
+  digital_filter_coefficients
+  digital_filter
+  mean_filter
   Eigen3::Eigen
+  geometry
 )
 
 ###################################

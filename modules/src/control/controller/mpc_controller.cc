@@ -19,8 +19,6 @@
 #include "common/math/mpc_solver.h"
 #include "common/math/mpc_osqp.h"
 
-#include "common/src/log.h"
-
 namespace EDrive {
 namespace control {
 
