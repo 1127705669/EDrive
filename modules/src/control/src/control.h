@@ -65,6 +65,8 @@ class Control : public EDrive::common::EDriveApp {
   std::string adapter_conf_file = "/src/control/conf/adapter.conf";
   std::string control_conf_file = "/src/control/conf/control.conf";
 
+  std::shared_ptr<DependencyInjector> injector_ = nullptr;
+
 };
 
 } // namespace control

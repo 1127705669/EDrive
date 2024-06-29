@@ -8,6 +8,7 @@
 #include <string>
 #include "common/src/state.h"
 
+#include "control/common/dependency_injector.h"
 #include "control/proto/control_cmd.pb.h"
 #include "control/proto/control_conf.pb.h"
 #include "control/CarlaEgoVehicleControl.h"

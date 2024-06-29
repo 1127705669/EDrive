@@ -207,10 +207,38 @@ std::string LatController::Name() const { return name_; }
 Result_state LatController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
-    ControlCommand *control_command) {
+    ControlCommand *cmd) {
   if (trajectory_analyzer_ == nullptr) {
     trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory));
   }
+
+  /*
+  A matrix (Gear Drive)
+  [0.0, 1.0, 0.0, 0.0;
+    0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m, (l_r * c_r - l_f * c_f) / m / v;
+    0.0, 0.0, 0.0, 1.0;
+    0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z, (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
+  */
+  cf_ = control_conf_->lat_controller_conf().cf();
+  cr_ = control_conf_->lat_controller_conf().cr();
+  matrix_a_(0, 1) = 1.0;
+  matrix_a_coeff_(0, 2) = 0.0;
+
+  matrix_a_(1, 2) = (cf_ + cr_) / mass_;
+  matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
+  matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
+  matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
+  matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
+  matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
+
+  /*
+  b = [0.0, c_f / m, 0.0, l_f * c_f / i_z]^T
+  */
+  matrix_b_(1, 0) = cf_ / mass_;
+  matrix_b_(3, 0) = lf_ * cf_ / iz_;
+  matrix_bd_ = matrix_b_ * ts_;
+
+  UpdateDrivingOrientation();
 
   SimpleLateralDebug *debug;
 
@@ -287,6 +315,22 @@ void LatController::ComputeLateralErrors(const double x, const double y, const d
   const double raw_lateral_error =
       cos_matched_theta * dy - sin_matched_theta * dx;
   debug->set_lateral_error(raw_lateral_error);
+}
+
+void LatController::UpdateDrivingOrientation() {
+  // auto vehicle_state = injector_->vehicle_state();
+  // driving_orientation_ = vehicle_state->heading();
+  matrix_bd_ = matrix_b_ * ts_;
+  // Reverse the driving direction if the vehicle is in reverse mode
+  // if (FLAGS_reverse_heading_control) {
+  //   if (vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
+  //     driving_orientation_ =
+  //         common::math::NormalizeAngle(driving_orientation_ + M_PI);
+  //     // Update Matrix_b for reverse mode
+  //     matrix_bd_ = -matrix_b_ * ts_;
+  //     ADEBUG << "Matrix_b changed due to gear direction";
+  //   }
+  // }
 }
 
 } // namespace control

@@ -57,7 +57,7 @@ class LatController : public Controller {
   common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory,
       const nav_msgs::Odometry *localization,
-      ControlCommand *control_command) override;
+      ControlCommand *cmd) override;
 
   /**
    * @brief reset Lateral Controller
@@ -94,6 +94,9 @@ class LatController : public Controller {
                             const double linear_v, const double angular_v,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleLateralDebug *debug);
+  
+  // logic for reverse driving mode
+  void UpdateDrivingOrientation();
 
   void UpdateMatrix();
 
