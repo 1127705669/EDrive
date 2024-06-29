@@ -208,9 +208,8 @@ Result_state LatController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
     ControlCommand *cmd) {
-  if (trajectory_analyzer_ == nullptr) {
-    trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory));
-  }
+  trajectory_analyzer_ =
+      std::move(TrajectoryAnalyzer(trajectory));
 
   /*
   A matrix (Gear Drive)
@@ -240,9 +239,12 @@ Result_state LatController::ComputeControlCommand(
 
   UpdateDrivingOrientation();
 
-  SimpleLateralDebug *debug;
+  SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
+  debug->Clear();
 
-  UpdateStateAnalyticalMatching(debug);
+  // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
+  // Error Rate, preview lateral error1 , preview lateral error2, ...]
+  UpdateState(debug);
 
   UpdateMatrix();
 
@@ -258,15 +260,14 @@ Result_state LatController::ComputeControlCommand(
   return Result_state::State_Ok;
 }
 
-void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
+void LatController::UpdateState(SimpleLateralDebug *debug) {
 
   const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
 
-  ComputeLateralErrors(com.x(), com.y(),
-                       VehicleStateProvider::instance()->linear_velocity(),
-                       VehicleStateProvider::instance()->heading(),
-                       VehicleStateProvider::instance()->angular_velocity(),
-                       *trajectory_analyzer_, debug);
+  ComputeLateralErrors(
+      com.x(), com.y(), driving_orientation_,
+      VehicleStateProvider::instance()->linear_velocity(), VehicleStateProvider::instance()->angular_velocity(),
+      VehicleStateProvider::instance()->linear_acceleration(), trajectory_analyzer_, debug);
 
   // State matrix update;
   // First four elements are fixed;
@@ -274,6 +275,30 @@ void LatController::UpdateStateAnalyticalMatching(SimpleLateralDebug *debug) {
   matrix_state_(1, 0) = debug->lateral_error_rate();
   matrix_state_(2, 0) = debug->heading_error();
   matrix_state_(3, 0) = debug->heading_error_rate();
+
+  // Next elements are depending on preview window size;
+  for (int i = 0; i < preview_window_; ++i) {
+    const double preview_time = ts_ * (i + 1);
+    const auto preview_point =
+        trajectory_analyzer_.QueryNearestPointByRelativeTime(preview_time);
+
+    const auto matched_point = trajectory_analyzer_.QueryNearestPointByPosition(
+        preview_point.path_point.x, preview_point.path_point.y);
+
+    const double dx =
+        preview_point.path_point.x - matched_point.path_point.x;
+    const double dy =
+        preview_point.path_point.y - matched_point.path_point.y;
+
+    const double cos_matched_theta =
+        std::cos(matched_point.path_point.theta);
+    const double sin_matched_theta =
+        std::sin(matched_point.path_point.theta);
+    const double preview_d_error =
+        cos_matched_theta * dy - sin_matched_theta * dx;
+
+    matrix_state_(basic_state_size_ + i, 0) = preview_d_error;
+  }
 }
 
 void LatController::UpdateMatrix(){
@@ -293,10 +318,10 @@ void LatController::Stop() {
   EINFO << "stop";
 }
 
-void LatController::ComputeLateralErrors(const double x, const double y, const double theta,
-                            const double linear_v, const double angular_v,
-                            const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug) {
+void LatController::ComputeLateralErrors(
+    const double x, const double y, const double theta, const double linear_v,
+    const double angular_v, const double linear_a,
+    const TrajectoryAnalyzer &trajectory_analyzer, SimpleLateralDebug *debug) {
   // TODO(QiL): change this to conf.
   TrajectoryPoint target_point;
 
@@ -319,7 +344,7 @@ void LatController::ComputeLateralErrors(const double x, const double y, const d
 
 void LatController::UpdateDrivingOrientation() {
   // auto vehicle_state = injector_->vehicle_state();
-  // driving_orientation_ = vehicle_state->heading();
+  driving_orientation_ = VehicleStateProvider::instance()->heading();
   matrix_bd_ = matrix_b_ * ts_;
   // Reverse the driving direction if the vehicle is in reverse mode
   // if (FLAGS_reverse_heading_control) {

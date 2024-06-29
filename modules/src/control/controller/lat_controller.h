@@ -86,12 +86,13 @@ class LatController : public Controller {
   common::VehicleParam vehicle_param_;
 
  protected:
-  void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
+  void UpdateState(SimpleLateralDebug *debug);
 
   bool LoadControlConf(const ControlConf *control_conf);
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
+                            const double linear_a,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleLateralDebug *debug);
   
@@ -107,7 +108,7 @@ class LatController : public Controller {
   void LogInitParameters();
 
   // a proxy to analyze the planning trajectory
-  std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
+  TrajectoryAnalyzer trajectory_analyzer_;
 
   // the following parameters are vehicle physics related.
   // control time interval
