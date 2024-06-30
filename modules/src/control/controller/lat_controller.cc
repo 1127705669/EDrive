@@ -16,6 +16,7 @@
 // #include "common/math/linear_quadratic_regulator.h"
 // #include "common/math/math_utils.h"
 // #include "common/math/quaternion.h"
+#include "control/common/control_gflags.h"
 
 namespace EDrive {
 namespace control {
