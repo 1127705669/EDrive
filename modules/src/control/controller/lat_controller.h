@@ -88,14 +88,6 @@ class LatController : public Controller {
  protected:
   void UpdateState(SimpleLateralDebug *debug);
 
-  bool LoadControlConf(const ControlConf *control_conf);
-
-  void ComputeLateralErrors(const double x, const double y, const double theta,
-                            const double linear_v, const double angular_v,
-                            const double linear_a,
-                            const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug);
-  
   // logic for reverse driving mode
   void UpdateDrivingOrientation();
 
@@ -103,9 +95,21 @@ class LatController : public Controller {
 
   void UpdateMatrixCompound();
 
+  double ComputeFeedForward(double ref_curvature) const;
+
+  void ComputeLateralErrors(const double x, const double y, const double theta,
+                            const double linear_v, const double angular_v,
+                            const double linear_a,
+                            const TrajectoryAnalyzer &trajectory_analyzer,
+                            SimpleLateralDebug *debug);
+
+  bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
   void LoadLatGainScheduler(const LatControllerConf &lat_controller_conf);
   void LogInitParameters();
+  void ProcessLogs(const SimpleLateralDebug *debug);
+
+  void CloseLogFile();
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;

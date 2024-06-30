@@ -32,8 +32,24 @@ LatController::LatController() : name_("LQR-based Lateral Controller") {
   EINFO << "Using " << name_;
 }
 
-LatController::~LatController() {
-  
+LatController::~LatController() { CloseLogFile(); }
+
+void LatController::ProcessLogs(const SimpleLateralDebug *debug) {
+  // const std::string log_str = absl::StrCat(
+  //     debug->lateral_error(), ",", debug->ref_heading(), ",", debug->heading(),
+  //     ",", debug->heading_error(), ",", debug->heading_error_rate(), ",",
+  //     debug->lateral_error_rate(), ",", debug->curvature(), ",",
+  //     debug->steer_angle(), ",", debug->steer_angle_feedforward(), ",",
+  //     debug->steer_angle_lateral_contribution(), ",",
+  //     debug->steer_angle_lateral_rate_contribution(), ",",
+  //     debug->steer_angle_heading_contribution(), ",",
+  //     debug->steer_angle_heading_rate_contribution(), ",",
+  //     debug->steer_angle_feedback(), ",", chassis->steering_percentage(), ",",
+  //     injector_->vehicle_state()->linear_velocity());
+  // if (FLAGS_enable_csv_debug) {
+  //   steer_log_file_ << log_str << std::endl;
+  // }
+  // ADEBUG << "Steer_Control_Detail: " << log_str;
 }
 
 void LatController::LogInitParameters() {
@@ -179,6 +195,10 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   return true;
 }
 
+void LatController::CloseLogFile() {
+
+}
+
 void LatController::LoadLatGainScheduler(
     const LatControllerConf &lat_controller_conf) {
   const auto &lat_err_gain_scheduler =
@@ -317,6 +337,32 @@ Result_state LatController::Reset(){
 
 void LatController::Stop() {
   EINFO << "stop";
+}
+
+double LatController::ComputeFeedForward(double ref_curvature) const {
+  const double kv =
+      lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 2 / cr_ / wheelbase_;
+
+  // Calculate the feedforward term of the lateral controller; then change it
+  // from rad to %
+  const double v = VehicleStateProvider::instance()->linear_velocity();
+  double steer_angle_feedforwardterm;
+  // if (injector_->vehicle_state()->gear() == canbus::Chassis::GEAR_REVERSE &&
+  //     !lat_based_lqr_controller_conf_.reverse_use_dynamic_model()) {
+  //   steer_angle_feedforwardterm =
+  //       lat_based_lqr_controller_conf_.reverse_feedforward_ratio() *
+  //       wheelbase_ * ref_curvature * 180 / M_PI * steer_ratio_ /
+  //       steer_single_direction_max_degree_ * 100;
+  // } else {
+  //   steer_angle_feedforwardterm =
+  //       (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -
+  //        matrix_k_(0, 2) *
+  //            (lr_ * ref_curvature -
+  //             lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
+  //       180 / M_PI * steer_ratio_ / steer_single_direction_max_degree_ * 100;
+  // }
+
+  return steer_angle_feedforwardterm;
 }
 
 void LatController::ComputeLateralErrors(
