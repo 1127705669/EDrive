@@ -1,3 +1,4 @@
+std_msgs/Header header
 
  float64 total_path_length # in meters
  float64 total_path_time # in seconds

@@ -93,6 +93,12 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::FIXED_PATH:
         EnableFixedPath("/EDrive/planning/fixed_path", config);
         break;
+      case AdapterConfig::VEHICLE_STATUS:
+        EnableVehicleStatus("/carla/ego_vehicle/vehicle_status", config);
+        break;
+      case AdapterConfig::MARKER_DEBUG_POINT:
+        EnableMarkerDebugPoint("/EDrive/debug/marker_1", config);
+        break;
       default:
         ROS_INFO("Unknown adapter config type!");
         break;

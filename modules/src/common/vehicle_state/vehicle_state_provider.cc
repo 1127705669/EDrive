@@ -4,7 +4,15 @@
 
 #include "common/vehicle_state/vehicle_state_provider.h"
 
+#include <cmath>
+
 #include <Eigen/Core>
+
+#include "common/src/log.h"
+
+#include "common/src/log.h"
+#include "common/math/euler_angles_zxy.h"
+#include "common/math/quaternion.h"
 
 namespace EDrive {
 namespace common {
@@ -12,9 +20,52 @@ namespace common {
 VehicleStateProvider::VehicleStateProvider() {}
 
 Result_state VehicleStateProvider::Update(const nav_msgs::Odometry& localization){
+  original_localization_ = localization;
+  if (!ConstructExceptLinearVelocity(localization)) {
+    EERROR << "Fail to update because ConstructExceptLinearVelocity error.";
+    return State_Failed;
+  }
+  vehicle_state_.set_timestamp(localization.header.stamp.toSec());
+  
   vehicle_state_.set_linear_velocity(localization.twist.twist.linear.x);
   vehicle_state_.set_angular_velocity(localization.twist.twist.angular.z);
   return State_Ok;
+}
+
+double VehicleStateProvider::QuaternionToHeading(double w, double x, double y, double z) {
+    return std::atan2(2.0 * (w * z + x * y), 1 - 2 * (y * y + z * z));
+}
+
+bool VehicleStateProvider::ConstructExceptLinearVelocity(const nav_msgs::Odometry& localization) {
+  vehicle_state_.set_x(localization.pose.pose.position.x);
+  vehicle_state_.set_y(localization.pose.pose.position.y);
+  vehicle_state_.set_z(localization.pose.pose.position.z);
+
+  const auto &orientation = localization.pose.pose.orientation;
+
+  vehicle_state_.set_heading(
+        QuaternionToHeading(orientation.w, orientation.x,
+                            orientation.y, orientation.z));
+  
+  vehicle_state_.set_angular_velocity(
+      localization.twist.twist.angular.z);
+  vehicle_state_.set_linear_acceleration(
+      localization.twist.twist.linear.y);
+
+  if (!(vehicle_state_.linear_velocity() > 0.0)) {
+    vehicle_state_.set_kappa(0.0);
+  } else {
+    vehicle_state_.set_kappa(vehicle_state_.angular_velocity() /
+                             vehicle_state_.linear_velocity());
+  }
+
+  math::EulerAnglesZXYd euler_angle(orientation.w, orientation.x,
+                                    orientation.y, orientation.z);
+  vehicle_state_.set_roll(euler_angle.roll());
+  vehicle_state_.set_pitch(euler_angle.pitch());
+  vehicle_state_.set_yaw(euler_angle.yaw());
+
+  return true;
 }
 
 double VehicleStateProvider::x() const { return vehicle_state_.x(); }

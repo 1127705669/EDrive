@@ -117,7 +117,10 @@ class VehicleStateProvider {
    */
   math::Vec2d ComputeCOMPosition(const double rear_to_com_distance) const;
 
- private:
+  private:
+  bool ConstructExceptLinearVelocity(const nav_msgs::Odometry& localization);
+  double QuaternionToHeading(double w, double x, double y, double z);
+
   common::VehicleState vehicle_state_;
   nav_msgs::Odometry original_localization_;
 

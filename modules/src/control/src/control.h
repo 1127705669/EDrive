@@ -13,7 +13,7 @@
 
 #include "control/controller/controller_agent.h"
 
-#include "control/ControlCommand.h"
+#include "control/proto/control_cmd.pb.h"
 
 #include "control/CarlaEgoVehicleControl.h"
 
@@ -48,7 +48,11 @@ class Control : public EDrive::common::EDriveApp {
 
   void SendCmd(::control::CarlaEgoVehicleControl *control_command);
 
-  common::Result_state ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command);
+  common::Result_state ProduceControlCommand(ControlCommand *control_command);
+
+  void ConvertControlCommandToSimulator(
+    const ControlCommand& control_command,
+    ::control::CarlaEgoVehicleControl& simulator_control_command);
 
   ros::Timer timer_;
   ros::Time init_time_;
@@ -60,6 +64,8 @@ class Control : public EDrive::common::EDriveApp {
   std::string root_path;
   std::string adapter_conf_file = "/src/control/conf/adapter.conf";
   std::string control_conf_file = "/src/control/conf/control.conf";
+
+  std::shared_ptr<DependencyInjector> injector_ = nullptr;
 
 };
 

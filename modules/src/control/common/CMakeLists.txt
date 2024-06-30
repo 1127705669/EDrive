@@ -3,6 +3,8 @@ project(common)
 
 # find_package(Eigen3 REQUIRED)
 
+find_package(gflags REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   Eigen3
@@ -17,7 +19,23 @@ include
 )
 
 ###################################
-#    pid_controller               #
+#         control_gflags          #
+###################################
+set(CONTROL_FLAGS_SRC 
+  control_gflags.cc
+)
+
+add_library(control_gflags SHARED 
+  ${CONTROL_FLAGS_SRC}
+)
+
+target_link_libraries(control_gflags
+  ${catkin_LIBRARIES}
+  gflags
+)
+
+###################################
+#        pid_controller           #
 ###################################
 
 set(PID_CONTROLLER_SRC 

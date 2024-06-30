@@ -39,6 +39,28 @@ class TrajectoryAnalyzer {
   ~TrajectoryAnalyzer() = default;
 
   /**
+   * @brief get sequence number of the trajecotry
+   * @return sequence number.
+   */
+  unsigned int seq_num() { return seq_num_; }
+
+  /**
+   * @brief query a point of trajectery that its absolute time is closest
+   * to the give time.
+   * @param t absolute time for query
+   * @return a point of trajectory
+   */
+  ::common::TrajectoryPoint QueryNearestPointByAbsoluteTime(const double t) const;
+
+  /**
+   * @brief query a point of trajectery that its relative time is closest
+   * to the give time. The time is relative to the first pointof trajectory
+   * @param t relative time for query
+   * @return a point of trajectory
+   */
+  ::common::TrajectoryPoint QueryNearestPointByRelativeTime(const double t) const;
+
+  /**
    * @brief query a point on trajectery that its position is closest
    * to the given position.
    * @param x value of x-coordination in the given position
@@ -77,7 +99,11 @@ class TrajectoryAnalyzer {
                          double *ptr_d_dot) const;
 
  private:
+  void PublishPoint(const ::common::TrajectoryPoint point) const;
   std::vector<::common::TrajectoryPoint> trajectory_points_;
+
+  double header_time_ = 0.0;
+  unsigned int seq_num_ = 0;
 };
 
 } // namespace control

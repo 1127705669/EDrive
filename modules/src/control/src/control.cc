@@ -64,17 +64,28 @@ Result_state Control::Start(){
   return Result_state::State_Ok;
 }
 
+void Control::ConvertControlCommandToSimulator(
+    const ControlCommand& control_command, 
+    ::control::CarlaEgoVehicleControl& simulator_control_command) {
+  simulator_control_command.steer = -control_command.steering_target()/100;
+  simulator_control_command.throttle = 0.3;
+
+}
+
 void Control::OnTimer(const ros::TimerEvent &) {
   Result_state status = CheckInput();
 
   ros::Time start_timestamp = ros::Time::now();
-  ::control::CarlaEgoVehicleControl control_command;
+  ::control::CarlaEgoVehicleControl simulator_control_command;
+  ControlCommand control_command;
   status = ProduceControlCommand(&control_command);
   ros::Time end_timestamp = ros::Time::now();
-  SendCmd(&control_command);
+
+  ConvertControlCommandToSimulator(control_command, simulator_control_command);
+  SendCmd(&simulator_control_command);
 }
 
-Result_state Control::ProduceControlCommand(::control::CarlaEgoVehicleControl *control_command) {
+Result_state Control::ProduceControlCommand(ControlCommand *control_command) {
   if(Result_state::State_Ok != controller_agent_.ComputeControlCommand(&trajectory_, &localization_, control_command)) {
     ROS_INFO("controller agent compute control command failed, stopping...");
   }

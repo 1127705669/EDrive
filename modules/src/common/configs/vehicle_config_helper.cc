@@ -35,7 +35,7 @@ VehicleConfigHelper::VehicleConfigHelper() {}
 
 void VehicleConfigHelper::Init() {
   root_path = EDrive::common::util::GetRootPath();
-  conf_file = "/src/common/data/mkz_config.pb.txt";
+  conf_file = "/src/common/data/model3_config.pb.txt";
   root_path += conf_file;
   Init(root_path); 
 }

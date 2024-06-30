@@ -13,6 +13,7 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <geometry_msgs/Point.h>
 #include <tinyxml2.h>
+#include "planning/ADCTrajectory.h"
 
 #include <initializer_list>
 
@@ -37,7 +38,7 @@ public:
 
   // 公共函数用于加载和解析OSM文件
   common::Result_state loadMap(const std::string &file, visualization_msgs::MarkerArray &marker_array);
-  void publishMiddlePath(std::initializer_list<int> relation_ids, visualization_msgs::MarkerArray &path);
+  void publishMiddlePath(std::initializer_list<int> relation_ids, visualization_msgs::MarkerArray &path, ::planning::ADCTrajectory& trajectory_pb);
 
 private:
   struct Node {

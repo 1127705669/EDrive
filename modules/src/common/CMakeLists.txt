@@ -4,6 +4,9 @@ project(common)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
+find_package(PkgConfig)
+pkg_check_modules(GLOG REQUIRED libglog)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -65,6 +68,13 @@ foreach(MSG_FOLDER ${MSG_FOLDERS})
 
 endforeach()
 
+add_message_files(
+  DIRECTORY msg/carla_msgs
+  FILES
+  CarlaEgoVehicleControl.msg
+  CarlaEgoVehicleStatus.msg
+)
+
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
@@ -90,6 +100,7 @@ endforeach()
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
@@ -140,6 +151,11 @@ set(EDRIVE_APP
 )
 
 add_library(EDrive_app SHARED ${EDRIVE_APP})
+
+target_link_libraries(EDrive_app 
+  glog
+  gflags
+)
 
 # set_target_properties(EDrive_app PROPERTIES
 #     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/common/lib

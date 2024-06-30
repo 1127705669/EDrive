@@ -18,8 +18,8 @@ using TimedValue = std::pair<uint8, double>;
 const uint8 kMaxWindowSize = std::numeric_limits<uint8>::max() / 2;
 
 MF::MeanFilter(const uint8 window_size) : window_size_(window_size) {
-  ECHECK_GT(window_size_, 0);
-  ECHECK_LE(window_size_, kMaxWindowSize);
+  CHECK_GT(window_size_, 0);
+  CHECK_LE(window_size_, kMaxWindowSize);
   initialized_ = true;
 }
 
@@ -40,10 +40,10 @@ double MF::GetMax() const {
 }
 
 double MF::Update(const double measurement) {
-  ECHECK(initialized_);
-  ECHECK_LE(values_.size(), window_size_);
-  ECHECK_LE(min_candidates_.size(), window_size_);
-  ECHECK_LE(max_candidates_.size(), window_size_);
+  CHECK(initialized_);
+  CHECK_LE(values_.size(), window_size_);
+  CHECK_LE(min_candidates_.size(), window_size_);
+  CHECK_LE(max_candidates_.size(), window_size_);
   ++time_;
   time_ %= 2 * window_size_;
   if (values_.size() == window_size_) {
@@ -59,10 +59,10 @@ double MF::Update(const double measurement) {
 
 bool MF::ShouldPopOldestCandidate(const uint8 old_time) const {
   if (old_time < window_size_) {
-    ECHECK_LE(time_, old_time + window_size_);
+    CHECK_LE(time_, old_time + window_size_);
     return old_time + window_size_ == time_;
   } else if (time_ < window_size_) {
-    ECHECK_GE(old_time, time_ + window_size_);
+    CHECK_GE(old_time, time_ + window_size_);
     return old_time == time_ + window_size_;
   } else {
     return false;
@@ -70,7 +70,7 @@ bool MF::ShouldPopOldestCandidate(const uint8 old_time) const {
 }
 
 void MF::RemoveEarliest() {
-  ECHECK_EQ(values_.size(), window_size_);
+  CHECK_EQ(values_.size(), window_size_);
   double removed = values_.front();
   values_.pop_front();
   sum_ -= removed;

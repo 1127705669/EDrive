@@ -30,4 +30,6 @@ message MPCControllerConf {
   optional EDrive.control.GainScheduler steer_weight_gain_scheduler = 20;
   optional EDrive.control.GainScheduler feedforwardterm_gain_scheduler = 21;
   optional calibrationtable.ControlCalibrationTable calibration_table = 22;
+  optional bool enable_mpc_feedforward_compensation = 23 [default = false];
+  optional double unconstrained_control_diff_limit = 24;
 }

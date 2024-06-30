@@ -9,6 +9,7 @@
 #include "control/controller/controller.h"
 #include "control/proto/control_conf.pb.h"
 #include "control/CarlaEgoVehicleControl.h"
+#include "control/common/dependency_injector.h"
 
 #include "planning/ADCTrajectory.h"
 
@@ -32,7 +33,7 @@ class ControllerAgent {
   common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory, 
       const nav_msgs::Odometry *localization,
-      ::control::CarlaEgoVehicleControl *control_command);
+      control::ControlCommand *control_command);
 
  private:
   /**
@@ -43,6 +44,7 @@ class ControllerAgent {
   void RegisterControllers(const ControlConf *control_conf);
 
   std::vector<std::unique_ptr<Controller>> controller_list_;
+  std::shared_ptr<DependencyInjector> injector_ = nullptr;
 };
 
 } // namespace control

@@ -47,7 +47,7 @@ Result_state ControllerAgent::Init(const ControlConf *control_conf_) {
 Result_state ControllerAgent::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory, 
     const nav_msgs::Odometry *localization,
-    ::control::CarlaEgoVehicleControl *control_command) {
+    ControlCommand *control_command) {
   for (auto &controller : controller_list_) {
     ros::Time start_timestamp = ros::Time::now();
     controller->ComputeControlCommand(trajectory, localization, control_command);

@@ -72,6 +72,7 @@
         "bit": "cpp",
         "*.ipp": "cpp",
         "dense": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "eigen": "cpp"
     }
 }

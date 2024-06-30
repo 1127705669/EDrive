@@ -46,7 +46,7 @@ std::string LonController::Name() const { return name_; }
 Result_state LonController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
-    ::control::CarlaEgoVehicleControl *control_command) {
+    ControlCommand *control_command) {
   trajectory_message_ = trajectory;
   if (trajectory_analyzer_ == nullptr) {
     trajectory_analyzer_.reset(new TrajectoryAnalyzer(trajectory_message_));

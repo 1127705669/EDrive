@@ -4,11 +4,19 @@
 
 #pragma once
 
+#include <fstream>
+#include <memory>
+#include <string>
+
+#include "Eigen/Core"
+#include "common/configs/proto/vehicle_config.pb.h"
+#include "common/filters/digital_filter.h"
+#include "common/filters/digital_filter_coefficients.h"
+#include "common/filters/mean_filter.h"
+#include "control/common/interpolation_1d.h"
+#include "control/common/trajectory_analyzer.h"
 #include "control/controller/controller.h"
 
-#include "control/common/trajectory_analyzer.h"
-
-#include <Eigen/Core>
 
 namespace EDrive {
 namespace control {
@@ -49,7 +57,7 @@ class LatController : public Controller {
   common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory,
       const nav_msgs::Odometry *localization,
-      ::control::CarlaEgoVehicleControl *control_command) override;
+      ControlCommand *cmd) override;
 
   /**
    * @brief reset Lateral Controller
@@ -74,22 +82,37 @@ class LatController : public Controller {
   bool controller_initialized_ = false;
   const ControlConf *control_conf_ = nullptr;
 
+  // vehicle parameter
+  common::VehicleParam vehicle_param_;
+
  protected:
-  void UpdateStateAnalyticalMatching(SimpleLateralDebug *debug);
+  void UpdateState(SimpleLateralDebug *debug);
 
-  bool LoadControlConf(const ControlConf *control_conf);
-
-  void ComputeLateralErrors(const double x, const double y, const double theta,
-                            const double linear_v, const double angular_v,
-                            const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug);
+  // logic for reverse driving mode
+  void UpdateDrivingOrientation();
 
   void UpdateMatrix();
 
   void UpdateMatrixCompound();
 
+  double ComputeFeedForward(double ref_curvature) const;
+
+  void ComputeLateralErrors(const double x, const double y, const double theta,
+                            const double linear_v, const double angular_v,
+                            const double linear_a,
+                            const TrajectoryAnalyzer &trajectory_analyzer,
+                            SimpleLateralDebug *debug);
+
+  bool LoadControlConf(const ControlConf *control_conf);
+  void InitializeFilters(const ControlConf *control_conf);
+  void LoadLatGainScheduler(const LatControllerConf &lat_controller_conf);
+  void LogInitParameters();
+  void ProcessLogs(const SimpleLateralDebug *debug);
+
+  void CloseLogFile();
+
   // a proxy to analyze the planning trajectory
-  std::unique_ptr<TrajectoryAnalyzer> trajectory_analyzer_;
+  TrajectoryAnalyzer trajectory_analyzer_;
 
   // the following parameters are vehicle physics related.
   // control time interval
@@ -109,7 +132,7 @@ class LatController : public Controller {
   // rotational inertia
   double iz_ = 0.0;
   // the ratio between the turn of the steering wheel and the turn of the wheels
-  double steer_transmission_ratio_ = 0.0;
+  double steer_ratio_ = 0.0;
   // the maximum turn of steer
   double steer_single_direction_max_degree_ = 0.0;
 
@@ -118,6 +141,15 @@ class LatController : public Controller {
 
   // number of control cycles look ahead (preview controller)
   int preview_window_ = 0;
+
+  // longitudial length for look-ahead lateral error estimation during forward
+  // driving and look-back lateral error estimation during backward driving
+  // (look-ahead controller)
+  double lookahead_station_low_speed_ = 0.0;
+  double lookback_station_low_speed_ = 0.0;
+  double lookahead_station_high_speed_ = 0.0;
+  double lookback_station_high_speed_ = 0.0;
+
   // number of states without previews, includes
   // lateral error, lateral error rate, heading error, heading error rate
   const int basic_state_size_ = 4;
@@ -151,9 +183,25 @@ class LatController : public Controller {
   // parameters for lqr solver; threshold for computation
   double lqr_eps_ = 0.0;
 
+  common::DigitalFilter digital_filter_;
+
+  std::unique_ptr<Interpolation1D> lat_err_interpolation_;
+
+  std::unique_ptr<Interpolation1D> heading_err_interpolation_;
+
+  // MeanFilter heading_rate_filter_;
+  common::MeanFilter lateral_error_filter_;
+  common::MeanFilter heading_error_filter_;
+
   double query_relative_time_;
 
   double minimum_speed_protection_ = 0.1;
+
+  double low_speed_bound_ = 0.0;
+
+  double low_speed_window_ = 0.0;
+
+  double driving_orientation_ = 0.0;
 };
 
 } // namespace control

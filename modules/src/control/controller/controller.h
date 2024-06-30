@@ -8,6 +8,7 @@
 #include <string>
 #include "common/src/state.h"
 
+#include "control/common/dependency_injector.h"
 #include "control/proto/control_cmd.pb.h"
 #include "control/proto/control_conf.pb.h"
 #include "control/CarlaEgoVehicleControl.h"
@@ -57,7 +58,7 @@ class Controller {
   virtual common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory, 
       const nav_msgs::Odometry *localization, 
-      ::control::CarlaEgoVehicleControl *control_command) = 0;
+      control::ControlCommand *control_command) = 0;
 
   /**
    * @brief reset Controller

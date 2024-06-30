@@ -15,14 +15,16 @@
 
 #include <Eigen/Dense>
 
+#include "common/configs/proto/vehicle_config.pb.h"
+
 #include "common/filters/digital_filter.h"
 #include "common/filters/digital_filter_coefficients.h"
 #include "common/filters/mean_filter.h"
 
-#include "control/controller/controller.h"
-#include "control/common/trajectory_analyzer.h"
 #include "control/common/interpolation_1d.h"
 #include "control/common/interpolation_2d.h"
+#include "control/controller/controller.h"
+#include "control/common/trajectory_analyzer.h"
 
 /**
  * @namespace EDrive::control
@@ -67,7 +69,7 @@ class MPCController : public Controller {
   common::Result_state ComputeControlCommand(
       const ::planning::ADCTrajectory *trajectory,
       const nav_msgs::Odometry *localization,
-      ::control::CarlaEgoVehicleControl *control_command) override;
+      ControlCommand *control_command) override;
 
   /**
    * @brief reset MPC Controller
@@ -87,7 +89,7 @@ class MPCController : public Controller {
   std::string Name() const override;
 
  protected:
-  void UpdateStateAnalyticalMatching(SimpleMPCDebug *debug);
+  void UpdateState(SimpleMPCDebug *debug);
 
   void UpdateMatrix(SimpleMPCDebug *debug);
 
@@ -99,16 +101,23 @@ class MPCController : public Controller {
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
+                            const double linear_a,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleMPCDebug *debug);
 
   void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
                                  SimpleMPCDebug *debug);
+                                 
   bool LoadControlConf(const ControlConf *control_conf);
   void InitializeFilters(const ControlConf *control_conf);
   void LogInitParameters();
 
   void CloseLogFile();
+
+  double Wheel2SteerPct(const double wheel_angle);
+
+  // vehicle parameter
+  common::VehicleParam vehicle_param_;
 
   // a proxy to analyze the planning trajectory
   TrajectoryAnalyzer trajectory_analyzer_;
@@ -138,9 +147,11 @@ class MPCController : public Controller {
   // rotational inertia
   double iz_ = 0.0;
   // the ratio between the turn of the steering wheel and the turn of the wheels
-  double steer_transmission_ratio_ = 0.0;
+  double steer_ratio_ = 0.0;
   // the maximum turn of steer
   double steer_single_direction_max_degree_ = 0.0;
+  // the maximum turn of vehicle wheel
+  double wheel_single_direction_max_degree_ = 0.0;
 
   // limit steering to maximum theoretical lateral acceleration
   double max_lat_acc_ = 0.0;
@@ -189,6 +200,21 @@ class MPCController : public Controller {
   // lateral distance to reference trajectory of last control cycle
   double previous_lateral_error_ = 0.0;
 
+  // lateral dynamic variables for computing the differential valute to
+  // estimate acceleration and jerk
+  double previous_lateral_acceleration_ = 0.0;
+
+  double previous_heading_rate_ = 0.0;
+  double previous_ref_heading_rate_ = 0.0;
+
+  double previous_heading_acceleration_ = 0.0;
+  double previous_ref_heading_acceleration_ = 0.0;
+
+  // longitudinal dynamic variables for computing the differential valute to
+  // estimate acceleration and jerk
+  double previous_acceleration_ = 0.0;
+  double previous_acceleration_reference_ = 0.0;
+
   // parameters for mpc solver; number of iterations
   int mpc_max_iteration_ = 0;
   // parameters for mpc solver; threshold for computation
@@ -230,6 +256,14 @@ class MPCController : public Controller {
   common::MeanFilter heading_error_filter_;
 
   double minimum_speed_protection_ = 0.1;
+
+  // Enable the feedback-gain-related compensation components in the feedfoward
+  // term for steering control
+  bool enable_mpc_feedforward_compensation_ = false;
+
+  // Limitation for judging if the unconstrained analytical control is close
+  // enough to the solver's output with constraint
+  double unconstrained_control_diff_limit_ = 5.0;
 };
 
 }  // namespace control

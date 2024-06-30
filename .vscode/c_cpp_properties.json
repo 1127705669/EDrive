@@ -7,7 +7,9 @@
                 "/opt/ros/noetic/include/**",
                 "${workspaceFolder}/modules/devel/include",
                 "${workspaceFolder}/modules/src/**",
-                "${workspaceFolder}/modules/src"
+                "${workspaceFolder}/modules/src",
+                "${workspaceFolder}/modules/",
+                "/usr/include/eigen3"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
