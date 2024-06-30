@@ -44,7 +44,7 @@ Result_state Control::CheckInput() {
   auto localization_adapter = AdapterManager::GetLocalization();
   localization_ = localization_adapter->GetLatestObserved();
 
-  VehicleStateProvider::instance()->Update(localization_);
+  VehicleStateProvider::Instance()->Update(localization_);
 
   return Result_state::State_Ok;
 }

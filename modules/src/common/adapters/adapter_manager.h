@@ -34,13 +34,13 @@ namespace adapter {
     if(config.message_history_limit() <= 0){                                   \
       ROS_ERROR("    Message history limit must be greater than 0");           \
     }                                                                          \
-    instance()->InternalEnable##name(topic_name, config);                      \
+    Instance()->InternalEnable##name(topic_name, config);                      \
   }                                                                            \
   static name##Adapter *Get##name() {                                          \
-    return instance()->InternalGet##name();                                    \
+    return Instance()->InternalGet##name();                                    \
   }                                                                            \
   static void Publish##name(const name##Adapter::DataType &data) {             \
-    instance()->InternalPublish##name(data);                                   \
+    Instance()->InternalPublish##name(data);                                   \
   }                                                                            \
  private:                                                                      \
   std::unique_ptr<name##Adapter> name##_;                                      \
@@ -129,7 +129,7 @@ class AdapterManager
                                 void (T::*callback)(const ros::TimerEvent &),
                                 T *obj, bool oneshot = false,
                                 bool autostart = true) {
-    return instance()->node_handle_->createTimer(period, callback, obj,
+    return Instance()->node_handle_->createTimer(period, callback, obj,
                                                    oneshot, autostart);
   }
 

@@ -24,7 +24,7 @@
 
 #define DECLARE_SINGLETON(classname)        \
  public:                                    \
-  static classname *instance() {            \
+  static classname *Instance() {            \
     static classname instance;              \
     return &instance;                       \
   }                                         \

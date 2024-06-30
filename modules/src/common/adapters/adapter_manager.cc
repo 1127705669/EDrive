@@ -21,12 +21,12 @@ namespace adapter {
 AdapterManager::AdapterManager() {}
 
 void AdapterManager::Observe() {
-  for (const auto observe : instance()->observers_) {
+  for (const auto observe : Instance()->observers_) {
     observe();
   }
 }
 
-bool AdapterManager::Initialized() { return instance()->initialized_; }
+bool AdapterManager::Initialized() { return Instance()->initialized_; }
 
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   AdapterManagerConfig configs;
@@ -41,9 +41,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
     return;
   }
 
-  instance()->initialized_ = true;
+  Instance()->initialized_ = true;
   if (configs.is_ros()) {
-    instance()->node_handle_.reset(new ros::NodeHandle());
+    Instance()->node_handle_.reset(new ros::NodeHandle());
   }
 
   for (const auto &config : configs.config()) {

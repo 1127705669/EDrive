@@ -26,8 +26,6 @@ using Matrix = Eigen::MatrixXd;
 using EDrive::common::VehicleStateProvider;
 using ::common::TrajectoryPoint;
 
-constexpr double GRA_ACC = 9.8;
-
 LatController::LatController() : name_("LQR-based Lateral Controller") {
   EINFO << "Using " << name_;
 }
@@ -144,7 +142,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
     return false;
   }
   vehicle_param_ =
-      common::VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->lat_controller_conf().ts();
   if (ts_ <= 0.0) {
@@ -283,12 +281,12 @@ Result_state LatController::ComputeControlCommand(
 
 void LatController::UpdateState(SimpleLateralDebug *debug) {
 
-  const auto &com = VehicleStateProvider::instance()->ComputeCOMPosition(lr_);
+  const auto &com = VehicleStateProvider::Instance()->ComputeCOMPosition(lr_);
 
   ComputeLateralErrors(
       com.x(), com.y(), driving_orientation_,
-      VehicleStateProvider::instance()->linear_velocity(), VehicleStateProvider::instance()->angular_velocity(),
-      VehicleStateProvider::instance()->linear_acceleration(), trajectory_analyzer_, debug);
+      VehicleStateProvider::Instance()->linear_velocity(), VehicleStateProvider::Instance()->angular_velocity(),
+      VehicleStateProvider::Instance()->linear_acceleration(), trajectory_analyzer_, debug);
 
   // State matrix update;
   // First four elements are fixed;
@@ -323,7 +321,7 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateMatrix(){
-  const double v = std::max(VehicleStateProvider::instance()->linear_velocity(),
+  const double v = std::max(VehicleStateProvider::Instance()->linear_velocity(),
                             minimum_speed_protection_);
 }
 
@@ -345,7 +343,7 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
 
   // Calculate the feedforward term of the lateral controller; then change it
   // from rad to %
-  const double v = VehicleStateProvider::instance()->linear_velocity();
+  const double v = VehicleStateProvider::Instance()->linear_velocity();
   double steer_angle_feedforwardterm;
   // if (injector_->vehicle_state()->gear() == canbus::Chassis::GEAR_REVERSE &&
   //     !lat_based_lqr_controller_conf_.reverse_use_dynamic_model()) {
@@ -391,7 +389,7 @@ void LatController::ComputeLateralErrors(
 
 void LatController::UpdateDrivingOrientation() {
   // auto vehicle_state = injector_->vehicle_state();
-  driving_orientation_ = VehicleStateProvider::instance()->heading();
+  driving_orientation_ = VehicleStateProvider::Instance()->heading();
   matrix_bd_ = matrix_b_ * ts_;
   // Reverse the driving direction if the vehicle is in reverse mode
   // if (FLAGS_reverse_heading_control) {
