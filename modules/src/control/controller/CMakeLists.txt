@@ -93,6 +93,7 @@ target_link_libraries(mpc_controller
   Eigen3::Eigen
   mpc
   mpc_osqp
+  control_gflags
 )
 
 ###################################

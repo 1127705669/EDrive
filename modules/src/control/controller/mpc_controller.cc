@@ -18,6 +18,7 @@
 #include "common/math/math_utils.h"
 #include "common/math/mpc_solver.h"
 #include "common/math/mpc_osqp.h"
+#include "control/common/control_gflags.h"
 
 namespace EDrive {
 namespace control {
@@ -174,7 +175,7 @@ void MPCController::LoadMPCGainScheduler(
       mpc_controller_conf.feedforwardterm_gain_scheduler();
   const auto &steer_weight_gain_scheduler =
       mpc_controller_conf.steer_weight_gain_scheduler();
-  EINFO << "MPC control gain scheduler loaded";
+  EDEBUG << "MPC control gain scheduler loaded";
   Interpolation1D::DataType xy1, xy2, xy3, xy4;
   for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
     xy1.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
@@ -206,11 +207,6 @@ Result_state MPCController::ComputeControlCommand(
     const ::planning::ADCTrajectory *trajectory,
     const nav_msgs::Odometry *localization,
     ControlCommand *cmd) {
-  double vx = localization->twist.twist.linear.x;
-  double vy = localization->twist.twist.linear.y;
-  double velocity_magnitude = std::sqrt(vx * vx + vy * vy);
-  VehicleStateProvider::Instance()->set_linear_velocity(velocity_magnitude);
-
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(trajectory));
 
@@ -226,7 +222,6 @@ Result_state MPCController::ComputeControlCommand(
 
   FeedforwardUpdate(debug);
 
-  // Add gain sheduler for higher speed steering
   matrix_q_updated_ = matrix_q_;
   matrix_r_updated_ = matrix_r_;
   steer_angle_feedforwardterm_updated_ = steer_angle_feedforwardterm_;
@@ -329,6 +324,21 @@ Result_state MPCController::ComputeControlCommand(
                        steer_angle_feedforwardterm_updated_ +
                        steer_angle_ff_compensation;
 
+  if (FLAGS_set_steer_limit) {
+    const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
+                                         (VehicleStateProvider::Instance()->linear_velocity() *
+                                          VehicleStateProvider::Instance()->linear_velocity())) *
+                               steer_ratio_ * 180 / M_PI /
+                               steer_single_direction_max_degree_ * 100;
+
+    // Clamp the steer angle with steer limitations at current speed
+    double steer_angle_limited =
+        common::math::Clamp(steer_angle, -steer_limit, steer_limit);
+    steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
+    steer_angle = steer_angle_limited;
+    debug->set_steer_angle_limited(steer_angle_limited);
+  }
+
   steer_angle = digital_filter_.Filter(steer_angle);
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
@@ -357,7 +367,7 @@ Result_state MPCController::ComputeControlCommand(
     brake_cmd = std::max(-calibration_value, brake_lowerbound_);
   }
 
-  cmd->set_steering_rate(100.0);
+  cmd->set_steering_rate(FLAGS_steer_angle_rate);
   // if the car is driven by acceleration, disgard the cmd->throttle and brake
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
@@ -555,7 +565,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   InitializeFilters(control_conf);
   LoadMPCGainScheduler(control_conf->mpc_controller_conf());
   LogInitParameters();
-  EINFO << "[MPCController] init done!";
+  EDEBUG << "[MPCController] init done!";
   return Result_state::State_Ok;
 }
 

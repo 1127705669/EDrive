@@ -66,7 +66,7 @@ DEFINE_double(steer_angle_rate, 100.0,
               "Steer angle change rate in percentage.");
 DEFINE_bool(enable_gain_scheduler, false,
             "Enable gain scheduler for higher vehicle speed");
-DEFINE_bool(set_steer_limit, false, "Set steer limit");
+DEFINE_bool(set_steer_limit, true, "Set steer limit");
 
 DEFINE_int32(chassis_pending_queue_size, 10, "Max chassis pending queue size");
 DEFINE_int32(planning_pending_queue_size, 10,
