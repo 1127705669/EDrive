@@ -49,10 +49,8 @@ MPCController::MPCController() : name_("MPC Controller") {
 void MPCController::LoadControlCalibrationTable(
     const MPCControllerConf &mpc_controller_conf) {
   const auto &control_table = mpc_controller_conf.calibration_table();
-  
-  EINFO << "Control calibration table loaded";
-  EINFO << "Control calibration table size is " << control_table.calibration_size();
-
+  EDEBUG << "Control calibration table loaded";
+  EDEBUG << "Control calibration table size is " << control_table.calibration_size();
   Interpolation2D::DataType xyz;
   for (const auto &calibration : control_table.calibration()) {
     xyz.push_back(std::make_tuple(calibration.speed(),
@@ -61,7 +59,7 @@ void MPCController::LoadControlCalibrationTable(
   }
   control_interpolation_.reset(new Interpolation2D);
   if(!control_interpolation_->Init(xyz)){
-    ROS_ERROR("Fail to load control calibration table");
+    EERROR << "Fail to load control calibration table";
   }
 }
 
@@ -352,11 +350,11 @@ Result_state MPCController::ComputeControlCommand(
   double throttle_cmd = 0.0;
   double brake_cmd = 0.0;
   if (calibration_value >= 0) {
-    throttle_cmd = std::max(calibration_value, throttle_deadzone_);
+    throttle_cmd = std::max(calibration_value, throttle_lowerbound_);
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
-    brake_cmd = std::max(-calibration_value, brake_deadzone_);
+    brake_cmd = std::max(-calibration_value, brake_lowerbound_);
   }
 
   cmd->set_steering_rate(100.0);
@@ -386,7 +384,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   vehicle_param_ = VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
-  if(ts_ <= 0.0) {
+  if (ts_ <= 0.0) {
     EERROR << "[MPCController] Invalid control update interval.";
     return false;
   }
@@ -423,8 +421,12 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
 
   mpc_eps_ = control_conf->mpc_controller_conf().eps();
   mpc_max_iteration_ = control_conf->mpc_controller_conf().max_iteration();
-  throttle_deadzone_ = control_conf->mpc_controller_conf().throttle_deadzone();
-  brake_deadzone_ = control_conf->mpc_controller_conf().brake_deadzone();
+  throttle_lowerbound_ =
+      std::max(vehicle_param_.throttle_deadzone(),
+               control_conf->mpc_controller_conf().throttle_minimum_action());
+  brake_lowerbound_ =
+      std::max(vehicle_param_.brake_deadzone(),
+               control_conf->mpc_controller_conf().brake_minimum_action());
 
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
   standstill_acceleration_ =
@@ -467,8 +469,8 @@ void MPCController::LogInitParameters() {
   EINFO << "Moment of inertia about Z-axis (iz_): " << iz_;
   EINFO << "MPC epsilon (mpc_eps_): " << mpc_eps_;
   EINFO << "MPC max iteration (mpc_max_iteration_): " << mpc_max_iteration_;
-  EINFO << "Throttle deadzone (throttle_deadzone_): " << throttle_deadzone_;
-  EINFO << "Brake deadzone (brake_deadzone_): " << brake_deadzone_;
+  EINFO << "Throttle deadzone (throttle_lowerbound_): " << throttle_lowerbound_;
+  EINFO << "Brake deadzone (brake_lowerbound_): " << brake_lowerbound_;
   EINFO << "Minimum speed protection (minimum_speed_protection_): " << minimum_speed_protection_;
   EINFO << "Standstill acceleration (standstill_acceleration_): " << standstill_acceleration_;
 
@@ -501,7 +503,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
   matrix_a_(4, 5) = 1.0;
   matrix_a_(5, 5) = 0.0;
-  // TODO(QiL): expand the model to accomendate more combined states.
+  // TODO(QiL): expand the model to accommodate more combined states.
 
   matrix_a_coeff_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;

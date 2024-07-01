@@ -4,16 +4,14 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
-#include <ros/ros.h>
-
-// #include "control/proto/control_cmd.pb.h"
-
-#include "common/src/EDrive.h"
-
-#include "control/controller/controller_agent.h"
 
 #include "control/proto/control_cmd.pb.h"
+
+#include <ros/ros.h>
+
+#include "common/src/EDrive.h"
 
 #include "control/CarlaEgoVehicleControl.h"
 
@@ -22,6 +20,8 @@
 #include "planning/ADCTrajectory.h"
 
 #include <nav_msgs/Odometry.h>
+
+#include "control/controller/controller_agent.h"
 
 namespace EDrive {
 namespace control {

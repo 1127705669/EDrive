@@ -4,6 +4,8 @@
 
 #include "localization/src/map/vector_map.h"
 
+#include <cmath> 
+
 namespace EDrive {
 namespace localization {
 
@@ -144,6 +146,25 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
                 } else if (middle_points.size() == 1) {
                     // If it's the first point and there's no previous point, temporarily set to 0.0 and fix later
                     trajectory_point_.path_point.theta = 0.0;
+                }
+
+                if (middle_points.size() > 2 && j >= 1 && j < min_nodes_size - 1) {
+                    const geometry_msgs::Point& prev = middle_points[j - 1];
+                    const geometry_msgs::Point& curr = middle_points[j];
+                    const geometry_msgs::Point& next = middle_points[j + 1];
+
+                    double dx1 = curr.x - prev.x;
+                    double dy1 = curr.y - prev.y;
+                    double dx2 = next.x - curr.x;
+                    double dy2 = next.y - curr.y;
+
+                    double numerator = abs(dx1 * dy2 - dy1 * dx2);
+                    double denominator = std::pow(dx1 * dx1 + dy1 * dy1, 1.5) + std::pow(dx2 * dx2 + dy2 * dy2, 1.5);
+
+                    trajectory_point_.path_point.kappa = numerator / denominator;
+                } else {
+                    // Approximate curvature for the first and last points, or assume zero if not enough data
+                    trajectory_point_.path_point.kappa = 0.0;
                 }
 
                 trajectory_pb.trajectory_point.push_back(trajectory_point_);
