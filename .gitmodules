@@ -5,3 +5,6 @@
 [submodule "third_party/osqp"]
 	path = third_party/osqp
 	url = https://github.com/osqp/osqp.git
+[submodule "third_party/glog"]
+	path = third_party/glog
+	url = https://github.com/google/glog.git
