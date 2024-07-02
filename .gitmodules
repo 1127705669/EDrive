@@ -11,3 +11,6 @@
 [submodule "third_party/gflags"]
 	path = third_party/gflags
 	url = https://github.com/gflags/gflags.git
+[submodule "third_party/osqp-eigen"]
+	path = third_party/osqp-eigen
+	url = https://github.com/robotology/osqp-eigen.git
