@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(qp_solver)
 
 find_package(Eigen3 REQUIRED)
-find_package(qpOASES REQUIRED)
+# find_package(qpOASES REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -51,5 +51,5 @@ target_link_libraries(active_set_qp_solver
   qp_solver
   qp_solver_gflags
   Eigen3::Eigen
-  qpOASES
+  # qpOASES
 )
