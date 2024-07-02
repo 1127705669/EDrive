@@ -23,4 +23,8 @@ echo "Installing osqp-eigen..."
 bash install_osqp_eigen.sh
 echo "osqp-eigen installation completed."
 
+echo "Installing protocol buffers..."
+bash install_protobuf.sh
+echo "protocol buffers installation completed."
+
 echo "All third-party libraries have been successfully installed."
