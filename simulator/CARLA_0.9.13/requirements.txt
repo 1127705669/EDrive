@@ -1,0 +1,6 @@
+empy==3.3.2
+catkin_pkg
+rospkg
+PyYAML
+carla==0.9.13
+opencv-python
