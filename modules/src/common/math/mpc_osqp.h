@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "Eigen/Eigen"
-#include "osqp/osqp.h"
+#include "osqp.h"
 
 #include "common/src/log.h"
 

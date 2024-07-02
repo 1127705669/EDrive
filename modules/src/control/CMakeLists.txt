@@ -1,13 +1,37 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(control)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+# Set the third party directory
+get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} DIRECTORY)
+get_filename_component(GRANDPARENT_DIR ${PARENT_DIR} DIRECTORY)
+set(THIRD_PARTY_DIR ${GRANDPARENT_DIR}/third_party/build)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
+# Add osqp installation directory to CMAKE_PREFIX_PATH
+set(CMAKE_PREFIX_PATH 
+  ${CMAKE_PREFIX_PATH}
+  ${THIRD_PARTY_DIR}/gflags/lib/cmake
+  ${THIRD_PARTY_DIR}/glog/lib/cmake
+)
 
+# Include directories
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+  ${THIRD_PARTY_DIR}/glog/include
+  ${THIRD_PARTY_DIR}/gflags/include
+)
+
+# Link directories
+link_directories(
+  ${THIRD_PARTY_DIR}/glog/lib
+  ${THIRD_PARTY_DIR}/gflags/lib
+)
+
+find_package(glog REQUIRED)
+find_package(gflags REQUIRED)
+
+# Find packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
