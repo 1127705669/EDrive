@@ -7,13 +7,13 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")/installers"
 
 # Run each install script
-echo "Installing glog..."
-bash install_glog.sh
-echo "glog installation completed."
-
 echo "Installing gflags..."
 bash install_gflags.sh
 echo "gflags installation completed."
+
+echo "Installing glog..."
+bash install_glog.sh
+echo "glog installation completed."
 
 echo "Installing osqp..."
 bash install_osqp.sh

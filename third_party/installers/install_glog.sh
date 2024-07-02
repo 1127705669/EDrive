@@ -9,8 +9,7 @@ INSTALL_PREFIX=$(pwd)/../build/glog
 # Create the build directory if it does not exist
 mkdir -p $INSTALL_PREFIX
 
-# Define the glog version
-GLOG_VERSION="0.4.0"
+# Define the glog source directory
 GLOG_SRC_DIR="../glog"  # Adjust this path if necessary
 
 # Navigate to the script directory
