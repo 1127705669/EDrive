@@ -116,9 +116,8 @@ void MPCController::ComputeLateralErrors(
 
   // matched_theta = matched_point.path_point().theta();
   debug->set_ref_heading(matched_point.path_point.theta);
-
   const double delta_theta =
-      EDrive::common::math::NormalizeAngle(theta - debug->ref_heading());
+      common::math::NormalizeAngle(theta - debug->ref_heading());
   debug->set_heading_error(delta_theta);
 
   const double sin_delta_theta = std::sin(delta_theta);

@@ -34,6 +34,13 @@ add_library(geometry SHARED
   vec2d.cc
 )
 
+target_include_directories(geometry PUBLIC
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 ###################################
 #               lqr               #
 ###################################
