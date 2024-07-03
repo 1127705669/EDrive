@@ -449,7 +449,6 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
       control_conf->mpc_controller_conf().unconstrained_control_diff_limit();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
-
   EINFO << "MPC conf loaded";
   return true;
 }

@@ -7,7 +7,7 @@
 #include <cmath>
 #include <ros/ros.h>
 
-// #include "modules/common/log.h"
+#include "common/src/log.h"
 
 namespace {
 
@@ -41,7 +41,9 @@ double Interpolation2D::Interpolate(const KeyType &xy) const {
 
   auto itr_after = xyz_.lower_bound(xy.first);
   auto itr_before = itr_after;
-  --itr_before;
+  if (itr_before != xyz_.begin()) {
+    --itr_before;
+  }
 
   double x_before = itr_before->first;
   double z_before = InterpolateYz(itr_before->second, xy.second);
