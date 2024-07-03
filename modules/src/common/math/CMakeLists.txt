@@ -8,28 +8,11 @@ set(CMAKE_PREFIX_PATH
   ${THIRD_PARTY_DIR}/osqp-eigen/lib/cmake
 )
 
-# Include directories
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${THIRD_PARTY_DIR}/osqp/include
-  ${THIRD_PARTY_DIR}/osqp-eigen/include
-)
-
-# Link directories
-link_directories(
-  ${THIRD_PARTY_DIR}/osqp/lib
-  ${THIRD_PARTY_DIR}/osqp-eigen/lib
-)
-
 find_package(osqp REQUIRED)
 find_package(OsqpEigen REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  OsqpEigen
 )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/qp_solver)
@@ -59,7 +42,15 @@ add_library(lqr SHARED
   linear_quadratic_regulator.cc
 )
 
+target_include_directories(lqr PUBLIC
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 target_link_libraries(lqr
+  ${catkin_LIBRARIES}
   Eigen3::Eigen
 )
 
@@ -84,11 +75,13 @@ add_library(mpc_osqp SHARED
   mpc_osqp.cc
 )
 
-target_include_directories(mpc_osqp PRIVATE
+target_include_directories(mpc_osqp PUBLIC
+  include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${THIRD_PARTY_DIR}/osqp/include/osqp
+  ${THIRD_PARTY_DIR}/osqp/include
+  ${THIRD_PARTY_DIR}/osqp-eigen/include
 )
 
 target_link_libraries(mpc_osqp
