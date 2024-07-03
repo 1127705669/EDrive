@@ -27,7 +27,7 @@ add_library(vector_map SHARED
   ${VECTOR_MAP_SRC}
 )
 
-add_dependencies(vector_map ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(vector_map ${PROJECT_NAME}_generate_messages_cpp planning_generate_messages_cpp)
 
 target_link_libraries(vector_map
   ${PROTOBUF_LIBRARIES}
