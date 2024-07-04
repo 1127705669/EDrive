@@ -104,10 +104,10 @@ void MPCController::ComputeLateralErrors(
     const double angular_v, const double linear_a,
     const TrajectoryAnalyzer &trajectory_analyzer, SimpleMPCDebug *debug) {
   const auto matched_point =
-      trajectory_analyzer.QueryNearestPointByPosition(x, y);
+      trajectory_analyzer.QueryNearestPointByPosition(VehicleStateProvider::Instance()->x(), VehicleStateProvider::Instance()->y());
 
-  const double dx = x - matched_point.path_point.x;
-  const double dy = y - matched_point.path_point.y;
+  const double dx = VehicleStateProvider::Instance()->x() - matched_point.path_point.x;
+  const double dy = VehicleStateProvider::Instance()->y() - matched_point.path_point.y;
 
   const double cos_matched_theta = std::cos(matched_point.path_point.theta);
   const double sin_matched_theta = std::sin(matched_point.path_point.theta);
