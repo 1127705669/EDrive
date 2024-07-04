@@ -437,7 +437,9 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
       std::max(vehicle_param_.brake_deadzone(),
                control_conf->mpc_controller_conf().brake_minimum_action());
 
-  minimum_speed_protection_ = control_conf->minimum_speed_protection();
+  minimum_speed_protection_ = FLAGS_minimum_speed_protection;
+  max_acceleration_when_stopped_ = FLAGS_max_acceleration_when_stopped;
+  max_abs_speed_when_stopped_ = vehicle_param_.max_abs_speed_when_stopped();
   standstill_acceleration_ =
       control_conf->mpc_controller_conf().standstill_acceleration();
 
@@ -446,6 +448,9 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
 
   unconstrained_control_diff_limit_ =
       control_conf->mpc_controller_conf().unconstrained_control_diff_limit();
+    
+  enable_look_ahead_back_control_ =
+      control_conf->mpc_controller_conf().enable_look_ahead_back_control();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
   EINFO << "MPC conf loaded";

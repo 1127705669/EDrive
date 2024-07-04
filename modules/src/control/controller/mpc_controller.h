@@ -235,6 +235,10 @@ class MPCController : public Controller {
 
   const std::string name_;
 
+  double max_acceleration_when_stopped_ = 0.0;
+
+  double max_abs_speed_when_stopped_ = 0.0;
+
   double standstill_acceleration_ = 0.0;
 
   double throttle_lowerbound_ = 0.0;
@@ -264,6 +268,13 @@ class MPCController : public Controller {
   // Limitation for judging if the unconstrained analytical control is close
   // enough to the solver's output with constraint
   double unconstrained_control_diff_limit_ = 5.0;
+
+  // Look-ahead controller
+  bool enable_look_ahead_back_control_ = false;
+
+  double low_speed_bound_ = 0.0;
+
+  double low_speed_window_ = 0.0;
 };
 
 }  // namespace control
