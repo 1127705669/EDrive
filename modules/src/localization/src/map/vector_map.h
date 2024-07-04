@@ -9,6 +9,9 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <limits>
+#include <unordered_set>
+
 #include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <geometry_msgs/Point.h>
@@ -64,8 +67,17 @@ private:
     Relation(int id) : id(id) {}
   };
 
+  struct RoadSegment {
+    std::vector<geometry_msgs::Point> points;
+    int roadId;
+  };
+
   void parse_osm(const std::string &file, std::unordered_map<int, Node> &nodes, std::unordered_map<int, Way> &ways, std::vector<Relation> &relations);
   void create_marker_array(const std::unordered_map<int, Node> &nodes, const std::unordered_map<int, Way> &ways, visualization_msgs::MarkerArray &marker_array);
+  double calculateDistance(const geometry_msgs::Point& a, const geometry_msgs::Point& b);
+  std::vector<VectorMap::RoadSegment> sortSegmentsByProximity(std::vector<RoadSegment>& segments);
+  double calculateTheta(const geometry_msgs::Point& current, const geometry_msgs::Point& previous);
+  double calculateKappa(const geometry_msgs::Point& prev, const geometry_msgs::Point& current, const geometry_msgs::Point& next);
 
   std::unordered_map<int, Node> nodes_;
   std::unordered_map<int, Way> ways_;

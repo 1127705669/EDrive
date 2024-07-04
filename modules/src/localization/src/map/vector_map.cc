@@ -73,8 +73,75 @@ void VectorMap::parse_osm(const std::string &file, std::unordered_map<int, Node>
     }
 }
 
+std::vector<VectorMap::RoadSegment> VectorMap::sortSegmentsByProximity(std::vector<RoadSegment>& segments) {
+    if (segments.empty()) return {};
+
+    std::vector<RoadSegment> sortedSegments;
+    std::unordered_set<int> includedIndices; // 用于跟踪已经包括在排序中的段
+
+    // 从第一个段开始
+    sortedSegments.push_back(segments[0]);
+    includedIndices.insert(0);
+
+    while (sortedSegments.size() < segments.size()) {
+        auto& lastSegment = sortedSegments.back();
+        double minDistance = std::numeric_limits<double>::max();
+        int nextIndex = -1;
+
+        // 找出与最后一个段的最后一个点最近的段的第一个点
+        for (int i = 0; i < segments.size(); ++i) {
+            if (includedIndices.find(i) != includedIndices.end()) continue; // 跳过已经包括的段
+
+            double distance = calculateDistance(lastSegment.points.back(), segments[i].points.front());
+            if (distance < minDistance) {
+                minDistance = distance;
+                nextIndex = i;
+            }
+        }
+
+        if (nextIndex != -1) {
+            sortedSegments.push_back(segments[nextIndex]);
+            includedIndices.insert(nextIndex);
+        } else {
+            // 如果没有找到合适的下一个段，可能是因为某些段是孤立的，这种情况下可以考虑直接添加剩余的段
+            for (int i = 0; i < segments.size(); ++i) {
+                if (includedIndices.find(i) == includedIndices.end()) {
+                    sortedSegments.push_back(segments[i]);
+                    includedIndices.insert(i);
+                }
+            }
+        }
+    }
+
+    return sortedSegments;
+}
+
+double VectorMap::calculateDistance(const geometry_msgs::Point& a, const geometry_msgs::Point& b) {
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+}
+
+double VectorMap::calculateTheta(const geometry_msgs::Point& current, const geometry_msgs::Point& previous) {
+    double dx = current.x - previous.x;
+    double dy = current.y - previous.y;
+    return atan2(dy, dx);
+}
+
+double VectorMap::calculateKappa(const geometry_msgs::Point& prev, const geometry_msgs::Point& current, const geometry_msgs::Point& next) {
+    double dx1 = current.x - prev.x;
+    double dy1 = current.y - prev.y;
+    double dx2 = next.x - current.x;
+    double dy2 = next.y - current.y;
+    
+    double numerator = fabs(dx1 * dy2 - dy1 * dx2);
+    double denominator = pow(dx1 * dx1 + dy1 * dy1, 1.5) + pow(dx2 * dx2 + dy2 * dy2, 1.5);
+    return denominator != 0 ? numerator / denominator : 0.0;
+}
+
 void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visualization_msgs::MarkerArray &path, ::planning::ADCTrajectory& trajectory_pb) {
     int marker_id = 0;
+    std::vector<RoadSegment> allSegments;
+
+    // 收集所有道路段的数据
     for (int relation_id : relation_ids) {
         auto it = std::find_if(relations_.begin(), relations_.end(), [relation_id](const Relation& rel) {
             return rel.id == relation_id;
@@ -88,120 +155,133 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
         const Relation& relation = *it;
         if (relation.left_refs.size() != relation.right_refs.size()) {
             ROS_WARN("Mismatch in sizes of left_refs and right_refs for relation ID %d", relation_id);
+            continue;
         }
 
         size_t min_size = std::min(relation.left_refs.size(), relation.right_refs.size());
+        std::vector<geometry_msgs::Point> points;
 
-        std::vector<geometry_msgs::Point> middle_points;
         for (size_t i = 0; i < min_size; ++i) {
             int left_way_id = relation.left_refs[i];
             int right_way_id = relation.right_refs[i];
 
-            if (ways_.find(left_way_id) == ways_.end()) {
-                ROS_ERROR("Left way ID %d not found", left_way_id);
-                continue;
-            }
-            if (ways_.find(right_way_id) == ways_.end()) {
-                ROS_ERROR("Right way ID %d not found", right_way_id);
+            if (ways_.find(left_way_id) == ways_.end() || ways_.find(right_way_id) == ways_.end()) {
                 continue;
             }
 
             const Way& left_way = ways_.at(left_way_id);
             const Way& right_way = ways_.at(right_way_id);
-
             size_t min_nodes_size = std::min(left_way.node_refs.size(), right_way.node_refs.size());
+
             for (size_t j = 0; j < min_nodes_size; ++j) {
-                ::common::TrajectoryPoint trajectory_point_;
-                int left_node_id = left_way.node_refs[j];
-                int right_node_id = right_way.node_refs[j];
-
-                if (nodes_.find(left_node_id) == nodes_.end() || nodes_.find(right_node_id) == nodes_.end()) {
-                    ROS_ERROR("Node ref %d or %d not found", left_node_id, right_node_id);
-                    continue;
-                }
-
-                const Node& left_node = nodes_.at(left_node_id);
-                const Node& right_node = nodes_.at(right_node_id);
-
+                const Node& left_node = nodes_.at(left_way.node_refs[j]);
+                const Node& right_node = nodes_.at(right_way.node_refs[j]);
                 geometry_msgs::Point mid_point;
                 mid_point.x = (left_node.local_x + right_node.local_x) / 2.0;
                 mid_point.y = (left_node.local_y + right_node.local_y) / 2.0;
                 mid_point.z = (left_node.ele + right_node.ele) / 2.0;
 
-                trajectory_point_.path_point.x = mid_point.x;
-                trajectory_point_.path_point.y = mid_point.y;
-                trajectory_point_.path_point.z = mid_point.z;
-
-                middle_points.push_back(mid_point);
-
-                // Calculate heading angle here and update trajectory_point_
-                if (middle_points.size() > 1) {
-                    double dx = middle_points.back().x - middle_points[middle_points.size() - 2].x;
-                    double dy = middle_points.back().y - middle_points[middle_points.size() - 2].y;
-                    double theta = std::atan2(dy, dx);
-                    trajectory_point_.path_point.theta = theta;
-                } else if (middle_points.size() == 1 && trajectory_pb.trajectory_point.size() > 0) {
-                    // Use the previous trajectory point's theta value
-                    trajectory_point_.path_point.theta = trajectory_pb.trajectory_point.back().path_point.theta;
-                } else if (middle_points.size() == 1) {
-                    // If it's the first point and there's no previous point, temporarily set to 0.0 and fix later
-                    trajectory_point_.path_point.theta = 0.0;
-                }
-
-                if (middle_points.size() > 2 && j >= 1 && j < min_nodes_size - 1) {
-                    const geometry_msgs::Point& prev = middle_points[j - 1];
-                    const geometry_msgs::Point& curr = middle_points[j];
-                    const geometry_msgs::Point& next = middle_points[j + 1];
-
-                    double dx1 = curr.x - prev.x;
-                    double dy1 = curr.y - prev.y;
-                    double dx2 = next.x - curr.x;
-                    double dy2 = next.y - curr.y;
-
-                    double numerator = abs(dx1 * dy2 - dy1 * dx2);
-                    double denominator = std::pow(dx1 * dx1 + dy1 * dy1, 1.5) + std::pow(dx2 * dx2 + dy2 * dy2, 1.5);
-
-                    trajectory_point_.path_point.kappa = numerator / denominator;
-                } else {
-                    // Approximate curvature for the first and last points, or assume zero if not enough data
-                    trajectory_point_.path_point.kappa = 0.0;
-                }
-
-                trajectory_pb.trajectory_point.push_back(trajectory_point_);
-
-                visualization_msgs::Marker marker;
-                marker.header.frame_id = "map";
-                marker.header.stamp = ros::Time::now();
-                marker.ns = "middle_points";
-                marker.id = marker_id++;
-                marker.type = visualization_msgs::Marker::SPHERE;
-                marker.action = visualization_msgs::Marker::ADD;
-
-                marker.pose.position.x = mid_point.x;
-                marker.pose.position.y = mid_point.y;
-                marker.pose.position.z = mid_point.z;
-
-                marker.pose.orientation.x = 0.0;
-                marker.pose.orientation.y = 0.0;
-                marker.pose.orientation.z = 0.0;
-                marker.pose.orientation.w = 1.0;
-
-                marker.scale.x = 0.5;
-                marker.scale.y = 0.5;
-                marker.scale.z = 0.5;
-                marker.color.a = 1.0;
-                marker.color.r = 0.0;
-                marker.color.g = 1.0;
-                marker.color.b = 0.0;
-
-                path.markers.push_back(marker);
+                points.push_back(mid_point);
             }
         }
 
-        // Correct the heading angle of the first point if there are more than one middle points
-        if (middle_points.size() > 1) {
-            trajectory_pb.trajectory_point.front().path_point.theta = trajectory_pb.trajectory_point[1].path_point.theta;
+        allSegments.push_back({points, relation_id});
+    }
+
+    // 假设第一个道路段已经正确处理
+    std::vector<RoadSegment> sortedSegments = sortSegmentsByProximity(allSegments);
+
+    // 使用封闭路径的特性
+    double initialTheta = 0.0;  // 用于存储路径的初始 Theta 值
+    double initialKappa = 0.0;  // 用于存储路径的初始 Kappa 值
+    geometry_msgs::Point firstPoint, lastPoint;
+
+    // 计算初始Theta的条件检查
+    if (!sortedSegments.empty() && !sortedSegments.front().points.empty()) {
+        firstPoint = sortedSegments.front().points.front();
+        if (!sortedSegments.back().points.empty()) {
+            lastPoint = sortedSegments.back().points.back();
+            if (firstPoint.x == lastPoint.x && firstPoint.y == lastPoint.y) {
+                // 如果第一个点和最后一个点相同，则使用第二个点（如果存在）
+                if (sortedSegments.front().points.size() > 1) {
+                    initialTheta = calculateTheta(sortedSegments.front().points[1], firstPoint);
+                }
+            } else {
+                initialTheta = calculateTheta(firstPoint, lastPoint);
+            }
         }
+    }
+
+    // 遍历排序后的所有道路段
+    for (int i = 0; i < sortedSegments.size(); ++i) {
+        auto& segment = sortedSegments[i];
+        for (size_t j = 0; j < segment.points.size(); ++j) {
+            ::common::TrajectoryPoint tp;
+            tp.path_point.x = segment.points[j].x;
+            tp.path_point.y = segment.points[j].y;
+            tp.path_point.z = segment.points[j].z;
+
+            // Theta calculation
+            if (j > 0) {
+                tp.path_point.theta = calculateTheta(segment.points[j], segment.points[j - 1]);
+            } else if (i > 0) {
+                tp.path_point.theta = calculateTheta(segment.points[j], sortedSegments[i - 1].points.back());
+            } else {
+                // 第一个段的第一个点使用封闭路径特性
+                tp.path_point.theta = initialTheta; 
+            }
+
+            // 其他代码保持不变
+            trajectory_pb.trajectory_point.push_back(tp);
+        }
+    }
+
+
+    int idx = 0;  // 添加一个索引来跟踪每个元素的序列号
+    for (::common::TrajectoryPoint j : trajectory_pb.trajectory_point) {
+        visualization_msgs::Marker marker;
+        marker.header.frame_id = "map";
+        marker.header.stamp = ros::Time::now();
+        marker.ns = "middle_points";
+        marker.id = marker_id++;
+        marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;  // 设置marker类型为文本
+        marker.action = visualization_msgs::Marker::ADD;
+
+        marker.pose.position.x = j.path_point.x;
+        marker.pose.position.y = j.path_point.y;
+        marker.pose.position.z = j.path_point.z;
+
+        marker.pose.orientation.x = 0.0;
+        marker.pose.orientation.y = 0.0;
+        marker.pose.orientation.z = 0.0;
+        marker.pose.orientation.w = 1.0;
+
+        // 文本标记只需要设定scale.z，代表文本的高度
+        marker.scale.z = 0.5;  // 设置文本的高度
+
+        // 设置marker的文本内容为当前的 idx 值
+        std::stringstream ss;
+        ss << idx;
+        marker.text = ss.str();  // 将 idx 转换为字符串并设置为文本内容
+
+        // 为文本设置颜色和透明度
+        marker.color.a = 1.0;  // Alpha 必须设为1才能看见
+        if (idx == 0) {
+            marker.color.r = 1.0;
+            marker.color.g = 0.0;
+            marker.color.b = 0.0;
+        } else if (idx == trajectory_pb.trajectory_point.size() - 1) {
+            marker.color.r = 0.0;
+            marker.color.g = 0.0;
+            marker.color.b = 1.0;
+        } else {
+            marker.color.r = 0.0;
+            marker.color.g = 1.0;
+            marker.color.b = 0.0;
+        }
+
+        path.markers.push_back(marker);
+        idx++;  // 每次循环后递增索引
     }
 }
 
