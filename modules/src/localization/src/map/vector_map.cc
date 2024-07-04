@@ -227,11 +227,28 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
             } else if (i > 0) {
                 tp.path_point.theta = calculateTheta(segment.points[j], sortedSegments[i - 1].points.back());
             } else {
-                // 第一个段的第一个点使用封闭路径特性
-                tp.path_point.theta = initialTheta; 
+                tp.path_point.theta = initialTheta;
             }
 
-            // 其他代码保持不变
+            // Kappa calculation
+            if (j > 0 && j < segment.points.size() - 1) {
+                tp.path_point.kappa = calculateKappa(segment.points[j - 1], segment.points[j], segment.points[j + 1]);
+            } else if (j == 0 && segment.points.size() > 1) {
+                // 对于第一个点，如果是段的第一个点，使用前一段的最后一个点和当前段的下一个点
+                if (i > 0 && sortedSegments[i - 1].points.size() > 0) {
+                    tp.path_point.kappa = calculateKappa(sortedSegments[i - 1].points.back(), segment.points[j], segment.points[j + 1]);
+                } else {
+                    // 封闭路径的第一个段的第一个点
+                    tp.path_point.kappa = calculateKappa(sortedSegments.back().points.back(), segment.points[j], segment.points[j + 1]);
+                }
+            } else if (j == segment.points.size() - 1 && i < sortedSegments.size() - 1 && sortedSegments[i + 1].points.size() > 0) {
+                // 对于最后一个点，使用当前段的前一个点和下一段的第一个点
+                tp.path_point.kappa = calculateKappa(segment.points[j - 1], segment.points[j], sortedSegments[i + 1].points.front());
+            } else {
+                // 封闭路径的最后一个段的最后一个点
+                tp.path_point.kappa = calculateKappa(segment.points[j - 1], segment.points[j], sortedSegments.front().points.front());
+            }
+
             trajectory_pb.trajectory_point.push_back(tp);
         }
     }
