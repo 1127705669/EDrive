@@ -5,6 +5,14 @@
 #include "control/common/trajectory_analyzer.h"
 #include "common/adapters/adapter_manager.h"
 
+#include <algorithm>
+#include <cmath>
+#include <utility>
+
+#include "Eigen/Core"
+
+#include "common/src/log.h"
+
 namespace math = EDrive::common::math;
 using ::common::PathPoint;
 using ::common::TrajectoryPoint;
@@ -151,6 +159,34 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByPosition(
   const TrajectoryPoint point = trajectory_points_[index_min];
   PublishPoint(point);
   return trajectory_points_[index_min];
+}
+
+void TrajectoryAnalyzer::TrajectoryTransformToCOM(
+    const double rear_to_com_distance) {
+  CHECK_GT(trajectory_points_.size(), 0U);
+  for (size_t i = 0; i < trajectory_points_.size(); ++i) {
+    auto com = ComputeCOMPosition(rear_to_com_distance,
+                                  trajectory_points_[i].path_point);
+    trajectory_points_[i].path_point.x = com.x();
+    trajectory_points_[i].path_point.y = com.y();
+  }
+}
+
+common::math::Vec2d TrajectoryAnalyzer::ComputeCOMPosition(
+    const double rear_to_com_distance, const ::common::PathPoint &path_point) const {
+  // Initialize the vector for coordinate transformation of the position
+  // reference point
+  Eigen::Vector3d v;
+  const double cos_heading = std::cos(path_point.theta);
+  const double sin_heading = std::sin(path_point.theta);
+  v << rear_to_com_distance * cos_heading, rear_to_com_distance * sin_heading,
+      0.0;
+  // Original position reference point at center of rear-axis
+  Eigen::Vector3d pos_vec(path_point.x, path_point.y, path_point.z);
+  // Transform original position with vector v
+  Eigen::Vector3d com_pos_3d = v + pos_vec;
+  // Return transfromed x and y
+  return common::math::Vec2d(com_pos_3d[0], com_pos_3d[1]);
 }
 
 } // namespace control

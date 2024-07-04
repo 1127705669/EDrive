@@ -209,6 +209,10 @@ Result_state MPCController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(trajectory));
 
+  if (control_conf_.trajectory_transform_to_com_reverse()) {
+    trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
+  }
+
   SimpleMPCDebug *debug = cmd->mutable_debug()->mutable_simple_mpc_debug();
   debug->Clear();
 
@@ -507,6 +511,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
     ROS_ERROR("failed to load control conf");
     return Result_state::State_Failed;
   }
+  control_conf_ = control_conf->mpc_controller_conf();
   // Matrix init operations.
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);

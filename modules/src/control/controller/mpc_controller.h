@@ -129,6 +129,7 @@ class MPCController : public Controller {
 
   std::unique_ptr<Interpolation2D> control_interpolation_;
 
+  MPCControllerConf control_conf_;
   // the following parameters are vehicle physics related.
   // control time interval
   double ts_ = 0.0;

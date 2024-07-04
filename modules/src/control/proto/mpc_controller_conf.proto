@@ -33,4 +33,5 @@ message MPCControllerConf {
   optional bool enable_mpc_feedforward_compensation = 23 [default = false];
   optional double unconstrained_control_diff_limit = 24;
   optional bool enable_look_ahead_back_control = 30 [default = false];
+  optional bool trajectory_transform_to_com_reverse = 42 [default = false];
 }
