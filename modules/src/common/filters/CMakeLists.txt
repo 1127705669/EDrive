@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(filters)
 
-
-find_package(PkgConfig)
-pkg_check_modules(GLOG REQUIRED libglog)
-
 find_package(catkin REQUIRED COMPONENTS
   roscpp
 )

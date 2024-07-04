@@ -104,10 +104,10 @@ void MPCController::ComputeLateralErrors(
     const double angular_v, const double linear_a,
     const TrajectoryAnalyzer &trajectory_analyzer, SimpleMPCDebug *debug) {
   const auto matched_point =
-      trajectory_analyzer.QueryNearestPointByPosition(x, y);
+      trajectory_analyzer.QueryNearestPointByPosition(VehicleStateProvider::Instance()->x(), VehicleStateProvider::Instance()->y());
 
-  const double dx = x - matched_point.path_point.x;
-  const double dy = y - matched_point.path_point.y;
+  const double dx = VehicleStateProvider::Instance()->x() - matched_point.path_point.x;
+  const double dy = VehicleStateProvider::Instance()->y() - matched_point.path_point.y;
 
   const double cos_matched_theta = std::cos(matched_point.path_point.theta);
   const double sin_matched_theta = std::sin(matched_point.path_point.theta);
@@ -116,9 +116,8 @@ void MPCController::ComputeLateralErrors(
 
   // matched_theta = matched_point.path_point().theta();
   debug->set_ref_heading(matched_point.path_point.theta);
-
   const double delta_theta =
-      EDrive::common::math::NormalizeAngle(theta - debug->ref_heading());
+      common::math::NormalizeAngle(theta - debug->ref_heading());
   debug->set_heading_error(delta_theta);
 
   const double sin_delta_theta = std::sin(delta_theta);
@@ -209,6 +208,10 @@ Result_state MPCController::ComputeControlCommand(
     ControlCommand *cmd) {
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(trajectory));
+
+  if (control_conf_.trajectory_transform_to_com_reverse()) {
+    trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
+  }
 
   SimpleMPCDebug *debug = cmd->mutable_debug()->mutable_simple_mpc_debug();
   debug->Clear();
@@ -438,7 +441,9 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
       std::max(vehicle_param_.brake_deadzone(),
                control_conf->mpc_controller_conf().brake_minimum_action());
 
-  minimum_speed_protection_ = control_conf->minimum_speed_protection();
+  minimum_speed_protection_ = FLAGS_minimum_speed_protection;
+  max_acceleration_when_stopped_ = FLAGS_max_acceleration_when_stopped;
+  max_abs_speed_when_stopped_ = vehicle_param_.max_abs_speed_when_stopped();
   standstill_acceleration_ =
       control_conf->mpc_controller_conf().standstill_acceleration();
 
@@ -447,9 +452,11 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
 
   unconstrained_control_diff_limit_ =
       control_conf->mpc_controller_conf().unconstrained_control_diff_limit();
+    
+  enable_look_ahead_back_control_ =
+      control_conf->mpc_controller_conf().enable_look_ahead_back_control();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
-
   EINFO << "MPC conf loaded";
   return true;
 }
@@ -504,6 +511,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
     ROS_ERROR("failed to load control conf");
     return Result_state::State_Failed;
   }
+  control_conf_ = control_conf->mpc_controller_conf();
   // Matrix init operations.
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);

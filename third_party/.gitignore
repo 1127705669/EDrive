@@ -1,0 +1,9 @@
+# Ignore build directories for all third-party libraries
+glog/build/
+gflags/build/
+osqp/build/
+osqp-eigen/build/
+protobuf/cmake/build/
+
+# Ignore other common build directories
+build/

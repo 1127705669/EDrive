@@ -12,7 +12,7 @@ fi
 
 # Install system dependencies
 sudo apt-get update
-sudo apt-get install -y ros-noetic-derived-object-msgs ros-noetic-ackermann-msgs libffi7
+sudo apt-get install -y ros-noetic-derived-object-msgs ros-noetic-ackermann-msgs libffi7 libomp5
 
 # Check if the 'carla' conda environment already exists
 if conda env list | grep -q "carla"; then

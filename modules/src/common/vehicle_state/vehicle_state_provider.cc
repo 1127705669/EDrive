@@ -95,11 +95,19 @@ void VehicleStateProvider::set_linear_velocity(const double linear_velocity) {
 math::Vec2d VehicleStateProvider::ComputeCOMPosition(
     const double rear_to_com_distance) const {
   // set length as distance between rear wheel and center of mass.
-  Eigen::Vector3d v(0.0, rear_to_com_distance, 0.0);
+  Eigen::Vector3d v;
+  v << 0.0, rear_to_com_distance, 0.0;
   Eigen::Vector3d pos_vec(vehicle_state_.x(), vehicle_state_.y(),
                           vehicle_state_.z());
   // Initialize the COM position without rotation
   Eigen::Vector3d com_pos_3d = v + pos_vec;
+  
+  const auto &orientation = original_localization_.pose.pose.orientation;
+
+  Eigen::Quaternion<double> quaternion(orientation.w, orientation.x,
+                                        orientation.y, orientation.z);
+  // Update the COM position with rotation
+  com_pos_3d = quaternion.toRotationMatrix() * v + pos_vec;
 
   return math::Vec2d(com_pos_3d[0], com_pos_3d[1]);
 }

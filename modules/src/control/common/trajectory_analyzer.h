@@ -7,9 +7,11 @@
 #include <vector>
 #include <ros/ros.h>
 
+#include "planning/ADCTrajectory.h"
+
+#include "common/math/vec2d.h"
 #include "common/vehicle_state/vehicle_state_provider.h"
 
-#include "planning/ADCTrajectory.h"
 
 namespace EDrive {
 namespace control {
@@ -98,6 +100,26 @@ class TrajectoryAnalyzer {
                          double *ptr_s, double *ptr_s_dot, double *ptr_d,
                          double *ptr_d_dot) const;
 
+  /**
+   * @brief Transform the current trajectory points to the center of mass(COM)
+   * of the vehicle, given the distance from rear wheels to the center of mass.
+   * @param rear_to_com_distance Distance from rear wheels to
+   *        the vehicle's center of mass.
+   */
+  void TrajectoryTransformToCOM(const double rear_to_com_distance);
+
+  /**
+   * @brief Compute the position of center of mass(COM) of the vehicle,
+   *        given the distance from rear wheels to the center of mass.
+   * @param rear_to_com_distance Distance from rear wheels to
+   *        the vehicle's center of mass.
+   * @param path_point PathPoint along the published planning trajectory.
+   * @return The position of the vehicle's center of mass.
+   */
+  common::math::Vec2d ComputeCOMPosition(
+      const double rear_to_com_distance,
+      const ::common::PathPoint &path_point) const;
+  
  private:
   void PublishPoint(const ::common::TrajectoryPoint point) const;
   std::vector<::common::TrajectoryPoint> trajectory_points_;

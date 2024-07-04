@@ -46,6 +46,8 @@ add_library(pid_controller SHARED
   ${PID_CONTROLLER_SRC}
 )
 
+add_dependencies(pid_controller control_generate_messages_cpp planning_generate_messages_cpp)
+
 ###################################
 #    trajectory_analyzer          #
 ###################################
