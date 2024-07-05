@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(common_proto)
+project(map_proto)
 
 find_package(Protobuf REQUIRED)
 
-set(PROTO_DIR_NAME "common")
+set(PROTO_DIR_NAME "map")
 
 ## Set protocol buffer output address
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -34,13 +34,14 @@ foreach(proto_file ${proto_files})
   )
 endforeach()
 
-add_custom_target(generate_${PROTO_DIR_NAME}_proto_message ALL
+add_custom_target(generate_${PROTO_DIR_NAME}_message ALL
   DEPENDS ${MESSAGE_SRC} ${MESSAGE_HDRS}
   COMMENT "Generating ${PROTO_DIR_NAME} Protocol Buffer messages"
 )
 
 # Create an empty library target
 add_library(${PROTO_DIR_NAME}_proto SHARED)
+add_dependencies(${PROTO_DIR_NAME}_proto generate_common_proto_message)
 
 # Append source files to the target after they are generated
 target_sources(${PROTO_DIR_NAME}_proto PRIVATE ${MESSAGE_SRC} ${MESSAGE_HDRS})

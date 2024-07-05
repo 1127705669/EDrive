@@ -25,7 +25,7 @@ namespace common {
  *
  * @Brief This is a helper class that can load vehicle configurations. The
  * vehicle configurations are
- * defined modules/common/configs/proto/vehicle_config.proto
+ * defined common/configs/proto/vehicle_config.proto
  */
 class VehicleConfigHelper {
  public:
@@ -40,7 +40,7 @@ class VehicleConfigHelper {
   /**
    * @brief Initialize vehicle configurations with \p config
    * @param config A VehicleConfig class instance. The VehicleConfig class is
-   * defined by modules/common/configs/proto/vehicle_config.proto.
+   * defined by common/configs/proto/vehicle_config.proto.
    */
   static void Init(const VehicleConfig &config);
 
@@ -50,7 +50,7 @@ class VehicleConfigHelper {
    * invalid format.
    * @param config_file The configuration file path. The format of the file is
    * defined by protobuf file
-   * modules/common/configs/proto/vehicle_config.proto.
+   * common/configs/proto/vehicle_config.proto.
    */
   static void Init(const std::string &config_file);
 

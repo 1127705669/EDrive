@@ -1,11 +1,11 @@
 syntax = "proto2";
 package EDrive.control;
 
-// import "modules/canbus/proto/chassis.proto";
-// import "modules/common/proto/header.proto";
-// import "modules/common/proto/vehicle_signal.proto";
-// import "modules/control/proto/pad_msg.proto";
-// import "modules/common/proto/drive_state.proto";
+// import "canbus/proto/chassis.proto";
+// import "common/proto/header.proto";
+// import "common/proto/vehicle_signal.proto";
+// import "control/proto/pad_msg.proto";
+// import "common/proto/drive_state.proto";
 
 enum TurnSignal {
   TURN_NONE = 0;
