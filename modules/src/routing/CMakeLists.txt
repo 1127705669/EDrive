@@ -98,6 +98,7 @@ find_package(catkin REQUIRED COMPONENTS
 #   std_msgs
 # )
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
@@ -143,15 +144,25 @@ catkin_package(
 include_directories(
 include
   ${catkin_INCLUDE_DIRS}
-  ../
-  ../../
-  ../../../
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/routing.cpp
 # )
+add_library(routing_lib
+  src/routing.cc
+)
+
+target_link_libraries(routing_lib
+  ${PROTOBUF_LIBRARIES}
+  ${catkin_LIBRARIES}
+  EDrive_app
+  common_adapters
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -164,7 +175,12 @@ include
 # add_executable(${PROJECT_NAME}_node src/routing_node.cpp)
 add_executable(routing 
   src/main.cc 
-  src/routing.cc 
+)
+
+target_link_libraries(routing
+  ${catkin_LIBRARIES}
+  routing_lib
+  gflags
 )
 
 ## Rename C++ executable without prefix
@@ -178,11 +194,7 @@ add_executable(routing
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(routing
-  ${catkin_LIBRARIES}
-  EDrive_app
-  common_adapters
-)
+
 
 #############
 ## Install ##

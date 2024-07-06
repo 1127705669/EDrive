@@ -1,5 +1,4 @@
-#ifndef STATE_H
-#define STATE_H
+#pragma once
 
 namespace EDrive{
 namespace common{
@@ -12,5 +11,3 @@ State_Failed
 
 } // namespace common
 } // namespace EDrive
-
-#endif

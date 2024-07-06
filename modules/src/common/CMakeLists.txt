@@ -165,15 +165,6 @@ include
   ${CMAKE_SOURCE_DIR}
 )
 
-
-add_library(common_log INTERFACE)
-
-target_compile_options(common_log INTERFACE
-  -include ${CMAKE_CURRENT_SOURCE_DIR}/src/log.h
-)
-
-target_link_libraries(common_log INTERFACE ${catkin_LIBRARIES} glog::glog)
-
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/common.cpp
@@ -183,12 +174,6 @@ set(EDRIVE_APP
 )
 
 add_library(EDrive_app SHARED ${EDRIVE_APP})
-
-target_link_libraries(EDrive_app 
-  common_log
-)
-
-
 
 # set_target_properties(EDrive_app PROPERTIES
 #     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/common/lib
@@ -235,6 +220,7 @@ target_link_libraries(EDrive_app
   ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
   common_adapters
+  glog::glog
 )
 
 #############
