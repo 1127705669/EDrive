@@ -7,6 +7,10 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")/installers"
 
 # Run each install script
+echo "Installing tinyxml2..."
+bash install_tinyxml2.sh
+echo "tinyxml2 installation completed."
+
 echo "Installing gflags..."
 bash install_gflags.sh
 echo "gflags installation completed."
