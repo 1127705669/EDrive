@@ -4,6 +4,7 @@ project(common)
 # Set the third party directory
 get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} DIRECTORY)
 get_filename_component(GRANDPARENT_DIR ${PARENT_DIR} DIRECTORY)
+set(THIRD_PARTY_ROOT_DIR ${GRANDPARENT_DIR}/third_party)
 set(THIRD_PARTY_DIR ${GRANDPARENT_DIR}/third_party/build)
 
 # Add osqp installation directory to CMAKE_PREFIX_PATH
@@ -132,6 +133,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vehicle_state)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/math)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/configs)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/filters)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/util)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

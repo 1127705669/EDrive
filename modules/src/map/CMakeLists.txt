@@ -4,6 +4,12 @@ project(map)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
+# Set the third party directory
+get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} DIRECTORY)
+get_filename_component(GRANDPARENT_DIR ${PARENT_DIR} DIRECTORY)
+set(THIRD_PARTY_DIR ${GRANDPARENT_DIR}/third_party/build)
+
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages

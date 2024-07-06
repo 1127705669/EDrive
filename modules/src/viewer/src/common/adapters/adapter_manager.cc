@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <fcntl.h>
-
+#include "google/protobuf/stubs/stringprintf.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/text_format.h"
 
