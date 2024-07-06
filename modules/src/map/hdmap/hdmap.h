@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
 #pragma once

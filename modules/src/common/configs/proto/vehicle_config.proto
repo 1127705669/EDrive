@@ -91,7 +91,7 @@ message VehicleParam {
 }
 
 message VehicleConfig {
-  // optional apollo.common.Header header = 1;
+  // optional EDrive.common.Header header = 1;
   optional VehicleParam vehicle_param = 2;
   optional Extrinsics extrinsics = 3;
 }

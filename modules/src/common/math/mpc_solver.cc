@@ -28,7 +28,7 @@ namespace math {
 //   if (matrix_a.rows() != matrix_a.cols() ||
 //       matrix_b.rows() != matrix_a.rows() ||
 //       matrix_lower.rows() != matrix_upper.rows()) {
-//     // AERROR << "One or more matrices have incompatible dimensions. Aborting.";
+//     // EERROR << "One or more matrices have incompatible dimensions. Aborting.";
 //     return false;
 //   }
 
@@ -147,7 +147,7 @@ namespace math {
 //       matrix_equality_boundary));
 //   auto result = qp_solver->Solve();
 //   if (!result) {
-//     // AERROR << "Linear MPC solver failed";
+//     // EERROR << "Linear MPC solver failed";
 //     return false;
 //   }
 //   matrix_v = qp_solver->params();

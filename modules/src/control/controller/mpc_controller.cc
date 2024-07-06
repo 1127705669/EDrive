@@ -462,8 +462,8 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
 }
 
 void MPCController::LogInitParameters() {
-  // AINFO << name_ << " begin.";
-  // AINFO << "[MPCController parameters]"
+  // EINFO << name_ << " begin.";
+  // EINFO << "[MPCController parameters]"
   //       << " mass_: " << mass_ << ","
   //       << " iz_: " << iz_ << ","
   //       << " lf_: " << lf_ << ","
@@ -654,8 +654,8 @@ void MPCController::ComputeLongitudinalErrors(
       trajectory_analyzer->QueryNearestPointByAbsoluteTime(
           current_control_time.toSec());
 
-  // ADEBUG << "matched point:" << matched_point.DebugString();
-  // ADEBUG << "reference point:" << reference_point.DebugString();
+  // EDEBUG << "matched point:" << matched_point.DebugString();
+  // EDEBUG << "reference point:" << reference_point.DebugString();
   debug->set_station_error(reference_point.path_point.s - s_matched);
   debug->set_speed_error(reference_point.v - s_dot_matched);
 

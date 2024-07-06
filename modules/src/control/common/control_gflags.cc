@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The EDrive Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,29 @@
 #include "control/common/control_gflags.h"
 
 DEFINE_string(pipeline_file,
-              "/apollo/modules/control/control_component/conf/pipeline.pb.txt",
+              "/EDrive/control/control_component/conf/pipeline.pb.txt",
               "default control conf data file");
 
 DEFINE_string(control_conf_file,
-              "/apollo/modules/control/conf/control_conf.pb.txt",
+              "/EDrive/control/conf/control_conf.pb.txt",
               "default control conf data file");
 
 DEFINE_string(mpc_controller_conf_file,
-              "/apollo/modules/control/conf/mpc_controller_conf.pb.txt",
+              "/EDrive/control/conf/mpc_controller_conf.pb.txt",
               "mpc controller conf data file");
 
 DEFINE_string(lateral_controller_conf_file,
-              "/apollo/modules/control/conf/lateral_controller_conf.pb.txt",
+              "/EDrive/control/conf/lateral_controller_conf.pb.txt",
               "lateral controller conf data file");
 
 DEFINE_string(
     longitudinal_controller_conf_file,
-    "/apollo/modules/control/conf/longitudinal_controller_conf.pb.txt",
+    "/EDrive/control/conf/longitudinal_controller_conf.pb.txt",
     "longitudinal controller conf data file");
 
 DEFINE_string(
     calibration_table_file,
-    "/apollo/modules/control/control_component/conf/calibration_table.pb.txt",
+    "/EDrive/control/control_component/conf/calibration_table.pb.txt",
     "calibration table file");
 
 DEFINE_double(control_test_duration, -1.0, "control test duration");

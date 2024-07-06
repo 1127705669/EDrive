@@ -21,7 +21,7 @@
 #include "map/pnc_map/path.h"
 #include "planning/reference_line/reference_point.h"
 
-namespace apollo {
+namespace EDrive {
 namespace planning {
 
 class ReferenceLine {
@@ -186,6 +186,6 @@ class ReferenceLine {
 };
 
 }  // namespace planning
-}  // namespace apollo
+}  // namespace EDrive
 
 #endif  // MODULES_PLANNING_REFERENCE_LINE_REFERENCE_LINE_H_
