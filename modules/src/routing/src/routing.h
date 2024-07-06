@@ -13,8 +13,6 @@ namespace routing {
 
 class Routing : public EDrive::common::EDriveApp {
  public:
-//   Planning() = default;
-//   virtual ~Planning();
 
   std::string Name() const override;
 
@@ -25,5 +23,5 @@ class Routing : public EDrive::common::EDriveApp {
   void Stop() override;
 };
 
-} // routing
-} // EDrive
+} // namespace routing
+} // namespace EDrive

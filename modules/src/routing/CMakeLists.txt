@@ -99,6 +99,9 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/common)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/topo_creator)
+
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
