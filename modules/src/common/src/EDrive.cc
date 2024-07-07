@@ -23,7 +23,7 @@ namespace common {
 void EDriveApp::ExportFlags() const {
   const auto root_path = EDrive::common::util::GetRootPath();
   const auto export_file = root_path + "/src/common/data/" + Name() + ".flags";
-  std::cout << export_file << std::endl;
+  // std::cout << export_file << std::endl;
   std::ofstream fout(export_file);
   CHECK(fout) << "Cannot open file " << export_file;
 

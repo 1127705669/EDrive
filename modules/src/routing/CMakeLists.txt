@@ -100,7 +100,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/common)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/graph)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/topo_creator)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/strategy)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -165,6 +167,7 @@ target_link_libraries(routing_lib
   ${catkin_LIBRARIES}
   EDrive_app
   common_adapters
+  routing_gflags
 )
 
 ## Add cmake target dependencies of the library
