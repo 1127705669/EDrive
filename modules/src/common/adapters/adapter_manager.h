@@ -16,6 +16,7 @@
 #include "common/src/macro.h"
 #include "common/adapters/proto/adapter_config.pb.h"
 #include "common/adapters/message_adapters.h"
+#include <type_traits>
 
 namespace EDrive {
 namespace common {
@@ -55,14 +56,26 @@ namespace adapter {
         new name##Adapter(#name, topic_name, config.message_history_limit())); \
     if (config.mode() != AdapterConfig::PUBLISH_ONLY) {                        \
       ROS_INFO("    registering subscriber: %s", topic_name.c_str());          \
-      name##subscriber_ =                                                      \
+      if (name##_->use_proto_container_) {                                     \
+        name##subscriber_ =                                                    \
+          node_handle_->subscribe(topic_name, config.message_history_limit(),  \
+                                  &name##Adapter::RosCallbackByteArray,        \
+                                  name##_.get());                              \
+      } else {                                                                 \
+        name##subscriber_ =                                                    \
           node_handle_->subscribe(topic_name, config.message_history_limit(),  \
                                   &name##Adapter::RosCallback, name##_.get()); \
+      }                                                                        \
     }                                                                          \
     if (config.mode() != AdapterConfig::RECEIVE_ONLY) {                        \
       ROS_INFO("    registering publisher: %s", topic_name.c_str());           \
-      name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
+      if (name##_->use_proto_container_) {                                     \
+        name##publisher_ = node_handle_->advertise<std_msgs::ByteMultiArray>(  \
                topic_name, config.message_history_limit(), config.latch());    \
+      } else {                                                                 \
+        name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(   \
+               topic_name, config.message_history_limit(), config.latch());    \
+      }                                                                        \
     }                                                                          \
     observers_.push_back([this]() { name##_->Observe(); });                    \
     name##config_ = config;                                                    \
@@ -146,6 +159,7 @@ class AdapterManager
 
   /// The following code registered all the adapters of interest.
   // REGISTER_ADAPTER(Viewer);
+  // REGISTER_ADAPTER(Test);
   REGISTER_ADAPTER(Vehicle);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(ControlCommand);

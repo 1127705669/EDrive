@@ -18,6 +18,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointCloud2.h>
 #include "common/CarlaEgoVehicleStatus.h"
+#include "localization/proto/test.pb.h"
 
 /**
  * @file message_adapters.h
@@ -46,6 +47,7 @@ using CloudPointMapAdapter = Adapter<sensor_msgs::PointCloud2>;
 using FixedPathAdapter = Adapter<visualization_msgs::MarkerArray>;
 using VehicleStatusAdapter = Adapter<::common::CarlaEgoVehicleStatus>;
 using MarkerDebugPointAdapter = Adapter<visualization_msgs::Marker>;
+using TestAdapter = Adapter<localization::TestMessage>;
 
 } // namespace adapter
 } // namespace common
