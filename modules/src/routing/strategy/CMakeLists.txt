@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
 ###################################
 add_library(strategy INTERFACE)
 
-target_link_libraries(controller INTERFACE
+target_link_libraries(strategy INTERFACE
   routing_a_star_strategy
 )
 
