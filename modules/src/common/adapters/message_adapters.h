@@ -19,6 +19,8 @@
 #include <sensor_msgs/PointCloud2.h>
 #include "common/CarlaEgoVehicleStatus.h"
 #include "localization/proto/test.pb.h"
+#include "map/relative_map/proto/navigation.pb.h"
+#include "routing/proto/routing.pb.h"
 
 /**
  * @file message_adapters.h
@@ -48,6 +50,10 @@ using FixedPathAdapter = Adapter<visualization_msgs::MarkerArray>;
 using VehicleStatusAdapter = Adapter<::common::CarlaEgoVehicleStatus>;
 using MarkerDebugPointAdapter = Adapter<visualization_msgs::Marker>;
 using TestAdapter = Adapter<localization::TestMessage>;
+using NavigationAdapter = Adapter<relative_map::NavigationInfo>;
+using RelativeMapAdapter = Adapter<relative_map::MapMsg>;
+using RoutingRequestAdapter = Adapter<routing::RoutingRequest>;
+using RoutingResponseAdapter = Adapter<routing::RoutingResponse>;
 
 } // namespace adapter
 } // namespace common

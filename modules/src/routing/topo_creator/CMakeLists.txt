@@ -52,22 +52,51 @@ target_link_libraries(edge_creator
 ###################################
 #         graph_creator           #
 ###################################
-# set(GRAPH_CREATOR_SRC 
-#   graph_creator.cc
-# )
+set(GRAPH_CREATOR_SRC 
+  graph_creator.cc
+)
 
-# add_library(graph_creator SHARED 
-#   ${GRAPH_CREATOR_SRC}
-# )
+add_library(graph_creator SHARED 
+  ${GRAPH_CREATOR_SRC}
+)
 
-# target_include_directories(graph_creator PUBLIC
-#   ${CMAKE_CURRENT_SOURCE_DIR}
-#   ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
-# )
+target_include_directories(graph_creator PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+)
 
-# target_link_libraries(graph_creator
-#   edge_creator
-#   node_creator
-#   map_proto
-#   routing_proto
-# )
+target_link_libraries(graph_creator
+  edge_creator
+  node_creator
+  util
+  opendrive_adapter
+  map_proto
+  routing_proto
+)
+
+###################################
+#         topo_creator           #
+###################################
+set(TOPO_CREATOR_SRC 
+  topo_creator.cc
+)
+
+add_library(topo_creator SHARED 
+  ${GRAPH_CREATOR_SRC}
+)
+
+target_include_directories(topo_creator PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+)
+
+target_link_libraries(topo_creator
+  graph_creator
+  EDrive_app
+  config_gflags
+  util
+  hdmap_util
+  map_proto
+  routing_gflags
+  routing_proto
+)

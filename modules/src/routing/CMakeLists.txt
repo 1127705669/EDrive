@@ -103,6 +103,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/common)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/graph)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/topo_creator)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/strategy)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/core)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

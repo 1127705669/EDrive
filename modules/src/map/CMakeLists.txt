@@ -80,6 +80,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/proto)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/hdmap)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/relative_map)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

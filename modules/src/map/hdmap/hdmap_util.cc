@@ -105,10 +105,10 @@ const HDMap* HDMapUtil::BaseMapPtr() {
       EERROR << "RelativeMap adapter is not registered";
       return nullptr;
     }
-    if (relative_map->Empty()) {
-      EERROR << "RelativeMap is empty";
-      return nullptr;
-    }
+    // if (relative_map->Empty()) {
+    //   EERROR << "RelativeMap is empty";
+    //   return nullptr;
+    // }
     const auto& latest = relative_map->GetLatestObserved();
     if (base_map_ != nullptr &&
         base_map_seq_ == latest.header().sequence_num()) {

@@ -177,6 +177,10 @@ class AdapterManager
   /// The following code registered all the adapters of interest.
   // REGISTER_ADAPTER(Viewer);
   REGISTER_ADAPTER(Test);
+  REGISTER_ADAPTER(RoutingRequest);
+  REGISTER_ADAPTER(RoutingResponse);
+  REGISTER_ADAPTER(RelativeMap);
+  REGISTER_ADAPTER(Navigation);
   REGISTER_ADAPTER(Vehicle);
   REGISTER_ADAPTER(Planning);
   REGISTER_ADAPTER(ControlCommand);

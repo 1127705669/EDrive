@@ -102,6 +102,18 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::TEST:
         EnableTest("/EDrive/localization/test", config);
         break;
+      case AdapterConfig::RELATIVE_MAP:
+        EnableRelativeMap("/EDrive/relative_map", config);
+        break;
+      case AdapterConfig::NAVIGATION:
+        EnableNavigation("/EDrive/navigation", config);
+        break;
+      case AdapterConfig::ROUTING_REQUEST:
+        EnableRoutingRequest("/EDrive/routing_request", config);
+        break;
+      case AdapterConfig::ROUTING_RESPONSE:
+        EnableRoutingResponse("/EDrive/routing_response", config);
+        break;
       default:
         ROS_INFO("Unknown adapter config type!");
         break;
