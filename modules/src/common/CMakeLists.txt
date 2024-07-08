@@ -4,6 +4,7 @@ project(common)
 # Set the third party directory
 get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} DIRECTORY)
 get_filename_component(GRANDPARENT_DIR ${PARENT_DIR} DIRECTORY)
+set(THIRD_PARTY_ROOT_DIR ${GRANDPARENT_DIR}/third_party)
 set(THIRD_PARTY_DIR ${GRANDPARENT_DIR}/third_party/build)
 
 # Add osqp installation directory to CMAKE_PREFIX_PATH
@@ -132,6 +133,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vehicle_state)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/math)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/configs)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/filters)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/util)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -165,17 +167,6 @@ include
   ${CMAKE_SOURCE_DIR}
 )
 
-set(EDrive_LOG
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/log_test.cc
-)
-
-add_library(EDrive_log SHARED ${EDrive_LOG})
-
-target_link_libraries(EDrive_log 
-  glog
-  gflags
-)
-
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/common.cpp
@@ -185,12 +176,6 @@ set(EDRIVE_APP
 )
 
 add_library(EDrive_app SHARED ${EDRIVE_APP})
-
-target_link_libraries(EDrive_app 
-  EDrive_log
-)
-
-
 
 # set_target_properties(EDrive_app PROPERTIES
 #     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/common/lib
@@ -237,6 +222,7 @@ target_link_libraries(EDrive_app
   ${PROTOBUF_LIBRARIES}
   ${catkin_LIBRARIES}
   common_adapters
+  glog::glog
 )
 
 #############

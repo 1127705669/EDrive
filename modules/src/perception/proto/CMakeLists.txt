@@ -3,13 +3,15 @@ project(perception_proto)
 
 find_package(Protobuf REQUIRED)
 
-## set protocol buffer output address
+set(PROTO_DIR_NAME "perception")
+
+## Set protocol buffer output address
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(PROTOBUF_IMPORT_DIRS ${CMAKE_SOURCE_DIR})
 set(GENERATED_PROTO_DIR ${CATKIN_DEVEL_PREFIX}/include)
 
 # Ensure the output directory exists
-file(MAKE_DIRECTORY ${GENERATED_PROTO_DIR}/perception/proto)
+file(MAKE_DIRECTORY ${GENERATED_PROTO_DIR}/${PROTO_DIR_NAME}/proto)
 
 file(GLOB_RECURSE proto_files ${PROTO_DIR}/*.proto)
 
@@ -18,9 +20,8 @@ set(MESSAGE_HDRS "")
 
 foreach(proto_file ${proto_files})
   get_filename_component(FIL_WE ${proto_file} NAME_WE)
-  # Set file here
-  set(GEN_SRC "${GENERATED_PROTO_DIR}/perception/proto/${FIL_WE}.pb.cc")
-  set(GEN_HDR "${GENERATED_PROTO_DIR}/perception/proto/${FIL_WE}.pb.h")
+  set(GEN_SRC ${GENERATED_PROTO_DIR}/${PROTO_DIR_NAME}/proto/${FIL_WE}.pb.cc)
+  set(GEN_HDR ${GENERATED_PROTO_DIR}/${PROTO_DIR_NAME}/proto/${FIL_WE}.pb.h)
   list(APPEND MESSAGE_SRC ${GEN_SRC})
   list(APPEND MESSAGE_HDRS ${GEN_HDR})
   add_custom_command(
@@ -33,17 +34,17 @@ foreach(proto_file ${proto_files})
   )
 endforeach()
 
-add_custom_target(generate_perception_message ALL
+add_custom_target(generate_${PROTO_DIR_NAME}_message ALL
   DEPENDS ${MESSAGE_SRC} ${MESSAGE_HDRS}
-  COMMENT "Generating Protocol Buffer messages"
+  COMMENT "Generating ${PROTO_DIR_NAME} Protocol Buffer messages"
 )
 
 # Create an empty library target
-add_library(perception_proto SHARED)
-add_dependencies(perception_proto generate_localization_message)
+add_library(${PROTO_DIR_NAME}_proto SHARED)
+add_dependencies(${PROTO_DIR_NAME}_proto generate_common_proto_message)
 
 # Append source files to the target after they are generated
-target_sources(perception_proto PRIVATE ${MESSAGE_SRC} ${MESSAGE_HDRS})
+target_sources(${PROTO_DIR_NAME}_proto PRIVATE ${MESSAGE_SRC} ${MESSAGE_HDRS})
 
 include_directories(
   include
@@ -53,6 +54,7 @@ include_directories(
 )
 
 # Link with other libraries
-target_link_libraries(perception_proto
-
+target_link_libraries(${PROTO_DIR_NAME}_proto
+  common_proto
+  map_proto
 )

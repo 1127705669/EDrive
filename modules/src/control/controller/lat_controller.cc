@@ -47,7 +47,7 @@ void LatController::ProcessLogs(const SimpleLateralDebug *debug) {
   // if (FLAGS_enable_csv_debug) {
   //   steer_log_file_ << log_str << std::endl;
   // }
-  // ADEBUG << "Steer_Control_Detail: " << log_str;
+  // EDEBUG << "Steer_Control_Detail: " << log_str;
 }
 
 void LatController::LogInitParameters() {
@@ -398,7 +398,7 @@ void LatController::UpdateDrivingOrientation() {
   //         common::math::NormalizeAngle(driving_orientation_ + M_PI);
   //     // Update Matrix_b for reverse mode
   //     matrix_bd_ = -matrix_b_ * ts_;
-  //     ADEBUG << "Matrix_b changed due to gear direction";
+  //     EDEBUG << "Matrix_b changed due to gear direction";
   //   }
   // }
 }

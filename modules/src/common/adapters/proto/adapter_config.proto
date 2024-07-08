@@ -22,6 +22,8 @@ message AdapterConfig {
     FIXED_PATH = 15;
     VEHICLE_STATUS = 16;
     MARKER_DEBUG_POINT = 17;
+    ROUTING_RESPONSE = 18;
+    TEST = 19;
   }
   enum Mode {
     RECEIVE_ONLY = 0;
@@ -41,4 +43,5 @@ message AdapterConfig {
 message AdapterManagerConfig {
   repeated AdapterConfig config = 1;
   required bool is_ros = 2;  // Whether the message comes from ROS
+  optional bool is_protocol = 3 [default=false];
 }

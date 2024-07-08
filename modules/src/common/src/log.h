@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <ros/ros.h>
 #include <cstdlib> // For std::abort()
 
 #include "glog/logging.h"

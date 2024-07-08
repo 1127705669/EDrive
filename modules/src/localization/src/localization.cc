@@ -8,6 +8,7 @@
 #include "localization/src/common/localization_gflags.h"
 #include "common/util/file.h"
 #include "common/adapters/adapter_manager.h"
+#include "localization/proto/test.pb.h"
 
 namespace EDrive {
 namespace localization {
@@ -89,6 +90,12 @@ Result_state Localization::Start(){
 void Localization::OnTimer(const ros::TimerEvent &) {
   Result_state status = CheckInput();
   PositionConvert();
+
+  TestMessage test;
+  test.set_id(1);
+  test.set_name("test");
+
+  AdapterManager::PublishTest(test);
 
   Publish();
 }
