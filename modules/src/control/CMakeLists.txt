@@ -214,4 +214,5 @@ target_link_libraries(control_lib
   control_proto
   EDrive_app
   common_adapters
+  localization_proto
 )

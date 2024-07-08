@@ -99,6 +99,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::MARKER_DEBUG_POINT:
         EnableMarkerDebugPoint("/EDrive/debug/marker_1", config);
         break;
+      case AdapterConfig::TEST:
+        EnableTest("/EDrive/localization/test", config);
+        break;
       default:
         ROS_INFO("Unknown adapter config type!");
         break;

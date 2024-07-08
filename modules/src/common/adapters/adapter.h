@@ -51,7 +51,7 @@ public:
     DataPtr GetLatestObserved() const {
         std::lock_guard<std::mutex> lock(mutex_);
         if (observed_queue_.empty()) {
-            throw std::runtime_error("The view of data queue is empty. No data is received yet.");
+            ROS_ERROR("The view of data queue is empty. No data is received yet.");
         }
         return observed_queue_.front();
     }
@@ -195,6 +195,21 @@ class Adapter : public AdapterBase {
 
   bool use_proto_container_;
 
+  template <typename T = D>
+  typename std::enable_if<is_protobuf_message<T>::value>::type
+  Publish(ros::Publisher& publisher, const DataType& data) {
+    std_msgs::ByteMultiArray byte_array_msg;
+    byte_array_msg.data.resize(data.ByteSizeLong());
+    data.SerializeToArray(byte_array_msg.data.data(), byte_array_msg.data.size());
+    publisher.publish(byte_array_msg);
+  }
+
+  template <typename T = D>
+  typename std::enable_if<!is_protobuf_message<T>::value>::type
+  Publish(ros::Publisher& publisher, const DataType& data) {
+    publisher.publish(data);
+  }
+
  private:
   template<typename T = D>
   typename std::enable_if<is_protobuf_message<T>::value>::type
@@ -214,7 +229,7 @@ class Adapter : public AdapterBase {
   template<typename T = D>
   typename std::enable_if<is_protobuf_message<T>::value, DataPtr>::type
   DeserializeFromByteString(const boost::shared_ptr<ByteString>& byteString) const {
-    auto message = std::make_shared<D>();
+    auto message = boost::make_shared<D>();
     if (!message->ParseFromArray(byteString->data(), byteString->size())) {
         throw std::runtime_error("Failed to parse byte string to message");
     }
