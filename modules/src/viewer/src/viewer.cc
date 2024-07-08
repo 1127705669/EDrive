@@ -71,7 +71,7 @@ Result_state Viewer::Init(){
   AdapterManager::Init(adapter_conf_file);
 
   ROS_INFO("  viewer init, starting...");
-  EDrive::common::util::GetProtoFromASIIFile(viewer_conf_file, &viewer_conf_);
+  EDrive::common::util::GetProtoFromASCIIFile(viewer_conf_file, &viewer_conf_);
 
   RegisterControllers(&viewer_conf_);
 

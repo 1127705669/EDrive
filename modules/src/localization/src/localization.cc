@@ -29,7 +29,7 @@ Result_state Localization::Init(){
   ROS_INFO("  registering node: %s", Name().c_str());
   AdapterManager::Init(adapter_conf_file);
 
-  EDrive::common::util::GetProtoFromASIIFile(localization_conf_file, &localization_conf_);
+  EDrive::common::util::GetProtoFromASCIIFile(localization_conf_file, &localization_conf_);
   
   /*
     * Example usage of PCDConvert function:

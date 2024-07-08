@@ -105,6 +105,7 @@ target_link_libraries(routing_sub_topo_graph
   map_proto
   routing_gflags
   routing_proto
+  util
 )
 
 ###################################
@@ -124,4 +125,5 @@ target_link_libraries(routing_topo_graph
   map_proto
   routing_gflags
   routing_proto
+  util
 )

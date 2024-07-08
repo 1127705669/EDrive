@@ -28,7 +28,7 @@ Result_state Control::Init(){
   AdapterManager::Init(adapter_conf_file);
 
   ROS_INFO("  controller init, starting...");
-  EDrive::common::util::GetProtoFromASIIFile(control_conf_file, &control_conf_);
+  EDrive::common::util::GetProtoFromASCIIFile(control_conf_file, &control_conf_);
   if(Result_state::State_Ok != controller_agent_.Init(&control_conf_)) {
     ROS_ERROR("    controller agent init failed, stopping...");
   }

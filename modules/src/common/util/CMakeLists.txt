@@ -6,11 +6,36 @@ find_package(Protobuf REQUIRED)
 set(Protobuf_INCLUDE_DIRS
   ${Protobuf_INCLUDE_DIRS}
   ${THIRD_PARTY_ROOT_DIR}/protobuf/src
+  ${THIRD_PARTY_DIR}/protobuf/include
 )
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
+
+###################################
+#              util               #
+###################################
+set(UTIL_SRC 
+  file.cc
+  string_util.cc
+  string_tokenizer.cc
+)
+
+add_library(util SHARED 
+  ${UTIL_SRC}
+)
+
+target_include_directories(util PUBLIC
+  ${catkin_INCLUDE_DIRS}
+  ${Protobuf_INCLUDE_DIRS}
+)
+
+target_link_libraries(util PRIVATE 
+  ${PROTOBUF_LIBRARIES}
+  string_util
+)
+
 
 ###################################
 #           string_util           #

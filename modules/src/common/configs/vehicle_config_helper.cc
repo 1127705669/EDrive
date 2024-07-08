@@ -42,7 +42,7 @@ void VehicleConfigHelper::Init() {
 
 void VehicleConfigHelper::Init(const std::string &config_file) {
   VehicleConfig params;
-  EDrive::common::util::GetProtoFromASIIFile(config_file, &params);
+  EDrive::common::util::GetProtoFromASCIIFile(config_file, &params);
   Init(params);
 }
 
