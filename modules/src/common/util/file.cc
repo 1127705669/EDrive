@@ -44,6 +44,18 @@ std::string GetRosHome() {
 
 }  // namespace
 
+std::string GetRootPath() {
+  std::string ret_value;
+  char buffer[FILENAME_MAX];
+    
+  if (getcwd(buffer, sizeof(buffer)) == nullptr) {
+    EERROR << "Cannot get root path!";
+  }
+  ret_value = buffer;
+
+  return ret_value;
+}
+
 bool GetContent(const std::string &file_name, std::string *content) {
   std::ifstream fin(file_name);
   if (!fin) {

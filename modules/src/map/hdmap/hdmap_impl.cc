@@ -102,7 +102,7 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
           iter->second->set_road_id(road_id);
           iter->second->set_section_id(section_id);
         } else {
-          AFATAL << "Unknown lane id: " << lane_id.id();
+          EFATAL << "Unknown lane id: " << lane_id.id();
         }
       }
     }
@@ -632,7 +632,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
   car_point.set_y(point.y());
   EDrive::common::math::Vec2d map_point;
   if (GetLanes(point, kLanesSearchRange, &temp_surrounding_lanes) == -1) {
-    AINFO << "Can not find lanes around car.";
+    EINFO << "Can not find lanes around car.";
     return -1;
   }
   for (const auto& surround_lane : temp_surrounding_lanes) {
@@ -641,7 +641,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
     }
   }
   if (surrounding_lanes.empty()) {
-    AINFO << "Car is not on lane.";
+    EINFO << "Car is not on lane.";
     return -1;
   }
   for (const auto& lane : surrounding_lanes) {

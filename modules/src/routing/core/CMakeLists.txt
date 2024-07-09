@@ -8,6 +8,15 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ###################################
+#              core               #
+###################################
+add_library(core INTERFACE)
+
+target_link_libraries(core INTERFACE
+  routing_navigator
+)
+
+###################################
 #    routing_result_generator     #
 ###################################
 add_library(routing_result_generator SHARED 

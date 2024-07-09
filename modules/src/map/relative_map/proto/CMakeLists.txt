@@ -55,5 +55,6 @@ include_directories(
 
 # Link with other libraries
 target_link_libraries(map_${PROTO_DIR_NAME}_proto
-
+  perception_proto
+  localization_proto
 )

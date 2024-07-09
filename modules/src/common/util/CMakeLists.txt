@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 ###################################
 set(UTIL_SRC 
   file.cc
-  string_util.cc
+  util.cc
   string_tokenizer.cc
 )
 
@@ -34,6 +34,9 @@ target_include_directories(util PUBLIC
 target_link_libraries(util PRIVATE 
   ${PROTOBUF_LIBRARIES}
   string_util
+  common_math
+  common_proto
+  perception_proto
 )
 
 

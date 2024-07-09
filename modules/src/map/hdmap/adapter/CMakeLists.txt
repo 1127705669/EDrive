@@ -10,6 +10,11 @@ set(CMAKE_PREFIX_PATH
 find_package(tinyxml2 REQUIRED)
 find_package(glog REQUIRED)
 find_package(gflags REQUIRED)
+find_library(PROJ4_LIB NAMES proj PATHS /usr/local/lib /usr/lib /path/to/proj4)
+
+if(NOT PROJ4_LIB)
+    message(FATAL_ERROR "Cannot find libproj4 library")
+endif()
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -44,8 +49,11 @@ target_include_directories(opendrive_adapter PUBLIC
 
 target_link_libraries(opendrive_adapter
   ${catkin_LIBRARIES}
+  common_math
+  util
   tinyxml2
   glog::glog
   gflags
   map_proto
+  ${PROJ4_LIB}
 )

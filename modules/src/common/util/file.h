@@ -44,17 +44,7 @@ namespace EDrive {
 namespace common {
 namespace util {
 
-std::string GetRootPath() {
-  std::string ret_value;
-  char buffer[FILENAME_MAX];
-    
-  if (getcwd(buffer, sizeof(buffer)) == nullptr) {
-    EERROR << "Cannot get root path!";
-  }
-  ret_value = buffer;
-
-  return ret_value;
-}
+std::string GetRootPath();
 
 template <typename MessageType>
 bool SetProtoToASCIIFile(const MessageType &message, int file_descriptor) {

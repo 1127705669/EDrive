@@ -168,7 +168,12 @@ target_link_libraries(routing_lib
   ${catkin_LIBRARIES}
   EDrive_app
   common_adapters
+  util
+  hdmap_util
   routing_gflags
+  core
+  graph
+  routing_proto
 )
 
 ## Add cmake target dependencies of the library
