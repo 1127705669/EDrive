@@ -71,7 +71,7 @@ class Routing : public EDrive::common::EDriveApp {
  private:
   std::unique_ptr<Navigator> navigator_ptr_;
   // EDrive::common::monitor::MonitorLogger monitor_logger_;
-
+  std::string root_path_;
   RoutingConfig routing_conf_;
   const hdmap::HDMap *hdmap_ = nullptr;
 };

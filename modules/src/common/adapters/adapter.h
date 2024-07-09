@@ -193,6 +193,29 @@ class Adapter : public AdapterBase {
     }
   }
 
+  /**
+   * @brief registers the provided callback function to the adapter,
+   * so that the callback function will be called once right after the
+   * message hits the adapter.
+   * @param callback the callback with signature void(const D &).
+   */
+  void AddCallback(Callback callback) {
+    receive_callbacks_.push_back(callback);
+  }
+
+  /**
+   * @brief Pops out the latest added callback.
+   * @return false if there's no callback to pop out, true otherwise.
+   */
+  bool PopCallback() {
+    if (receive_callbacks_.empty()) {
+      return false;
+    }
+    receive_callbacks_.pop_back();
+    return true;
+  }
+
+
   bool use_proto_container_;
 
   template <typename T = D>
@@ -263,8 +286,10 @@ class Adapter : public AdapterBase {
   ros::Time last_receive_time_;
 
   Container<ByteString> proto_container_;
-
   Container<D> ros_container_;
+
+  /// User defined function when receiving a message
+  std::vector<Callback> receive_callbacks_;
 
   mutable DataPtr last_deserialized_message_;
   

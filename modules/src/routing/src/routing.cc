@@ -33,10 +33,13 @@ std::string Routing::Name() const { return FLAGS_routing_node_name; }
 Routing::Routing() {}
 
 EDrive::common::Result_state Routing::Init() {
+  root_path_ = EDrive::common::util::GetRootPath();
+  std::string adapter_conf_file = root_path_ + "/src/" + FLAGS_routing_conf_file;
+
   const auto routing_map_file = EDrive::hdmap::RoutingMapFile();
   EINFO << "Use routing topology graph path: " << routing_map_file;
   navigator_ptr_.reset(new Navigator(routing_map_file));
-  CHECK(common::util::GetProtoFromFile(FLAGS_routing_conf_file, &routing_conf_))
+  CHECK(common::util::GetProtoFromFile(adapter_conf_file, &routing_conf_))
       << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
   EINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
@@ -44,8 +47,8 @@ EDrive::common::Result_state Routing::Init() {
   hdmap_ = EDrive::hdmap::HDMapUtil::BaseMapPtr();
   CHECK(hdmap_) << "Failed to load map file:" << EDrive::hdmap::BaseMapFile();
 
-  AdapterManager::Init(FLAGS_routing_adapter_config_filename);
-  // AdapterManager::AddRoutingRequestCallback(&Routing::OnRoutingRequest, this);
+  AdapterManager::Init(root_path_ + "/src/" +FLAGS_routing_adapter_config_filename);
+  AdapterManager::AddRoutingRequestCallback(&Routing::OnRoutingRequest, this);
   return EDrive::common::Result_state::State_Ok;
 }
 
