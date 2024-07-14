@@ -54,9 +54,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning("/EDrive/planning/trajectory", config);
         break;
-      // case AdapterConfig::VIEWER:
-      //   EnableViewer("/EDrive/viewer", config);
-      //   break;
+      case AdapterConfig::VIEWER:
+        EnableViewer("/EDrive/viewer", config);
+        break;
       case AdapterConfig::VEHICLE_DATA:
         EnableVehicle("/carla/ego_vehicle/odometry", config);
         break;
@@ -115,7 +115,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableRoutingResponse("/EDrive/routing_response", config);
         break;
       default:
-        ROS_INFO("Unknown adapter config type!");
+        EERROR << "Unknown adapter config type: " << config.type();
         break;
     }
   }

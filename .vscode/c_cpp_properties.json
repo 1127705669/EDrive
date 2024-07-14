@@ -9,7 +9,8 @@
                 "${workspaceFolder}/modules/src/**",
                 "${workspaceFolder}/modules/src",
                 "${workspaceFolder}/modules/",
-                "/usr/include/eigen3"
+                "/usr/include/eigen3",
+                "/usr/include/opencv4"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

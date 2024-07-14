@@ -3,12 +3,13 @@ syntax = "proto2";
 package EDrive.viewer;
 
 message ViewerConf {
-  enum ViewerType {
-    ENV_VIEWER = 0;
-    PLANNING_TRAJECTORY = 1;
-    VEHSTA_VIEWER = 2;
+  enum ViewerAgentType {
+    LOCALIZATION_AGENT = 0;
+    PLANNING_AGENT = 1;
+    CONTROL_AGENT = 2;
+    PERCEPTION_AGENT = 4;
   };
 
   optional double viewer_period = 1;
-  repeated ViewerType active_viewers = 2;
+  repeated ViewerAgentType active_viewer_agents = 2;
 }

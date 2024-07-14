@@ -13,7 +13,7 @@
 #include "common/src/EDrive.h"
 #include "common/src/state.h"
 
-#include "viewer/src/common/viewer_agent.h"
+#include "viewer/viewer_agent/viewer_agent_base.h"
 
 #include "viewer/proto/viewer_conf.pb.h"
 
@@ -40,24 +40,26 @@ class Viewer : public EDrive::common::EDriveApp {
 
   void Stop() override;
 
+  void ProcessData();
+
  private:
   // Watch dog timer
   void OnTimer(const ros::TimerEvent &);
 
   /**
    * @brief
-   * Register new controllers. If you need to add a new type of controller,
-   * You should first register your controller in this function.
+   * Register new Agents. If you need to add a new type of Agent,
+   * You should first register your Agent in this function.
    */
-  void RegisterControllers(const ViewerConf *viewer_conf_);
+  void RegisterAgents(const ViewerConf *viewer_conf_);
 
   common::Result_state CheckInput();
 
   void Publish(visualization_msgs::MarkerArray *objects_marker_array);
 
-  ViewerAgent viewer_agent_;
-
   ViewerConf viewer_conf_;
+
+  std::vector<std::unique_ptr<ViewerAgentBase>> agent_list_;
 
   ros::Timer timer_;
   ::planning::ADCTrajectory trajectory_;
@@ -65,8 +67,6 @@ class Viewer : public EDrive::common::EDriveApp {
   derived_object_msgs::ObjectArray objects_;
   visualization_msgs::MarkerArray objects_marker_array_;
   nav_msgs::Path trajectory_path_;
-
-  std::vector<std::unique_ptr<ViewerBase>> viewer_list_;
 
   std::string root_path;
   std::string adapter_conf_file = "/src/viewer/conf/adapter.conf";

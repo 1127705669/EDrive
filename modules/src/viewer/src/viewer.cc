@@ -5,23 +5,20 @@
 #include <ros/ros.h>
 #include "viewer/src/viewer.h"
 
-#include "viewer/src/common/adapters/adapter_manager.h"
-#include "viewer/src/common/viewer_agent.h"
+#include "common/adapters/adapter_manager.h"
 #include "common/util/file.h"
 
 #include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "viewer/src/visual_component/environment/env_handle.h"
-#include "viewer/src/visual_component/vehicle_state/vehicle_state_visualizer.h"
-#include "viewer/src/visual_component/planning/planning_handle.h"
+#include "viewer/viewer_agent/perception_agent.h"
 
 namespace EDrive {
 namespace viewer {
 
 using EDrive::common::Result_state;
-using EDrive::viewer::adapter::AdapterManager;
+using EDrive::common::adapter::AdapterManager;
 
 std::string Viewer::Name() const { return "EDrive_viewer"; }
 
@@ -41,25 +38,6 @@ Result_state Viewer::CheckInput() {
   return Result_state::State_Ok;
 }
 
-void Viewer::RegisterControllers(const ViewerConf *viewer_conf) {
-  for (auto active_viewer : viewer_conf->active_viewers()) {
-    switch (active_viewer) {
-      case ViewerConf::VEHSTA_VIEWER:
-        viewer_list_.emplace_back(std::move(new Vehicle_state()));
-        break;
-      case ViewerConf::ENV_VIEWER:
-        viewer_list_.emplace_back(std::move(new Env_handle(&objects_, &objects_marker_array_)));
-        break;
-      case ViewerConf::PLANNING_TRAJECTORY:
-        viewer_list_.emplace_back(std::move(new Planning_handle(&trajectory_, &trajectory_path_)));
-        break;
-      
-      default:
-        ROS_ERROR("    Unknown active controller type: ");
-    }
-  }
-}
-
 Result_state Viewer::Init(){
   ROS_INFO("Viewer init, starting...");
 
@@ -73,7 +51,7 @@ Result_state Viewer::Init(){
   ROS_INFO("  viewer init, starting...");
   EDrive::common::util::GetProtoFromASCIIFile(viewer_conf_file, &viewer_conf_);
 
-  RegisterControllers(&viewer_conf_);
+  RegisterAgents(&viewer_conf_);
 
   return Result_state::State_Ok;
 }
@@ -93,19 +71,48 @@ Result_state Viewer::Start(){
   return Result_state::State_Ok;
 }
 
+void Viewer::RegisterAgents(const ViewerConf *viewer_conf_) {
+  for (auto active_viewer_agent : viewer_conf_->active_viewer_agents()) {
+    switch (active_viewer_agent) {
+      case ViewerConf::LOCALIZATION_AGENT:
+        agent_list_.emplace_back(std::move(new PerceptionAgent(objects_)));
+        break;
+      case ViewerConf::PLANNING_AGENT:
+        // agent_list_.emplace_back(std::move(new LonController()));
+        break;
+      case ViewerConf::CONTROL_AGENT:
+        // agent_list_.emplace_back(std::move(new LonController()));
+        break;
+      case ViewerConf::PERCEPTION_AGENT:
+        // agent_list_.emplace_back(std::move(new LonController()));
+        break;
+      default:
+        EERROR << "    Unknown active controller type: " << active_viewer_agent;
+    }
+  }
+}
+
 void Viewer::Stop() {
   
+}
+
+void Viewer::ProcessData() {
+  for(auto &agent : agent_list_) {
+    agent->ProcessData();
+  }
 }
 
 void Viewer::OnTimer(const ros::TimerEvent &) {
   ros::Time begin = ros::Time::now();
   Result_state state = CheckInput();
 
-  for (auto &viwer : viewer_list_) {
-    ros::Time start_timestamp = ros::Time::now();
-    viwer->InterfaceMatch();
-    ros::Time end_timestamp = ros::Time::now();
-  }
+  ProcessData();
+
+  // for (auto &viwer : viewer_list_) {
+  //   ros::Time start_timestamp = ros::Time::now();
+  //   viwer->InterfaceMatch();
+  //   ros::Time end_timestamp = ros::Time::now();
+  // }
   
   /* init send data */
   ::viewer::VisualizingData visualizing_data;
