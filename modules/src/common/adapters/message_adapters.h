@@ -41,6 +41,7 @@ using CarlaObjectsAdapter = Adapter<derived_object_msgs::ObjectArray>;
 using ViewerObjectsAdapter = Adapter<visualization_msgs::MarkerArray>;
 using PerceptionAdapter = Adapter<derived_object_msgs::ObjectArray>;
 using LocalizationAdapter = Adapter<nav_msgs::Odometry>;
+using ViewerLocalizationAdapter = Adapter<visualization_msgs::Marker>;
 using ViewerPathAdapter = Adapter<nav_msgs::Path>;
 using RoadMarkingsAdapter = Adapter<sensor_msgs::Image>;
 using RoadMarkerAdapter = Adapter<visualization_msgs::Marker>;

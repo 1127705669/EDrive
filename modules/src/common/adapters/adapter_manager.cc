@@ -51,6 +51,9 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::CONTROL_COMMAND:
         EnableControlCommand("/carla/ego_vehicle/vehicle_control_cmd", config);
         break;
+      case AdapterConfig::VIEWER_LOCALIZATION_POSITION:
+        EnableViewerLocalization("/EDrive/viewer/localization/position", config);
+        break;
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning("/EDrive/planning/trajectory", config);
         break;

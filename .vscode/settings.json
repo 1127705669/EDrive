@@ -76,6 +76,7 @@
         "eigen": "cpp",
         "forward_list": "cpp",
         "regex": "cpp",
-        "slist": "cpp"
+        "slist": "cpp",
+        "lu": "cpp"
     }
 }

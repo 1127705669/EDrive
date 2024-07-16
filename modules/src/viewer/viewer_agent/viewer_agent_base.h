@@ -33,7 +33,7 @@ class ViewerAgentBase {
    * @param viewer_conf_ viewer configurations
    * @return Status initialization status
    */
-  common::Result_state Init(const ViewerConf *viewer_conf);
+  virtual common::Result_state Init(const ViewerConf *viewer_conf) = 0;
 
   virtual common::Result_state ProcessData() = 0;
 

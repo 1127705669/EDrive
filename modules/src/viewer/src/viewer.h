@@ -57,15 +57,18 @@ class Viewer : public EDrive::common::EDriveApp {
 
   void Publish(visualization_msgs::MarkerArray *objects_marker_array);
 
+  ros::Timer timer_;
   ViewerConf viewer_conf_;
 
   std::vector<std::unique_ptr<ViewerAgentBase>> agent_list_;
 
-  ros::Timer timer_;
-  ::planning::ADCTrajectory trajectory_;
-  nav_msgs::Odometry location_;
+  nav_msgs::Odometry ego_vehicle_odometry_;;
+  visualization_msgs::Marker ego_vehicle_marker_;
+
   derived_object_msgs::ObjectArray objects_;
   visualization_msgs::MarkerArray objects_marker_array_;
+
+  ::planning::ADCTrajectory trajectory_;
   nav_msgs::Path trajectory_path_;
 
   std::string root_path;

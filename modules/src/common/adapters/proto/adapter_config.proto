@@ -27,6 +27,7 @@ message AdapterConfig {
     TEST = 19;
     RELATIVE_MAP = 20;
     NAVIGATION = 21;
+    VIEWER_LOCALIZATION_POSITION = 23;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

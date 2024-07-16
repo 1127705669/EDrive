@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Localization1
+        - /Localization1/ego_location1
         - /Localization1/Vector Map1
         - /Perception1
         - /Control1
@@ -61,7 +62,7 @@ Visualization Manager:
       Displays:
         - Class: rviz/Marker
           Enabled: true
-          Marker Topic: /EDrive/localization/position/viewer
+          Marker Topic: /EDrive/viewer/localization/position
           Name: ego_location
           Namespaces:
             vehicle_shape: true
@@ -100,7 +101,7 @@ Visualization Manager:
           Marker Topic: /EDrive/localization/vector_map
           Name: Vector Map
           Namespaces:
-            ways: true
+            {}
           Queue Size: 100
           Value: true
         - Class: rviz/MarkerArray
@@ -144,7 +145,7 @@ Visualization Manager:
           Marker Topic: /EDrive/viewer/objects
           Name: Objects
           Namespaces:
-            object_markers: true
+            {}
           Queue Size: 100
           Value: true
       Enabled: true
@@ -156,7 +157,7 @@ Visualization Manager:
           Marker Topic: /EDrive/debug/marker_1
           Name: Matched Point
           Namespaces:
-            {}
+            trajectory_point: true
           Queue Size: 100
           Value: true
       Enabled: true
@@ -201,7 +202,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 491.97784423828125
+      Distance: 444.4782409667969
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -209,17 +210,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -53.20741653442383
-        Y: -34.9974479675293
-        Z: 23.79436492919922
+        X: -72.97502136230469
+        Y: -6.809927463531494
+        Z: 13.149436950683594
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0447969436645508
+      Pitch: 1.059796929359436
       Target Frame: map
-      Yaw: 3.164060115814209
+      Yaw: 3.169060230255127
     Saved: ~
 Window Geometry:
   CarlaControl:

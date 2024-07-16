@@ -13,6 +13,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "viewer/viewer_agent/perception_agent.h"
+#include "viewer/viewer_agent/localization_agent.h"
 
 namespace EDrive {
 namespace viewer {
@@ -29,8 +30,8 @@ Result_state Viewer::CheckInput() {
   auto trajectory_adapter = AdapterManager::GetPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
 
-  auto location_adapter = AdapterManager::GetLocalization();
-  location_ = location_adapter->GetLatestObserved();
+  auto ego_vehicle_odometry_adapter = AdapterManager::GetLocalization();
+  ego_vehicle_odometry_ = ego_vehicle_odometry_adapter->GetLatestObserved();
 
   auto objects_adapter = AdapterManager::GetPerception();
   objects_ = objects_adapter->GetLatestObserved();
@@ -52,6 +53,10 @@ Result_state Viewer::Init(){
   EDrive::common::util::GetProtoFromASCIIFile(viewer_conf_file, &viewer_conf_);
 
   RegisterAgents(&viewer_conf_);
+
+  for(auto &agent : agent_list_) {
+    agent->Init(&viewer_conf_);
+  }
 
   return Result_state::State_Ok;
 }
@@ -75,7 +80,7 @@ void Viewer::RegisterAgents(const ViewerConf *viewer_conf_) {
   for (auto active_viewer_agent : viewer_conf_->active_viewer_agents()) {
     switch (active_viewer_agent) {
       case ViewerConf::LOCALIZATION_AGENT:
-        agent_list_.emplace_back(std::move(new PerceptionAgent(objects_, objects_marker_array_)));
+        agent_list_.emplace_back(std::move(new LocalizationAgent(ego_vehicle_odometry_, ego_vehicle_marker_)));
         break;
       case ViewerConf::PLANNING_AGENT:
         // agent_list_.emplace_back(std::move(new LonController()));
@@ -84,7 +89,7 @@ void Viewer::RegisterAgents(const ViewerConf *viewer_conf_) {
         // agent_list_.emplace_back(std::move(new LonController()));
         break;
       case ViewerConf::PERCEPTION_AGENT:
-        // agent_list_.emplace_back(std::move(new LonController()));
+        agent_list_.emplace_back(std::move(new PerceptionAgent(objects_, objects_marker_array_)));
         break;
       default:
         EERROR << "    Unknown active controller type: " << active_viewer_agent;
@@ -127,6 +132,7 @@ void Viewer::Publish(visualization_msgs::MarkerArray *objects_marker_array) {
   AdapterManager::PublishViewerObjects(*objects_marker_array);
   objects_marker_array_.markers.clear();
   AdapterManager::PublishViewerPath(trajectory_path_);
+  AdapterManager::PublishViewerLocalization(ego_vehicle_marker_);
   // AdapterManager::PublishViewer(*visualizing_data);
 }
 
