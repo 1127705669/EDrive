@@ -51,7 +51,7 @@ void PerceptionAgent::VisualizeObjects() {
                     continue;
                 }
                 if (obj.shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y] == 0) {
-                    // EERROR << "Invalid BOX_Y dimension for object ID: " << obj.id;
+                    EERROR << "Invalid BOX_Y dimension for object ID: " << obj.id;
                     continue;
                 }
                 if (obj.shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z] == 0) {
@@ -99,14 +99,6 @@ void PerceptionAgent::VisualizeObjects() {
             default:
                 EERROR << "Unknown shape type: " << obj.shape.type;
                 continue;  // 跳过未知形状类型的对象
-        }
-
-        // 根据对象的分类设置尺寸
-        if (obj.classification == derived_object_msgs::Object::CLASSIFICATION_BIKE ||
-            obj.classification == derived_object_msgs::Object::CLASSIFICATION_MOTORCYCLE) {
-            // marker.scale.x = 1.0;  // 设置合适的长度
-            marker.scale.y = 0.5;  // 设置合适的宽度
-            // marker.scale.z = 1.5;  // 设置合适的高度
         }
 
         // 统一设置颜色为蓝色
