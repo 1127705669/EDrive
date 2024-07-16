@@ -4,3 +4,4 @@ rospkg
 PyYAML
 carla==0.9.13
 opencv-python
+numpy

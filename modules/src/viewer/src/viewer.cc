@@ -75,7 +75,7 @@ void Viewer::RegisterAgents(const ViewerConf *viewer_conf_) {
   for (auto active_viewer_agent : viewer_conf_->active_viewer_agents()) {
     switch (active_viewer_agent) {
       case ViewerConf::LOCALIZATION_AGENT:
-        agent_list_.emplace_back(std::move(new PerceptionAgent(objects_)));
+        agent_list_.emplace_back(std::move(new PerceptionAgent(objects_, objects_marker_array_)));
         break;
       case ViewerConf::PLANNING_AGENT:
         // agent_list_.emplace_back(std::move(new LonController()));

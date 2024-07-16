@@ -5,6 +5,7 @@
 #include "viewer/viewer_agent/viewer_agent_base.h"
 
 #include <derived_object_msgs/ObjectArray.h>
+#include <visualization_msgs/MarkerArray.h>
 
 namespace EDrive {
 namespace viewer {
@@ -19,7 +20,7 @@ class PerceptionAgent : public ViewerAgentBase {
   /**
    * @brief constructor
    */
-  PerceptionAgent(const derived_object_msgs::ObjectArray& objects);
+  PerceptionAgent(const derived_object_msgs::ObjectArray& objects, visualization_msgs::MarkerArray& objects_marker_array);
 
   /**
    * @brief destructor
@@ -42,8 +43,10 @@ class PerceptionAgent : public ViewerAgentBase {
   std::string Name() const override;
 
  private:
+  void VisualizeObjects();
   const std::string name_;
   const derived_object_msgs::ObjectArray& objects_;
+  visualization_msgs::MarkerArray &objects_marker_array_;
 };
 
 } // namespace viewer

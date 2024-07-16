@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Localization1
+        - /Localization1/Vector Map1
         - /Perception1
         - /Control1
         - /Control1/Matched Point1
@@ -78,7 +79,7 @@ Visualization Manager:
           Color: 255; 255; 255
           Color Transformer: Intensity
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Min Color: 0; 0; 0
@@ -93,7 +94,7 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
         - Class: rviz/MarkerArray
           Enabled: true
           Marker Topic: /EDrive/localization/vector_map
@@ -138,6 +139,14 @@ Visualization Manager:
           Transport Hint: raw
           Unreliable: false
           Value: true
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /EDrive/viewer/objects
+          Name: Objects
+          Namespaces:
+            object_markers: true
+          Queue Size: 100
+          Value: true
       Enabled: true
       Name: Perception
     - Class: rviz/Group
@@ -147,7 +156,7 @@ Visualization Manager:
           Marker Topic: /EDrive/debug/marker_1
           Name: Matched Point
           Namespaces:
-            trajectory_point: true
+            {}
           Queue Size: 100
           Value: true
       Enabled: true
@@ -192,7 +201,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 669.8460083007812
+      Distance: 491.97784423828125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -200,9 +209,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -96.62100982666016
-        Y: 2.0221362113952637
-        Z: -0.9204152226448059
+        X: -53.20741653442383
+        Y: -34.9974479675293
+        Z: 23.79436492919922
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
