@@ -102,9 +102,6 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::MARKER_DEBUG_POINT:
         EnableMarkerDebugPoint("/EDrive/debug/marker_1", config);
         break;
-      case AdapterConfig::TEST:
-        EnableTest("/EDrive/localization/test", config);
-        break;
       case AdapterConfig::RELATIVE_MAP:
         EnableRelativeMap("/EDrive/relative_map", config);
         break;

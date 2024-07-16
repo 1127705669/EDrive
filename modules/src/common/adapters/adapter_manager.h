@@ -198,7 +198,6 @@ class AdapterManager
   /// The following code registered all the adapters of interest.
   REGISTER_ADAPTER(ViewerLocalization);
   REGISTER_ADAPTER(Viewer);
-  REGISTER_ADAPTER(Test);
   REGISTER_ADAPTER(RoutingRequest);
   REGISTER_ADAPTER(RoutingResponse);
   REGISTER_ADAPTER(RelativeMap);

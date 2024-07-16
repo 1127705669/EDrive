@@ -44,9 +44,6 @@ Result_state Control::CheckInput() {
   auto localization_adapter = AdapterManager::GetLocalization();
   localization_ = localization_adapter->GetLatestObserved();
 
-  auto test_adapter = AdapterManager::GetTest();
-  test_ = test_adapter->GetLatestObserved();
-
   VehicleStateProvider::Instance()->Update(localization_);
 
   return Result_state::State_Ok;
@@ -77,8 +74,6 @@ void Control::ConvertControlCommandToSimulator(
 
 void Control::OnTimer(const ros::TimerEvent &) {
   Result_state status = CheckInput();
-
-  ROS_INFO("%d   %s", test_.id(), test_.name().c_str());
 
   ros::Time start_timestamp = ros::Time::now();
   ::control::CarlaEgoVehicleControl simulator_control_command;

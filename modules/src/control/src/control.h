@@ -23,8 +23,6 @@
 
 #include "control/controller/controller_agent.h"
 
-#include "localization/proto/test.pb.h"
-
 namespace EDrive {
 namespace control {
 
@@ -62,7 +60,6 @@ class Control : public EDrive::common::EDriveApp {
   ControlConf control_conf_;
   planning::ADCTrajectory trajectory_;
   nav_msgs::Odometry localization_; 
-  localization::TestMessage test_;
 
   std::string root_path;
   std::string adapter_conf_file = "/src/control/conf/adapter.conf";

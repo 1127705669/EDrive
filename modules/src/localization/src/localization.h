@@ -52,8 +52,6 @@ class Localization : public EDrive::common::EDriveApp {
 
   void Publish();
 
-  void PositionConvert();
-
   void PCDConvert(const std::string& file_path, bool apply_filter, bool save_filtered, const std::string& save_path = "");
 
   ros::Timer timer_;
