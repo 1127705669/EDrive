@@ -1,7 +1,6 @@
 [submodule "simulator/CARLA_0.9.13/catkin_ws/src/ros-bridge"]
     path = simulator/CARLA_0.9.13/catkin_ws/src/ros-bridge
     url = https://github.com/1127705669/ros-bridge.git
-    branch = master
 [submodule "third_party/osqp"]
 	path = third_party/osqp
 	url = https://github.com/osqp/osqp.git
