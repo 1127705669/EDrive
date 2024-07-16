@@ -29,6 +29,12 @@ LocalizationAgent::~LocalizationAgent() {}
 
 Result_state LocalizationAgent::Init(const ViewerConf *viewer_conf) {
   vehicle_param_ = VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
+  
+  ego_vehicle_marker_.pose.orientation.x = 0.0;
+  ego_vehicle_marker_.pose.orientation.y = 0.0;
+  ego_vehicle_marker_.pose.orientation.z = 0.0;
+  ego_vehicle_marker_.pose.orientation.w = 1.0;
+
   return Result_state::State_Ok;
 }
 
