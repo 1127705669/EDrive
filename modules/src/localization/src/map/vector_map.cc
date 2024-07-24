@@ -319,8 +319,8 @@ void VectorMap::create_marker_array(const std::unordered_map<int, Node> &nodes, 
         marker.pose.orientation.w = 1.0;
         marker.scale.x = 0.2;
         marker.color.a = 1.0;
-        marker.color.r = 0.0;
-        marker.color.g = 0.0;
+        marker.color.r = 1.0;
+        marker.color.g = 1.0;
         marker.color.b = 1.0;
 
         for (const int &ref : way.node_refs) {
