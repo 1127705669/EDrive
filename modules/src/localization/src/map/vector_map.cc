@@ -1,6 +1,7 @@
 /******************************************************************************
  * Copyright 2024 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
+#define SPEED_CONVERSION_FACTOR 3.6
 
 #include "localization/src/map/vector_map.h"
 
@@ -248,6 +249,9 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
                 // 封闭路径的最后一个段的最后一个点
                 tp.path_point.kappa = calculateKappa(segment.points[j - 1], segment.points[j], sortedSegments.front().points.front());
             }
+
+            // Set speed v using the defined macro
+            tp.v = 25.0 / SPEED_CONVERSION_FACTOR;
 
             trajectory_pb.trajectory_point.push_back(tp);
         }

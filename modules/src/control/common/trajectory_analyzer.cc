@@ -52,7 +52,44 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
                                            double *ptr_s, double *ptr_s_dot,
                                            double *ptr_d,
                                            double *ptr_d_dot) const {
+  double dx = x - ref_point.x;
+  double dy = y - ref_point.y;
 
+  double cos_ref_theta = std::cos(ref_point.theta);
+  double sin_ref_theta = std::sin(ref_point.theta);
+
+  // the sin of diff angle between vector (cos_ref_theta, sin_ref_theta) and
+  // (dx, dy)
+  double cross_rd_nd = cos_ref_theta * dy - sin_ref_theta * dx;
+  *ptr_d = cross_rd_nd;
+
+  // the cos of diff angle between vector (cos_ref_theta, sin_ref_theta) and
+  // (dx, dy)
+  double dot_rd_nd = dx * cos_ref_theta + dy * sin_ref_theta;
+  *ptr_s = ref_point.s + dot_rd_nd;
+
+  double delta_theta = theta - ref_point.theta;
+  double cos_delta_theta = std::cos(delta_theta);
+  double sin_delta_theta = std::sin(delta_theta);
+
+  *ptr_d_dot = v * sin_delta_theta;
+
+  double one_minus_kappa_r_d = 1 - ref_point.kappa * (*ptr_d);
+
+  if (one_minus_kappa_r_d <= 0.0) {
+    EERROR << "TrajectoryAnalyzer::ToTrajectoryFrame "
+              "found fatal reference and actual difference. "
+              "Control output might be unstable:"
+           << " ref_point.kappa:" << ref_point.kappa
+           << " ref_point.x:" << ref_point.x
+           << " ref_point.y:" << ref_point.y << " car x:" << x
+           << " car y:" << y << " *ptr_d:" << *ptr_d
+           << " one_minus_kappa_r_d:" << one_minus_kappa_r_d;
+    // currently set to a small value to avoid control crash.
+    one_minus_kappa_r_d = 0.01;
+  }
+
+  *ptr_s_dot = v * cos_delta_theta / one_minus_kappa_r_d;
 }
 
 void TrajectoryAnalyzer::PublishPoint(const ::common::TrajectoryPoint point) const {
