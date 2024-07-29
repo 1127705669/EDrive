@@ -38,7 +38,7 @@ Result_state Control::Init(){
 
 Result_state Control::CheckInput() {
   AdapterManager::Observe();
-  auto trajectory_adapter = AdapterManager::GetPlanning();
+  auto trajectory_adapter = AdapterManager::GetRLPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
 
   auto localization_adapter = AdapterManager::GetLocalization();

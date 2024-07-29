@@ -204,6 +204,7 @@ class AdapterManager
   REGISTER_ADAPTER(Navigation);
   REGISTER_ADAPTER(Vehicle);
   REGISTER_ADAPTER(Planning);
+  REGISTER_ADAPTER(RLPlanning);
   REGISTER_ADAPTER(ControlCommand);
   REGISTER_ADAPTER(CarlaObjects);
   REGISTER_ADAPTER(ViewerObjects);

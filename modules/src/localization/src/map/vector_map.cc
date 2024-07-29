@@ -251,7 +251,8 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
             }
 
             // Set speed v using the defined macro
-            tp.v = 25.0 / SPEED_CONVERSION_FACTOR;
+            // tp.v = 25.0 / SPEED_CONVERSION_FACTOR;
+            tp.v = 0;
 
             trajectory_pb.trajectory_point.push_back(tp);
         }

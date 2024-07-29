@@ -75,28 +75,37 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
+# file(GLOB MSG_FOLDERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg ${CMAKE_CURRENT_SOURCE_DIR}/msg/*)
 
-foreach(MSG_FOLDER ${MSG_FOLDERS})
-  message("Found msg folder: ${MSG_FOLDER}")
-  file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
+# foreach(MSG_FOLDER ${MSG_FOLDERS})
+#   message("Found msg folder: ${MSG_FOLDER}")
+#   file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER} ${CMAKE_CURRENT_SOURCE_DIR}/msg/${MSG_FOLDER}/*.msg)
 
-  foreach(MSG_FILE ${MSG_FILES})
-    message(" Found msg file: ${MSG_FILE}")
-  endforeach()
-  add_message_files(
-    DIRECTORY msg/${MSG_FOLDER}
-    FILES
-    ${MSG_FILES}
-  )
+#   foreach(MSG_FILE ${MSG_FILES})
+#     message(" Found msg file: ${MSG_FILE}")
+#   endforeach()
+#   add_message_files(
+#     DIRECTORY msg/${MSG_FOLDER}
+#     FILES
+#     ${MSG_FILES}
+#   )
 
-endforeach()
+# endforeach()
 
 add_message_files(
-  DIRECTORY msg/carla_msgs
   FILES
   CarlaEgoVehicleControl.msg
   CarlaEgoVehicleStatus.msg
+)
+
+add_message_files(
+  FILES
+  PathPoint.msg
+  Path.msg
+  SLPoint.msg
+  FrenetFramePoint.msg
+  SpeedPoint.msg
+  TrajectoryPoint.msg
 )
 
 ## Generate messages in the 'msg' folder
