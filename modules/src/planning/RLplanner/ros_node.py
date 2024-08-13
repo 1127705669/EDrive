@@ -46,13 +46,14 @@ class ROSNode:
         state = [point.path_point.x, point.path_point.y, point.v]
         return state
 
-    def print_debug_info(self, indices, states, nearest_index, updated_speeds):
+    def print_debug_info(self, indices, states, nearest_index, updated_speeds, rewards):
         # 使用 pandas DataFrame 更好地格式化和打印状态信息
         states_df = pd.DataFrame(states, columns=['x', 'y', 'v'])
         states_df['index'] = indices
         states_df['nearest'] = ['<-- Nearest' if idx == nearest_index else '' for idx in indices]
         states_df['updated_v'] = updated_speeds
-        print("States to model:\n", states_df)
+        states_df['reward'] = rewards
+        print("States to model:\n", states_df.to_string(index=False))
 
     def find_and_extract_points(self):
         if not self.trajectory_data or not self.odometry_data:
@@ -95,14 +96,8 @@ def main():
         # 使用 DDPG 模型预测这些点的速度
         updated_speeds = ros_node.ddpg_model.predict_speeds(flattened_states)
 
-        # 打印模型输出
-        print(f"Updated speeds: {updated_speeds}")
-
         for i, idx in enumerate(indices):
             ros_node.trajectory_data[-1].trajectory_point[idx].v = updated_speeds[i]
-
-        # 调用调试打印函数
-        ros_node.print_debug_info(indices, states, nearest_index, updated_speeds)
 
         # 发布更新后的轨迹
         ros_node.trajectory_pub.publish(ros_node.trajectory_data[-1])
@@ -120,6 +115,12 @@ def main():
 
         # 环境步进并训练
         next_states, rewards, dones = ros_node.env.step(updated_speeds)
+
+        print(rewards)
+
+        # 调用调试打印函数
+        # ros_node.print_debug_info(indices, states, nearest_index, updated_speeds, rewards)
+
         flattened_next_state = flatten_and_reshape(next_states)
 
         # 确保经验回放缓冲区中添加的是整组数据
