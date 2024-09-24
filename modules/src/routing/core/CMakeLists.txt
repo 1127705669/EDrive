@@ -42,12 +42,20 @@ add_library(routing_black_list_range_generator SHARED
 )
 
 target_include_directories(routing_black_list_range_generator PUBLIC
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+  ${Protobuf_INCLUDE_DIRS}
+  ${PROTOBUF_SRC_DIR}
 )
 
 target_link_libraries(routing_result_generator 
+  ${Protobuf_LIBRARIES}
   graph
+  common_proto
+  map_proto
+  routing_proto
 )
 
 ###################################

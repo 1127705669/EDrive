@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(common_proto)
-
-find_package(Protobuf REQUIRED)
+project(viewer_proto)
 
 ## Generate Protocol Buffer message
 ## set protocol buffer output address
@@ -19,7 +17,7 @@ foreach(proto_file ${proto_files})
   add_custom_command(
     OUTPUT "${PROTO_DIR}/${FIL_WE}.pb.cc"
            "${PROTO_DIR}/${FIL_WE}.pb.h"
-    COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
+    COMMAND  ${Protobuf_PROTOC_EXECUTABLE}
     ARGS --cpp_out  ${PROTO_DIR}
       -I ${PROTO_DIR}
       ${proto_file}
@@ -37,17 +35,21 @@ add_custom_target(generate_viewer_proto_message ALL
   VERBATIM
 )
 
-include_directories(
-include
-  ${catkin_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
 set(VIEWER_PROTO_SRC 
   viewer_conf.pb.cc
 )
 
 add_library(viewer_proto SHARED ${VIEWER_PROTO_SRC})
 
-target_link_libraries(viewer_proto PRIVATE ${PROTOBUF_LIBRARIES})
+target_include_directories(viewer_proto PUBLIC
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+  ${GENERATED_PROTO_DIR}
+  ${Protobuf_INCLUDE_DIRS}
+  ${PROTOBUF_SRC_DIR}
+)
+
+target_link_libraries(viewer_proto PRIVATE 
+  ${Protobuf_LIBRARIES}
+)

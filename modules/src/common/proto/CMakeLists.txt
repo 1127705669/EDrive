@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(common_proto)
 
-find_package(Protobuf REQUIRED)
-
 set(PROTO_DIR_NAME "common")
 
 ## Set protocol buffer output address
@@ -26,7 +24,7 @@ foreach(proto_file ${proto_files})
   list(APPEND MESSAGE_HDRS ${GEN_HDR})
   add_custom_command(
     OUTPUT ${GEN_SRC} ${GEN_HDR}
-    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
+    COMMAND ${Protobuf_PROTOC_EXECUTABLE}
     ARGS --cpp_out=${GENERATED_PROTO_DIR} -I${PROTOBUF_IMPORT_DIRS} -I${PROTO_DIR} ${proto_file}
     DEPENDS ${proto_file}
     COMMENT "Running C++ protocol buffer compiler on ${proto_file}"
@@ -45,14 +43,16 @@ add_library(${PROTO_DIR_NAME}_proto SHARED)
 # Append source files to the target after they are generated
 target_sources(${PROTO_DIR_NAME}_proto PRIVATE ${MESSAGE_SRC} ${MESSAGE_HDRS})
 
-include_directories(
+target_include_directories(${PROTO_DIR_NAME}_proto PUBLIC
   include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
   ${GENERATED_PROTO_DIR}
+  ${Protobuf_INCLUDE_DIRS}
+  ${PROTOBUF_SRC_DIR}
 )
 
 # Link with other libraries
 target_link_libraries(${PROTO_DIR_NAME}_proto
-
+  ${Protobuf_LIBRARIES}
 )

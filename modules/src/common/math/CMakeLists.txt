@@ -40,8 +40,14 @@ add_library(linear_interpolation SHARED
 )
 
 target_include_directories(linear_interpolation PUBLIC
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+)
+
+target_link_libraries(linear_interpolation
   geometry
-  pnc_point_proto
+  common_proto
 )
 
 ###################################

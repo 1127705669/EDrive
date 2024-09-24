@@ -4,7 +4,13 @@ project(planning)
 # Set the third party directory
 get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} DIRECTORY)
 get_filename_component(GRANDPARENT_DIR ${PARENT_DIR} DIRECTORY)
+set(THIRD_PARTY_ROOT_DIR ${GRANDPARENT_DIR}/third_party)
 set(THIRD_PARTY_DIR ${GRANDPARENT_DIR}/third_party/build)
+
+set(PROTOBUF_SRC_DIR ${THIRD_PARTY_ROOT_DIR}/protobuf/src)
+
+list(PREPEND CMAKE_PREFIX_PATH "${THIRD_PARTY_DIR}/protobuf")
+find_package(Protobuf 3.14.0 REQUIRED)
 
 # Add osqp installation directory to CMAKE_PREFIX_PATH
 set(CMAKE_PREFIX_PATH 

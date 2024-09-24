@@ -7,6 +7,11 @@ get_filename_component(GRANDPARENT_DIR ${PARENT_DIR} DIRECTORY)
 set(THIRD_PARTY_ROOT_DIR ${GRANDPARENT_DIR}/third_party)
 set(THIRD_PARTY_DIR ${GRANDPARENT_DIR}/third_party/build)
 
+set(PROTOBUF_SRC_DIR ${THIRD_PARTY_ROOT_DIR}/protobuf/src)
+
+list(PREPEND CMAKE_PREFIX_PATH "${THIRD_PARTY_DIR}/protobuf")
+find_package(Protobuf 3.14.0 REQUIRED)
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
