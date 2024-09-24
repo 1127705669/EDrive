@@ -30,4 +30,5 @@ target_include_directories(common_adapters PUBLIC
 
 target_link_libraries(common_adapters 
   adapter_proto
+  util
 )

@@ -28,7 +28,7 @@ Result_state Control::Init(){
   AdapterManager::Init(adapter_conf_file);
 
   ROS_INFO("  controller init, starting...");
-  EDrive::common::util::GetProtoFromASIIFile(control_conf_file, &control_conf_);
+  EDrive::common::util::GetProtoFromASCIIFile(control_conf_file, &control_conf_);
   if(Result_state::State_Ok != controller_agent_.Init(&control_conf_)) {
     ROS_ERROR("    controller agent init failed, stopping...");
   }
@@ -38,14 +38,11 @@ Result_state Control::Init(){
 
 Result_state Control::CheckInput() {
   AdapterManager::Observe();
-  auto trajectory_adapter = AdapterManager::GetPlanning();
+  auto trajectory_adapter = AdapterManager::GetRLPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
 
   auto localization_adapter = AdapterManager::GetLocalization();
   localization_ = localization_adapter->GetLatestObserved();
-
-  auto test_adapter = AdapterManager::GetTest();
-  test_ = test_adapter->GetLatestObserved();
 
   VehicleStateProvider::Instance()->Update(localization_);
 
@@ -71,14 +68,14 @@ void Control::ConvertControlCommandToSimulator(
     const ControlCommand& control_command, 
     ::control::CarlaEgoVehicleControl& simulator_control_command) {
   simulator_control_command.steer = -control_command.steering_target()/100;
-  simulator_control_command.throttle = 0.3;
-
+  simulator_control_command.throttle = control_command.throttle()/100;
+  simulator_control_command.brake = control_command.brake()/100;
+  // ROS_INFO("%f",simulator_control_command.throttle);
+  // simulator_control_command.throttle = 0.3;
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {
   Result_state status = CheckInput();
-
-  ROS_INFO("%d   %s", test_.id(), test_.name().c_str());
 
   ros::Time start_timestamp = ros::Time::now();
   ::control::CarlaEgoVehicleControl simulator_control_command;

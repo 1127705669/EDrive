@@ -14,6 +14,7 @@
 #include <google/protobuf/message.h>
 
 #include "common/adapters/adapter.h"
+#include "common/src/log.h"
 #include "common/src/macro.h"
 #include "common/adapters/proto/adapter_config.pb.h"
 #include "common/adapters/message_adapters.h"
@@ -46,6 +47,26 @@ using is_protobuf_message = std::is_base_of<google::protobuf::Message, T>;
   static void Publish##name(const name##Adapter::DataType &data) {             \
     Instance()->InternalPublish##name(data);                                   \
   }                                                                            \
+  static void Add##name##Callback(name##Adapter::Callback callback) {          \
+    CHECK(Instance()->name##_)                                                 \
+        << "Initialize adapter before setting callback";                       \
+    Instance()->name##_->AddCallback(callback);                                \
+  }                                                                            \
+  template <class T>                                                           \
+  static void Add##name##Callback(                                             \
+      void (T::*fp)(const name##Adapter::DataType &data), T *obj) {            \
+    Add##name##Callback(std::bind(fp, obj, std::placeholders::_1));            \
+  }                                                                            \
+  template <class T>                                                           \
+  static void Add##name##Callback(                                             \
+      void (T::*fp)(const name##Adapter::DataType &data)) {                    \
+    Add##name##Callback(fp);                                                   \
+  }                                                                            \
+  /* Returns false if there's no callback to pop out, true otherwise. */       \
+  static bool Pop##name##Callback() {                                          \
+    return Instance()->name##_->PopCallback();                                 \
+  }                                                                            \
+                                                                               \
  private:                                                                      \
   std::unique_ptr<name##Adapter> name##_;                                      \
   ros::Publisher name##publisher_;                                             \
@@ -175,10 +196,15 @@ class AdapterManager
   bool initialized_ = false;
 
   /// The following code registered all the adapters of interest.
-  // REGISTER_ADAPTER(Viewer);
-  REGISTER_ADAPTER(Test);
+  REGISTER_ADAPTER(ViewerLocalization);
+  REGISTER_ADAPTER(Viewer);
+  REGISTER_ADAPTER(RoutingRequest);
+  REGISTER_ADAPTER(RoutingResponse);
+  REGISTER_ADAPTER(RelativeMap);
+  REGISTER_ADAPTER(Navigation);
   REGISTER_ADAPTER(Vehicle);
   REGISTER_ADAPTER(Planning);
+  REGISTER_ADAPTER(RLPlanning);
   REGISTER_ADAPTER(ControlCommand);
   REGISTER_ADAPTER(CarlaObjects);
   REGISTER_ADAPTER(ViewerObjects);

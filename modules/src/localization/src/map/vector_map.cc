@@ -1,6 +1,7 @@
 /******************************************************************************
  * Copyright 2024 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
+#define SPEED_CONVERSION_FACTOR 3.6
 
 #include "localization/src/map/vector_map.h"
 
@@ -249,6 +250,10 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
                 tp.path_point.kappa = calculateKappa(segment.points[j - 1], segment.points[j], sortedSegments.front().points.front());
             }
 
+            // Set speed v using the defined macro
+            // tp.v = 25.0 / SPEED_CONVERSION_FACTOR;
+            tp.v = 0;
+
             trajectory_pb.trajectory_point.push_back(tp);
         }
     }
@@ -319,8 +324,8 @@ void VectorMap::create_marker_array(const std::unordered_map<int, Node> &nodes, 
         marker.pose.orientation.w = 1.0;
         marker.scale.x = 0.2;
         marker.color.a = 1.0;
-        marker.color.r = 0.0;
-        marker.color.g = 0.0;
+        marker.color.r = 1.0;
+        marker.color.g = 1.0;
         marker.color.b = 1.0;
 
         for (const int &ref : way.node_refs) {

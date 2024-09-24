@@ -9,7 +9,9 @@
                 "${workspaceFolder}/modules/src/**",
                 "${workspaceFolder}/modules/src",
                 "${workspaceFolder}/modules/",
-                "/usr/include/eigen3"
+                "/usr/include/eigen3",
+                "/usr/include/opencv4",
+                "${workspaceFolder}/third_party/protobuf/src"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

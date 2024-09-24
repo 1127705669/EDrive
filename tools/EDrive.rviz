@@ -5,6 +5,8 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Localization1
+        - /Localization1/ego_location1
+        - /Localization1/Vector Map1
         - /Perception1
         - /Control1
         - /Control1/Matched Point1
@@ -60,7 +62,7 @@ Visualization Manager:
       Displays:
         - Class: rviz/Marker
           Enabled: true
-          Marker Topic: /EDrive/localization/position/viewer
+          Marker Topic: /EDrive/viewer/localization/position
           Name: ego_location
           Namespaces:
             vehicle_shape: true
@@ -78,7 +80,7 @@ Visualization Manager:
           Color: 255; 255; 255
           Color Transformer: Intensity
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Min Color: 0; 0; 0
@@ -93,13 +95,13 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
         - Class: rviz/MarkerArray
           Enabled: true
           Marker Topic: /EDrive/localization/vector_map
           Name: Vector Map
           Namespaces:
-            ways: true
+            {}
           Queue Size: 100
           Value: true
         - Class: rviz/MarkerArray
@@ -137,6 +139,14 @@ Visualization Manager:
           Queue Size: 2
           Transport Hint: raw
           Unreliable: false
+          Value: true
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /EDrive/viewer/objects
+          Name: Objects
+          Namespaces:
+            {}
+          Queue Size: 100
           Value: true
       Enabled: true
       Name: Perception
@@ -192,7 +202,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 669.8460083007812
+      Distance: 444.4782409667969
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -200,17 +210,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -96.62100982666016
-        Y: 2.0221362113952637
-        Z: -0.9204152226448059
+        X: -72.97502136230469
+        Y: -6.809927463531494
+        Z: 13.149436950683594
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0447969436645508
+      Pitch: 1.059796929359436
       Target Frame: map
-      Yaw: 3.164060115814209
+      Yaw: 3.169060230255127
     Saved: ~
 Window Geometry:
   CarlaControl:

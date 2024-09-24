@@ -48,6 +48,18 @@ add_library(pid_controller SHARED
 
 add_dependencies(pid_controller control_generate_messages_cpp planning_generate_messages_cpp)
 
+target_include_directories(pid_controller PUBLIC
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+# Link with other libraries
+target_link_libraries(pid_controller
+  control_proto
+)
+
 ###################################
 #    trajectory_analyzer          #
 ###################################

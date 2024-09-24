@@ -24,6 +24,7 @@ add_library(vehicle_config_helper SHARED ${VEHICLE_CONFIG_HELPER_SRC})
 
 target_link_libraries(vehicle_config_helper 
   vehicle_config_proto
+  util
 )
 
 ###################################

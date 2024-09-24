@@ -31,7 +31,7 @@ bool AdapterManager::Initialized() { return Instance()->initialized_; }
 void AdapterManager::Init(const std::string &adapter_config_filename) {
   AdapterManagerConfig configs;
   
-  EDrive::common::util::GetProtoFromASIIFile(adapter_config_filename, &configs);
+  EDrive::common::util::GetProtoFromASCIIFile(adapter_config_filename, &configs);
   
   AdapterManager::Init(configs);
 }
@@ -51,12 +51,18 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::CONTROL_COMMAND:
         EnableControlCommand("/carla/ego_vehicle/vehicle_control_cmd", config);
         break;
+      case AdapterConfig::VIEWER_LOCALIZATION_POSITION:
+        EnableViewerLocalization("/EDrive/viewer/localization/position", config);
+        break;
+      case AdapterConfig::RL_PLANNING_TRAJECTORY:
+        EnableRLPlanning("/EDrive/planning/RLtrajectory", config);
+        break;
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning("/EDrive/planning/trajectory", config);
         break;
-      // case AdapterConfig::VIEWER:
-      //   EnableViewer("/EDrive/viewer", config);
-      //   break;
+      case AdapterConfig::VIEWER:
+        EnableViewer("/EDrive/viewer", config);
+        break;
       case AdapterConfig::VEHICLE_DATA:
         EnableVehicle("/carla/ego_vehicle/odometry", config);
         break;
@@ -99,11 +105,20 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::MARKER_DEBUG_POINT:
         EnableMarkerDebugPoint("/EDrive/debug/marker_1", config);
         break;
-      case AdapterConfig::TEST:
-        EnableTest("/EDrive/localization/test", config);
+      case AdapterConfig::RELATIVE_MAP:
+        EnableRelativeMap("/EDrive/relative_map", config);
+        break;
+      case AdapterConfig::NAVIGATION:
+        EnableNavigation("/EDrive/navigation", config);
+        break;
+      case AdapterConfig::ROUTING_REQUEST:
+        EnableRoutingRequest("/EDrive/routing_request", config);
+        break;
+      case AdapterConfig::ROUTING_RESPONSE:
+        EnableRoutingResponse("/EDrive/routing_response", config);
         break;
       default:
-        ROS_INFO("Unknown adapter config type!");
+        EERROR << "Unknown adapter config type: " << config.type();
         break;
     }
   }

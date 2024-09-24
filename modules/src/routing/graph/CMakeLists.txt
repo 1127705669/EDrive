@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(routing_graph)
 
-find_package(Protobuf REQUIRED)
-
 find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
@@ -43,9 +41,12 @@ add_library(routing_topo_node SHARED
 )
 
 target_include_directories(routing_topo_node PUBLIC
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
   ${Protobuf_INCLUDE_DIRS}
+  ${PROTOBUF_SRC_DIR}
 )
 
 target_link_libraries(routing_topo_node PRIVATE
@@ -105,6 +106,7 @@ target_link_libraries(routing_sub_topo_graph
   map_proto
   routing_gflags
   routing_proto
+  util
 )
 
 ###################################
@@ -124,4 +126,5 @@ target_link_libraries(routing_topo_graph
   map_proto
   routing_gflags
   routing_proto
+  util
 )

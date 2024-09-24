@@ -44,14 +44,17 @@ add_dependencies(localization_proto generate_localization_message)
 # Append source files to the target after they are generated
 target_sources(localization_proto PRIVATE ${MESSAGE_SRC} ${MESSAGE_HDRS})
 
-include_directories(
+target_include_directories(localization_proto PUBLIC
   include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
   ${GENERATED_PROTO_DIR}
+  ${Protobuf_INCLUDE_DIRS}
+  ${PROTOBUF_SRC_DIR}
 )
 
 # Link with other libraries
 target_link_libraries(localization_proto
-
+  ${Protobuf_LIBRARIES}
+  common_proto
 )

@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(vehicle_config_proto)
 
-find_package(Protobuf REQUIRED)
-
 ## Generate Protocol Buffer message
 ## set protocol buffer output address
 SET(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -19,7 +17,7 @@ foreach(proto_file ${proto_files})
   add_custom_command(
     OUTPUT "${PROTO_DIR}/${FIL_WE}.pb.cc"
            "${PROTO_DIR}/${FIL_WE}.pb.h"
-    COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
+    COMMAND  ${Protobuf_PROTOC_EXECUTABLE}
     ARGS --cpp_out  ${PROTO_DIR}
       -I ${PROTO_DIR}
       ${proto_file}
@@ -37,16 +35,22 @@ add_custom_target(generate_common_vehicle_config_message ALL
   VERBATIM
 )
 
-include_directories(
-include
-  ${catkin_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}
-)
-
 set(VEHICLE_CONFIG_SRC 
   vehicle_config.pb.cc
 )
 
 add_library(vehicle_config_proto SHARED ${VEHICLE_CONFIG_SRC})
 
-target_link_libraries(vehicle_config_proto adapter_proto)
+target_include_directories(vehicle_config_proto PUBLIC
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+  ${GENERATED_PROTO_DIR}
+  ${Protobuf_INCLUDE_DIRS}
+  ${PROTOBUF_SRC_DIR}
+)
+
+target_link_libraries(vehicle_config_proto 
+  ${Protobuf_LIBRARIES}
+  adapter_proto
+)

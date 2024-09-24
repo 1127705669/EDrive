@@ -73,6 +73,10 @@
         "*.ipp": "cpp",
         "dense": "cpp",
         "core": "cpp",
-        "eigen": "cpp"
+        "eigen": "cpp",
+        "forward_list": "cpp",
+        "regex": "cpp",
+        "slist": "cpp",
+        "lu": "cpp"
     }
 }

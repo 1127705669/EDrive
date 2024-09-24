@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package EDrive.localization;
-
-message TestMessage {
-  int32 id = 1;
-  string name = 2;
-}

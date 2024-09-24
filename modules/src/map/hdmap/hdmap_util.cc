@@ -26,7 +26,7 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
       return file_path;
     }
   }
-  AERROR << "No existing file found in " << dir << "/" << files
+  EERROR << "No existing file found in " << dir << "/" << files
          << ". Fallback to first candidate as default result.";
   CHECK(!candidates.empty()) << "Please specify at least one map.";
   return EDrive::common::util::StrCat(FLAGS_map_dir, "/", candidates[0]);
@@ -48,7 +48,7 @@ const SpeedControls* GetSpeedControls() {
 
 std::string BaseMapFile() {
   if (FLAGS_use_navigation_mode) {
-    AWARN << "base_map file is not used when FLAGS_use_navigation_mode is true";
+    EWARN << "base_map file is not used when FLAGS_use_navigation_mode is true";
   }
   return FLAGS_test_base_map_filename.empty()
              ? FindFirstExist(FLAGS_map_dir, FLAGS_base_map_filename)
@@ -57,14 +57,14 @@ std::string BaseMapFile() {
 
 std::string SimMapFile() {
   if (FLAGS_use_navigation_mode) {
-    AWARN << "sim_map file is not used when FLAGS_use_navigation_mode is true";
+    EWARN << "sim_map file is not used when FLAGS_use_navigation_mode is true";
   }
   return FindFirstExist(FLAGS_map_dir, FLAGS_sim_map_filename);
 }
 
 std::string RoutingMapFile() {
   if (FLAGS_use_navigation_mode) {
-    AWARN << "routing_map file is not used when FLAGS_use_navigation_mode is "
+    EWARN << "routing_map file is not used when FLAGS_use_navigation_mode is "
              "true";
   }
   return FindFirstExist(FLAGS_map_dir, FLAGS_routing_map_filename);
@@ -73,17 +73,17 @@ std::string RoutingMapFile() {
 std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
   std::unique_ptr<HDMap> hdmap(new HDMap());
   if (hdmap->LoadMapFromFile(map_file_path) != 0) {
-    AERROR << "Failed to load HDMap " << map_file_path;
+    EERROR << "Failed to load HDMap " << map_file_path;
     return nullptr;
   }
-  AINFO << "Load HDMap success: " << map_file_path;
+  EINFO << "Load HDMap success: " << map_file_path;
   return hdmap;
 }
 
 std::unique_ptr<HDMap> CreateMap(const MapMsg& map_msg) {
   std::unique_ptr<HDMap> hdmap(new HDMap());
   if (hdmap->LoadMapFromProto(map_msg.hdmap()) != 0) {
-    AERROR << "Failed to load RelativeMap: "
+    EERROR << "Failed to load RelativeMap: "
            << map_msg.header().ShortDebugString();
     return nullptr;
   }
@@ -102,13 +102,13 @@ const HDMap* HDMapUtil::BaseMapPtr() {
     std::lock_guard<std::mutex> lock(base_map_mutex_);
     auto* relative_map = AdapterManager::GetRelativeMap();
     if (!relative_map) {
-      AERROR << "RelativeMap adapter is not registered";
+      EERROR << "RelativeMap adapter is not registered";
       return nullptr;
     }
-    if (relative_map->Empty()) {
-      AERROR << "RelativeMap is empty";
-      return nullptr;
-    }
+    // if (relative_map->Empty()) {
+    //   EERROR << "RelativeMap is empty";
+    //   return nullptr;
+    // }
     const auto& latest = relative_map->GetLatestObserved();
     if (base_map_ != nullptr &&
         base_map_seq_ == latest.header().sequence_num()) {

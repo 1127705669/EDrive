@@ -8,6 +8,12 @@ set(CMAKE_PREFIX_PATH
   ${THIRD_PARTY_DIR}/osqp-eigen/lib/cmake
 )
 
+set(Protobuf_INCLUDE_DIRS
+  ${Protobuf_INCLUDE_DIRS}
+  ${THIRD_PARTY_ROOT_DIR}/protobuf/src
+  ${THIRD_PARTY_DIR}/protobuf/include
+)
+
 find_package(osqp REQUIRED)
 find_package(OsqpEigen REQUIRED)
 
@@ -26,10 +32,33 @@ add_library(cartesian_frenet_conversion SHARED
 )
 
 ###################################
+#     linear_interpolation        #
+###################################
+
+add_library(linear_interpolation SHARED 
+  linear_interpolation.cc
+)
+
+target_include_directories(linear_interpolation PUBLIC
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+)
+
+target_link_libraries(linear_interpolation
+  geometry
+  common_proto
+)
+
+###################################
 #            geometry             #
 ###################################
 
 add_library(geometry SHARED 
+  aabox2d.cc
+  box2d.cc
+  line_segment2d.cc
+  polygon2d.cc
   math_utils.cc
   vec2d.cc
 )
@@ -39,6 +68,7 @@ target_include_directories(geometry PUBLIC
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${Protobuf_INCLUDE_DIRS}
 )
 
 ###################################
@@ -104,6 +134,7 @@ target_link_libraries(mpc_osqp
 add_library(common_math INTERFACE)
 
 target_link_libraries(common_math INTERFACE
+  linear_interpolation
   cartesian_frenet_conversion
   geometry
   lqr

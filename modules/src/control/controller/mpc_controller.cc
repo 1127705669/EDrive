@@ -645,8 +645,8 @@ void MPCController::ComputeLongitudinalErrors(
       VehicleStateProvider::Instance()->x(),
       VehicleStateProvider::Instance()->y(),
       VehicleStateProvider::Instance()->heading(),
-      VehicleStateProvider::Instance()->linear_velocity(), matched_point,
-      &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
+      VehicleStateProvider::Instance()->linear_velocity(), matched_point, &s_matched,
+      &s_dot_matched, &d_matched, &d_dot_matched);
 
   ros::Time current_control_time = ros::Time::now();
 
@@ -656,16 +656,37 @@ void MPCController::ComputeLongitudinalErrors(
 
   // EDEBUG << "matched point:" << matched_point.DebugString();
   // EDEBUG << "reference point:" << reference_point.DebugString();
-  debug->set_station_error(reference_point.path_point.s - s_matched);
-  debug->set_speed_error(reference_point.v - s_dot_matched);
+
+  const double linear_v = VehicleStateProvider::Instance()->linear_velocity();
+  const double linear_a = VehicleStateProvider::Instance()->linear_acceleration();
+  double heading_error = common::math::NormalizeAngle(
+      VehicleStateProvider::Instance()->heading() - matched_point.theta);
+  double lon_speed = linear_v * std::cos(heading_error);
+  double lon_acceleration = linear_a * std::cos(heading_error);
+  double one_minus_kappa_lat_error = 1 - reference_point.path_point.kappa *
+                                             linear_v * std::sin(heading_error);
 
   debug->set_station_reference(reference_point.path_point.s);
-  debug->set_speed_reference(reference_point.v);
-  debug->set_acceleration_reference(reference_point.a);
-
   debug->set_station_feedback(s_matched);
-  debug->set_speed_feedback(
-      VehicleStateProvider::Instance()->linear_velocity());
+  debug->set_station_error(reference_point.path_point.s - s_matched);
+  debug->set_speed_reference(reference_point.v);
+  debug->set_speed_feedback(lon_speed);
+  debug->set_speed_error(reference_point.v - s_dot_matched);
+  debug->set_acceleration_reference(reference_point.a);
+  debug->set_acceleration_feedback(lon_acceleration);
+  debug->set_acceleration_error(reference_point.a -
+                                lon_acceleration / one_minus_kappa_lat_error);
+
+  double jerk_reference =
+      (debug->acceleration_reference() - previous_acceleration_reference_) /
+      ts_;
+  double lon_jerk =
+      (debug->acceleration_feedback() - previous_acceleration_) / ts_;
+  debug->set_jerk_reference(jerk_reference);
+  debug->set_jerk_feedback(lon_jerk);
+  debug->set_jerk_error(jerk_reference - lon_jerk / one_minus_kappa_lat_error);
+  previous_acceleration_reference_ = debug->acceleration_reference();
+  previous_acceleration_ = debug->acceleration_feedback();
 }
 
 }  // namespace control

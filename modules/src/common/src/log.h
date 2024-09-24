@@ -76,25 +76,25 @@
 
 // Define return condition macros
 #define RETURN_IF_NULL(ptr)               \
-  if (ptr == nullptr) {                 \
-    EWARN("%s is nullptr.", #ptr);    \
-    return;                           \
-  }
+    if (ptr == nullptr) {                 \
+        EWARN << #ptr << " is nullptr.";  \
+        return;                           \
+    }
 
 #define RETURN_VAL_IF_NULL(ptr, val)      \
-  if (ptr == nullptr) {                 \
-    EWARN("%s is nullptr.", #ptr);    \
-    return val;                       \
-  }
+    if (ptr == nullptr) {                 \
+        EWARN << #ptr << " is nullptr.";  \
+        return val;                       \
+    }
 
 #define RETURN_IF(condition)                   \
-  if (condition) {                           \
-    EWARN("%s is not met.", #condition);   \
-    return;                                \
-  }
+    if (condition) {                           \
+        EWARN << #condition << " is not met."; \
+        return;                                \
+    }
 
 #define RETURN_VAL_IF(condition, val)          \
-  if (condition) {                           \
-    EWARN("%s is not met.", #condition);   \
-    return val;                            \
-  }
+    if (condition) {                           \
+        EWARN << #condition << " is not met."; \
+        return val;                            \
+    }

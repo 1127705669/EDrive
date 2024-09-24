@@ -4,7 +4,7 @@
 
 #include "common/configs/config_gflags.h"
 
-DEFINE_string(map_dir, "map/data/demo",
+DEFINE_string(map_dir, "/home/ethan/workset/EDrive/modules/src/map/data",
               "Directory which contains a group of related maps.");
 DEFINE_int32(local_utm_zone_id, 10, "UTM zone id.");
 
