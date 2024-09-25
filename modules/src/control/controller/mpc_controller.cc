@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "Eigen/LU"
+#include <Eigen/LU>
 
 #include "common/configs/vehicle_config_helper.h"
 #include "common/src/log.h"
@@ -508,7 +508,7 @@ void MPCController::InitializeFilters(const ControlConf *control_conf) {
 
 Result_state MPCController::Init(const ControlConf *control_conf) {
   if (!LoadControlConf(control_conf)) {
-    ROS_ERROR("failed to load control conf");
+    EERROR << "failed to load control conf";
     return Result_state::State_Failed;
   }
   control_conf_ = control_conf->mpc_controller_conf();

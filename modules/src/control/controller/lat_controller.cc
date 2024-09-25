@@ -85,9 +85,11 @@ Result_state LatController::Init(const ControlConf *control_conf) {
   /*
   A matrix (Gear Drive)
   [0.0, 1.0, 0.0, 0.0;
-   0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m, (l_r * c_r - l_f * c_f) / m / v;
+   0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m,
+   (l_r * c_r - l_f * c_f) / m / v;
    0.0, 0.0, 0.0, 1.0;
-   0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z, (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
+   0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z,
+   (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
   */
   matrix_a_(0, 1) = 1.0;
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
@@ -119,7 +121,12 @@ Result_state LatController::Init(const ControlConf *control_conf) {
   int reverse_q_param_size =
       control_conf_->lat_controller_conf().reverse_matrix_q_size();
   if (matrix_size != q_param_size || matrix_size != reverse_q_param_size) {
-    EERROR << "lateral controller error: matrix_q size: " << q_param_size;
+    EERROR <<
+        "lateral controller error: matrix_q size: ", q_param_size,
+        "lateral controller error: reverse_matrix_q size: ",
+        reverse_q_param_size,
+        " in parameter file not equal to matrix_size: ", matrix_size;
+
     return Result_state::State_Failed;
   }
 
@@ -145,10 +152,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->lat_controller_conf().ts();
-  if (ts_ <= 0.0) {
-    EERROR << "[LatController] Invalid control update interval.";
-    return false;
-  }
+  CHECK_GT(ts_, 0.0) << "[LatController] Invalid control update interval.";
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();

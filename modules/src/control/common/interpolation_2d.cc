@@ -20,7 +20,7 @@ namespace control {
 
 bool Interpolation2D::Init(const DataType &xyz) {
   if (xyz.empty()) {
-    ROS_ERROR("empty input.");
+    EERROR << "empty input.";
     return false;
   }
   for (const auto &t : xyz) {
@@ -59,7 +59,7 @@ double Interpolation2D::Interpolate(const KeyType &xy) const {
 double Interpolation2D::InterpolateYz(const std::map<double, double> &yz_table,
                                       double y) const {
   if (yz_table.empty()) {
-    ROS_ERROR("Unable to interpolateYz because yz_table is empty.");
+    EERROR << "Unable to interpolateYz because yz_table is empty.";
     return y;
   }
   double max_y = yz_table.rbegin()->first;
