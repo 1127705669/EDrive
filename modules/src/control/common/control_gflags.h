@@ -84,6 +84,12 @@ DECLARE_bool(use_vehicle_epb);
 
 DECLARE_double(pitch_offset_deg);
 
+DECLARE_bool(enable_feedback_augment_on_high_speed);
+
 DECLARE_bool(is_control_ut_test_mode);
 
 DECLARE_bool(publish_control_debug_info);
+
+DECLARE_bool(enable_maximum_steer_rate_limit);
+
+DECLARE_bool(enable_navigation_mode_error_filter);

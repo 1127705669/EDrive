@@ -127,8 +127,17 @@ DEFINE_bool(use_vehicle_epb, false, "enable epb brake for vehicle.");
 
 DEFINE_double(pitch_offset_deg, 0.0, "vehicle pitch offset when in horizon.");
 
+DEFINE_bool(enable_feedback_augment_on_high_speed, false,
+            "Enable augmented control on lateral error on high speed");
+
 DEFINE_bool(is_control_ut_test_mode, false,
             "True to run control in ut test mode");
 
 DEFINE_bool(publish_control_debug_info, false,
             "True to run control in ut test mode");
+
+DEFINE_bool(enable_maximum_steer_rate_limit, false,
+            "Enable steer rate limit obtained from vehicle_param.pb.txt");
+
+DEFINE_bool(enable_navigation_mode_error_filter, false,
+            "Enable error_filter for navigation mode");

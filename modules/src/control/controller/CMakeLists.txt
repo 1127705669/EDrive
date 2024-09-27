@@ -68,6 +68,8 @@ target_link_libraries(lat_controller
   mean_filter
   Eigen3::Eigen
   geometry
+  common_math
+  leadlag_controller
 )
 
 ###################################
