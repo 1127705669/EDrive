@@ -112,54 +112,54 @@ void MPCController::ComputeLateralErrors(
   const double cos_matched_theta = std::cos(matched_point.path_point.theta);
   const double sin_matched_theta = std::sin(matched_point.path_point.theta);
   // d_error = cos_matched_theta * dy - sin_matched_theta * dx;
-  debug->set_lateral_error(cos_matched_theta * dy - sin_matched_theta * dx);
+  // debug->set_lateral_error(cos_matched_theta * dy - sin_matched_theta * dx);
 
   // matched_theta = matched_point.path_point().theta();
-  debug->set_ref_heading(matched_point.path_point.theta);
+  // debug->set_ref_heading(matched_point.path_point.theta);
   const double delta_theta =
       common::math::NormalizeAngle(theta - debug->ref_heading());
-  debug->set_heading_error(delta_theta);
+  // debug->set_heading_error(delta_theta);
 
   const double sin_delta_theta = std::sin(delta_theta);
   // d_error_dot = chassis_v * sin_delta_theta;
   double lateral_error_dot = linear_v * sin_delta_theta;
   double lateral_error_dot_dot = linear_a * sin_delta_theta;
 
-  debug->set_lateral_error_rate(lateral_error_dot);
-  debug->set_lateral_acceleration(lateral_error_dot_dot);
-  debug->set_lateral_jerk(
-      (debug->lateral_acceleration() - previous_lateral_acceleration_) / ts_);
-  previous_lateral_acceleration_ = debug->lateral_acceleration();
+  // debug->set_lateral_error_rate(lateral_error_dot);
+  // debug->set_lateral_acceleration(lateral_error_dot_dot);
+  // debug->set_lateral_jerk(
+  //     (debug->lateral_acceleration() - previous_lateral_acceleration_) / ts_);
+  // previous_lateral_acceleration_ = debug->lateral_acceleration();
 
   // matched_kappa = matched_point.path_point().kappa();
-  debug->set_curvature(matched_point.path_point.kappa);
+  // debug->set_curvature(matched_point.path_point.kappa);
   // theta_error = delta_theta;
-  debug->set_heading_error(delta_theta);
+  // debug->set_heading_error(delta_theta);
   // theta_error_dot = angular_v - matched_point.path_point().kappa() *
   // matched_point.v();
-  debug->set_heading_rate(angular_v);
-  debug->set_ref_heading_rate(debug->curvature() * matched_point.v);
-  debug->set_heading_error_rate(debug->heading_rate() -
-                                debug->ref_heading_rate());
+  // debug->set_heading_rate(angular_v);
+  // debug->set_ref_heading_rate(debug->curvature() * matched_point.v);
+  // debug->set_heading_error_rate(debug->heading_rate() -
+  //                               debug->ref_heading_rate());
 
-  debug->set_heading_acceleration(
-      (debug->heading_rate() - previous_heading_rate_) / ts_);
-  debug->set_ref_heading_acceleration(
-      (debug->ref_heading_rate() - previous_ref_heading_rate_) / ts_);
-  debug->set_heading_error_acceleration(debug->heading_acceleration() -
-                                        debug->ref_heading_acceleration());
-  previous_heading_rate_ = debug->heading_rate();
-  previous_ref_heading_rate_ = debug->ref_heading_rate();
+  // debug->set_heading_acceleration(
+  //     (debug->heading_rate() - previous_heading_rate_) / ts_);
+  // debug->set_ref_heading_acceleration(
+  //     (debug->ref_heading_rate() - previous_ref_heading_rate_) / ts_);
+  // debug->set_heading_error_acceleration(debug->heading_acceleration() -
+  //                                       debug->ref_heading_acceleration());
+  // previous_heading_rate_ = debug->heading_rate();
+  // previous_ref_heading_rate_ = debug->ref_heading_rate();
 
-  debug->set_heading_jerk(
-      (debug->heading_acceleration() - previous_heading_acceleration_) / ts_);
-  debug->set_ref_heading_jerk(
-      (debug->ref_heading_acceleration() - previous_ref_heading_acceleration_) /
-      ts_);
-  debug->set_heading_error_jerk(debug->heading_jerk() -
-                                debug->ref_heading_jerk());
-  previous_heading_acceleration_ = debug->heading_acceleration();
-  previous_ref_heading_acceleration_ = debug->ref_heading_acceleration();
+  // debug->set_heading_jerk(
+  //     (debug->heading_acceleration() - previous_heading_acceleration_) / ts_);
+  // debug->set_ref_heading_jerk(
+  //     (debug->ref_heading_acceleration() - previous_ref_heading_acceleration_) /
+  //     ts_);
+  // debug->set_heading_error_jerk(debug->heading_jerk() -
+  //                               debug->ref_heading_jerk());
+  // previous_heading_acceleration_ = debug->heading_acceleration();
+  // previous_ref_heading_acceleration_ = debug->ref_heading_acceleration();
 }
 
 std::string MPCController::Name() const { return name_; }
@@ -323,29 +323,29 @@ Result_state MPCController::ComputeControlCommand(
          << (mpc_end_timestamp.toSec() - mpc_start_timestamp.toSec()) * 1000 << " ms.";
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
-  double steer_angle = steer_angle_feedback +
-                       steer_angle_feedforwardterm_updated_ +
-                       steer_angle_ff_compensation;
+  // double steer_angle = steer_angle_feedback +
+  //                      steer_angle_feedforwardterm_updated_ +
+  //                      steer_angle_ff_compensation;
 
-  if (FLAGS_set_steer_limit) {
-    const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
-                                         (VehicleStateProvider::Instance()->linear_velocity() *
-                                          VehicleStateProvider::Instance()->linear_velocity())) *
-                               steer_ratio_ * 180 / M_PI /
-                               steer_single_direction_max_degree_ * 100;
+  // if (FLAGS_set_steer_limit) {
+  //   const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
+  //                                        (VehicleStateProvider::Instance()->linear_velocity() *
+  //                                         VehicleStateProvider::Instance()->linear_velocity())) *
+  //                              steer_ratio_ * 180 / M_PI /
+  //                              steer_single_direction_max_degree_ * 100;
 
-    // Clamp the steer angle with steer limitations at current speed
-    double steer_angle_limited =
-        common::math::Clamp(steer_angle, -steer_limit, steer_limit);
-    steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
-    steer_angle = steer_angle_limited;
-    debug->set_steer_angle_limited(steer_angle_limited);
-  }
+  //   // Clamp the steer angle with steer limitations at current speed
+  //   double steer_angle_limited =
+  //       common::math::Clamp(steer_angle, -steer_limit, steer_limit);
+  //   steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
+  //   steer_angle = steer_angle_limited;
+  //   debug->set_steer_angle_limited(steer_angle_limited);
+  // }
 
-  steer_angle = digital_filter_.Filter(steer_angle);
+  // steer_angle = digital_filter_.Filter(steer_angle);
   // Clamp the steer angle to -100.0 to 100.0
-  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
-  cmd->set_steering_target(steer_angle);
+  // steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
+  // cmd->set_steering_target(steer_angle);
 
   debug->set_acceleration_cmd_closeloop(acc_feedback);
 
@@ -370,19 +370,19 @@ Result_state MPCController::ComputeControlCommand(
     brake_cmd = std::max(-calibration_value, brake_lowerbound_);
   }
 
-  cmd->set_steering_rate(FLAGS_steer_angle_rate);
+  // cmd->set_steering_rate(FLAGS_steer_angle_rate);
   // if the car is driven by acceleration, disgard the cmd->throttle and brake
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
   cmd->set_acceleration(acceleration_cmd);
 
-  debug->set_heading(VehicleStateProvider::Instance()->heading());
+  // debug->set_heading(VehicleStateProvider::Instance()->heading());
   // debug->set_steering_position(chassis->steering_percentage());
-  debug->set_steer_angle(steer_angle);
-  debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
-  debug->set_steer_angle_feedforward_compensation(steer_angle_ff_compensation);
-  debug->set_steer_unconstrained_control_diff(unconstrained_control_diff);
-  debug->set_steer_angle_feedback(steer_angle_feedback);
+  // debug->set_steer_angle(steer_angle);
+  // debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
+  // debug->set_steer_angle_feedforward_compensation(steer_angle_ff_compensation);
+  // debug->set_steer_unconstrained_control_diff(unconstrained_control_diff);
+  // debug->set_steer_angle_feedback(steer_angle_feedback);
 
   return Result_state::State_Ok;
 }
@@ -469,27 +469,27 @@ void MPCController::LogInitParameters() {
   //       << " lf_: " << lf_ << ","
   //       << " lr_: " << lr_;
 
-  EINFO << "Configuration Parameters:";
-  EINFO << "Front cornering stiffness (cf_): " << cf_;
-  EINFO << "Rear cornering stiffness (cr_): " << cr_;
-  EINFO << "Wheelbase (wheelbase_): " << wheelbase_;
-  EINFO << "Max steer angle (max_steer_angle): " << vehicle_param_.max_steer_angle();
-  EINFO << "Steering transmission ratio (steer_ratio_): " << steer_ratio_;
-  EINFO << "Max steering angle in degrees (steer_single_direction_max_degree_): " << steer_single_direction_max_degree_;
-  EINFO << "Max wheel angle in degrees (wheel_single_direction_max_degree_): " << wheel_single_direction_max_degree_;
-  EINFO << "Max lateral acceleration (max_lat_acc_): " << max_lat_acc_;
-  EINFO << "Max acceleration (max_acceleration_): " << max_acceleration_;
-  EINFO << "Max deceleration (max_deceleration_): " << max_deceleration_;
-  EINFO << "Total mass (mass_): " << mass_;
-  EINFO << "Front axle to center distance (lf_): " << lf_;
-  EINFO << "Rear axle to center distance (lr_): " << lr_;
-  EINFO << "Moment of inertia about Z-axis (iz_): " << iz_;
-  EINFO << "MPC epsilon (mpc_eps_): " << mpc_eps_;
-  EINFO << "MPC max iteration (mpc_max_iteration_): " << mpc_max_iteration_;
-  EINFO << "Throttle deadzone (throttle_lowerbound_): " << throttle_lowerbound_;
-  EINFO << "Brake deadzone (brake_lowerbound_): " << brake_lowerbound_;
-  EINFO << "Minimum speed protection (minimum_speed_protection_): " << minimum_speed_protection_;
-  EINFO << "Standstill acceleration (standstill_acceleration_): " << standstill_acceleration_;
+  // EINFO << "Configuration Parameters:";
+  // EINFO << "Front cornering stiffness (cf_): " << cf_;
+  // EINFO << "Rear cornering stiffness (cr_): " << cr_;
+  // EINFO << "Wheelbase (wheelbase_): " << wheelbase_;
+  // EINFO << "Max steer angle (max_steer_angle): " << vehicle_param_.max_steer_angle();
+  // EINFO << "Steering transmission ratio (steer_ratio_): " << steer_ratio_;
+  // EINFO << "Max steering angle in degrees (steer_single_direction_max_degree_): " << steer_single_direction_max_degree_;
+  // EINFO << "Max wheel angle in degrees (wheel_single_direction_max_degree_): " << wheel_single_direction_max_degree_;
+  // EINFO << "Max lateral acceleration (max_lat_acc_): " << max_lat_acc_;
+  // EINFO << "Max acceleration (max_acceleration_): " << max_acceleration_;
+  // EINFO << "Max deceleration (max_deceleration_): " << max_deceleration_;
+  // EINFO << "Total mass (mass_): " << mass_;
+  // EINFO << "Front axle to center distance (lf_): " << lf_;
+  // EINFO << "Rear axle to center distance (lr_): " << lr_;
+  // EINFO << "Moment of inertia about Z-axis (iz_): " << iz_;
+  // EINFO << "MPC epsilon (mpc_eps_): " << mpc_eps_;
+  // EINFO << "MPC max iteration (mpc_max_iteration_): " << mpc_max_iteration_;
+  // EINFO << "Throttle deadzone (throttle_lowerbound_): " << throttle_lowerbound_;
+  // EINFO << "Brake deadzone (brake_lowerbound_): " << brake_lowerbound_;
+  // EINFO << "Minimum speed protection (minimum_speed_protection_): " << minimum_speed_protection_;
+  // EINFO << "Standstill acceleration (standstill_acceleration_): " << standstill_acceleration_;
 
 }
 

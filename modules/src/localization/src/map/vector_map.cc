@@ -222,6 +222,8 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
             tp.path_point.y = segment.points[j].y;
             tp.path_point.z = segment.points[j].z;
 
+            tp.v = 35.0 / SPEED_CONVERSION_FACTOR;
+
             // Theta calculation
             if (j > 0) {
                 tp.path_point.theta = calculateTheta(segment.points[j], segment.points[j - 1]);
@@ -252,7 +254,6 @@ void VectorMap::publishMiddlePath(std::initializer_list<int> relation_ids, visua
 
             // Set speed v using the defined macro
             // tp.v = 25.0 / SPEED_CONVERSION_FACTOR;
-            tp.v = 0;
 
             trajectory_pb.trajectory_point.push_back(tp);
         }
