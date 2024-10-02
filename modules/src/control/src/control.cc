@@ -71,7 +71,7 @@ void Control::ConvertControlCommandToSimulator(
   // simulator_control_command.throttle = control_command.throttle()/100;
   // simulator_control_command.brake = control_command.brake()/100;
   // ROS_INFO("%f",simulator_control_command.throttle);
-  simulator_control_command.throttle = 0.3;
+  simulator_control_command.throttle = 0.4;
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {

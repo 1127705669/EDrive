@@ -51,12 +51,12 @@ void LatController::ProcessLogs(const SimpleLateralDebug *debug) {
 }
 
 void LatController::LogInitParameters() {
-  EINFO << name_ << " begin.";
-  EINFO << "[LatController parameters]"
-        << " mass_: " << mass_ << ","
-        << " iz_: " << iz_ << ","
-        << " lf_: " << lf_ << ","
-        << " lr_: " << lr_;
+  // EINFO << name_ << " begin.";
+  // EINFO << "[LatController parameters]"
+  //       << " mass_: " << mass_ << ","
+  //       << " iz_: " << iz_ << ","
+  //       << " lf_: " << lf_ << ","
+  //       << " lr_: " << lr_;
 }
 
 void LatController::InitializeFilters(const ControlConf *control_conf) {
@@ -139,6 +139,12 @@ Result_state LatController::Init(const ControlConf *control_conf) {
   auto &lat_controller_conf = control_conf_->lat_controller_conf();
   LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
+
+  enable_leadlag_ = control_conf_->lat_controller_conf()
+                        .enable_reverse_leadlag_compensation();
+  if (enable_leadlag_) {
+    leadlag_controller_.Init(lat_controller_conf.reverse_leadlag_conf(), ts_);
+  }
 
   return Result_state::State_Ok;
 }
@@ -310,9 +316,7 @@ Result_state LatController::ComputeControlCommand(
                                       M_PI * steer_ratio_ /
                                       steer_single_direction_max_degree_ * 100;
 
-  const double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
-
-  
+  const double steer_angle_feedforward = ComputeFeedForward(-debug->curvature());
 
   double steer_angle = 0.0;
   double steer_angle_feedback_augment = 0.0;
@@ -336,8 +340,6 @@ Result_state LatController::ComputeControlCommand(
 
   steer_angle = steer_angle_feedback + steer_angle_feedforward +
                 steer_angle_feedback_augment;
-
-  EINFO << "steer_angle_feedforward: " << steer_angle_feedforward << "   steer_angle: " << steer_angle;
 
   // Compute the steering command limit with the given maximum lateral
   // acceleration
@@ -505,7 +507,7 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
             lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
       180 / M_PI * steer_ratio_ / steer_single_direction_max_degree_ * 100;
 
-  return -steer_angle_feedforwardterm;
+  return 5 * steer_angle_feedforwardterm;
 }
 
 void LatController::ComputeLateralErrors(
