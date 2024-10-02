@@ -96,7 +96,7 @@ math::Vec2d VehicleStateProvider::ComputeCOMPosition(
     const double rear_to_com_distance) const {
   // set length as distance between rear wheel and center of mass.
   Eigen::Vector3d v;
-  v << 0.0, rear_to_com_distance, 0.0;
+  v << rear_to_com_distance, 0.0, 0.0;
   Eigen::Vector3d pos_vec(vehicle_state_.x(), vehicle_state_.y(),
                           vehicle_state_.z());
   // Initialize the COM position without rotation

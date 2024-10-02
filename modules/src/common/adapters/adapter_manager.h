@@ -82,14 +82,14 @@ using is_protobuf_message = std::is_base_of<google::protobuf::Message, T>;
     name##_.reset(                                                             \
         new name##Adapter(#name, topic_name, config.message_history_limit())); \
     if (config.mode() != AdapterConfig::PUBLISH_ONLY) {                        \
-      ROS_INFO("    registering subscriber: %s", topic_name.c_str());          \
+      EINFO << "    registering subscriber: " << topic_name.c_str();           \
       name##subscriber_ =                                                      \
           node_handle_->subscribe(topic_name, config.message_history_limit(),  \
                                   &name##Adapter::RosCallbackByteArray,        \
                                   name##_.get());                              \
     }                                                                          \
     if (config.mode() != AdapterConfig::RECEIVE_ONLY) {                        \
-      ROS_INFO("    registering publisher: %s", topic_name.c_str());           \
+      EINFO << "    registering publisher: " << topic_name.c_str();            \
       name##publisher_ = node_handle_->advertise<std_msgs::ByteMultiArray>(    \
                topic_name, config.message_history_limit(), config.latch());    \
     }                                                                          \
@@ -104,13 +104,13 @@ using is_protobuf_message = std::is_base_of<google::protobuf::Message, T>;
     name##_.reset(                                                             \
         new name##Adapter(#name, topic_name, config.message_history_limit())); \
     if (config.mode() != AdapterConfig::PUBLISH_ONLY) {                        \
-      ROS_INFO("    registering subscriber: %s", topic_name.c_str());          \
+      EINFO << "    registering subscriber: " << topic_name.c_str();           \
       name##subscriber_ =                                                      \
           node_handle_->subscribe(topic_name, config.message_history_limit(),  \
                                   &name##Adapter::RosCallback, name##_.get()); \
     }                                                                          \
     if (config.mode() != AdapterConfig::RECEIVE_ONLY) {                        \
-      ROS_INFO("    registering publisher: %s", topic_name.c_str());           \
+      EINFO << "    registering publisher: " << topic_name.c_str();            \
       name##publisher_ = node_handle_->advertise<name##Adapter::DataType>(     \
                topic_name, config.message_history_limit(), config.latch());    \
     }                                                                          \

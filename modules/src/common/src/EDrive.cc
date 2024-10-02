@@ -41,7 +41,7 @@ int EDrive::common::EDriveApp::Spin() {
 
   auto status = Init();
   if (State_Ok != status) {
-    ROS_INFO(" Init failed: ");
+    EINFO << " Init failed: ";
     return -1;
   }
 
@@ -53,7 +53,7 @@ int EDrive::common::EDriveApp::Spin() {
 
   status = Start();
   if (State_Ok != status) {
-    ROS_INFO(" Start failed: ");
+    EINFO << " Start failed: ";
     return -2;
   }
   ExportFlags();
@@ -66,7 +66,7 @@ int EDrive::common::EDriveApp::Spin() {
   ros::waitForShutdown();
   Stop();
 
-  ROS_INFO(" exited. ");
+  EINFO << " exited. ";
 
   return 0;
 }

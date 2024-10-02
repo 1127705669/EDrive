@@ -35,6 +35,30 @@ target_link_libraries(control_gflags
 )
 
 ###################################
+#       leadlag_controller        #
+###################################
+
+set(LEADING_CONTROLLER_SRC
+  leadlag_controller.cc
+)
+
+add_library(leadlag_controller SHARED 
+  ${LEADING_CONTROLLER_SRC}
+)
+
+target_include_directories(leadlag_controller PUBLIC
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(leadlag_controller
+  ${catkin_LIBRARIES}
+  control_proto
+)
+
+###################################
 #        pid_controller           #
 ###################################
 

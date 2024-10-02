@@ -8,7 +8,7 @@
 #include <csignal>
 #include <string>
 
-#include "gflags/gflags.h"
+#include <gflags/gflags.h>
 #include "common/src/log.h"
 #include "common/src/state.h"
 
@@ -47,9 +47,12 @@ class EDriveApp {
 
 #define EDRIVE_MAIN(APP)                                       \
   int main(int argc, char *argv[]) {                           \
-    google::InitGoogleLogging(argv[0]);                        \
-    google::ParseCommandLineFlags(&argc, &argv, true);         \
     APP edrive_app_;                                           \
+    google::InitGoogleLogging(edrive_app_.Name().c_str());     \
+    FLAGS_logtostderr = 1;                                     \
+    FLAGS_minloglevel = google::GLOG_INFO;                     \
+    FLAGS_log_prefix = false;                                  \
+    google::ParseCommandLineFlags(&argc, &argv, true);         \
     ros::init(argc, argv, edrive_app_.Name());                 \
     edrive_app_.Spin();                                        \
     return 0;                                                  \

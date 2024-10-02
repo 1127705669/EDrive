@@ -2,6 +2,8 @@
  * Copyright 2023 The EDrive Authors. All Rights Reserved.
  *****************************************************************************/
 
+#include "common/src/log.h"
+
 #include <ros/ros.h>
 #include "control/controller/lon_controller.h"
 
@@ -15,7 +17,7 @@ using EDrive::common::Result_state;
 constexpr double GRA_ACC = 9.8;
 
 LonController::LonController() : name_("LonController"){
-  ROS_INFO("    registering Lon controller...");
+  EINFO << "    registering Lon controller...";
 }
 
 LonController::~LonController() {
@@ -26,16 +28,16 @@ Result_state LonController::Init(const ControlConf *control_conf) {
   control_conf_ = control_conf;
   if (control_conf_ == nullptr) {
     controller_initialized_ = false;
-    ROS_ERROR("get_longitudinal_param() nullptr");
+    EERROR << "get_longitudinal_param() nullptr";
     return Result_state::State_Failed;
   }
 
   const LonControllerConf &lon_controller_conf =
       control_conf_->lon_controller_conf();
 
-  ROS_INFO("      station pid controller init, staring...");
+  EINFO << "      station pid controller init, staring...";
   station_pid_controller_.Init(lon_controller_conf.station_pid_conf());
-  ROS_INFO("      speed pid controller init, staring...");
+  EINFO << "      speed pid controller init, staring...";
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
   
   return Result_state::State_Ok;
@@ -68,7 +70,7 @@ Result_state LonController::Reset(){
 }
 
 void LonController::Stop() {
-  ROS_INFO("stop");
+  EINFO << "stop";
 }
 
 void LonController::ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory_analyzer) {

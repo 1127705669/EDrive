@@ -9,6 +9,8 @@
 #pragma once
 
 #include <cstdlib> // For std::abort()
+#include <iomanip>  // for std::setw
+#include <cstring>  // for strrchr
 
 #include "glog/logging.h"
 #include "glog/raw_logging.h"
@@ -26,10 +28,15 @@
 #define EDEBUG_MODULE(module) \
   VLOG(4) << LEFT_BRACKET << module << RIGHT_BRACKET << "[DEBUG] "
 #define EDEBUG EDEBUG_MODULE(MODULE_NAME)
-#define EINFO ELOG_MODULE(MODULE_NAME, INFO)
-#define EWARN ELOG_MODULE(MODULE_NAME, WARN)
-#define EERROR ELOG_MODULE(MODULE_NAME, ERROR)
-#define EFATAL ELOG_MODULE(MODULE_NAME, FATAL)
+
+#define LOG_SIMPLE(level) \
+    LOG(level) << "[" << std::left << std::setw(20) << std::setfill(' ') << (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__) << ": " \
+                << std::right << std::setfill(' ') << std::setw(3) << (__LINE__) << "] "
+
+#define EINFO LOG_SIMPLE(INFO)
+#define EWARN LOG_SIMPLE(WARNING)
+#define EERROR LOG_SIMPLE(ERROR)
+#define EFATAL LOG_SIMPLE(FATAL)
 
 #ifndef ELOG_MODULE_STREAM
 #define ELOG_MODULE_STREAM(log_severity) ELOG_MODULE_STREAM_##log_severity

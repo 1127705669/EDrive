@@ -14,6 +14,7 @@
 #include "common/filters/digital_filter_coefficients.h"
 #include "common/filters/mean_filter.h"
 #include "control/common/interpolation_1d.h"
+#include "control/common/leadlag_controller.h"
 #include "control/common/trajectory_analyzer.h"
 #include "control/controller/controller.h"
 
@@ -189,11 +190,26 @@ class LatController : public Controller {
 
   std::unique_ptr<Interpolation1D> heading_err_interpolation_;
 
+  // for compute the differential valute to estimate acceleration/lon_jerk
+  double previous_lateral_acceleration_ = 0.0;
+
+  double previous_heading_rate_ = 0.0;
+  double previous_ref_heading_rate_ = 0.0;
+
+  double previous_heading_acceleration_ = 0.0;
+  double previous_ref_heading_acceleration_ = 0.0;
+
   // MeanFilter heading_rate_filter_;
   common::MeanFilter lateral_error_filter_;
   common::MeanFilter heading_error_filter_;
 
+  // Lead/Lag controller
+  bool enable_leadlag_ = false;
+  LeadlagController leadlag_controller_;
+
   double query_relative_time_;
+
+  double pre_steer_angle_ = 0.0;
 
   double minimum_speed_protection_ = 0.1;
 
