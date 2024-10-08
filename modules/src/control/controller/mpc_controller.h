@@ -160,11 +160,11 @@ class MPCController : public Controller {
   // number of states, includes
   // lateral error, lateral error rate, heading error, heading error rate,
   // station error, velocity error,
-  const int basic_state_size_ = 6;
+  const int basic_state_size_ = 1;
 
-  const int controls_ = 2;
+  const int controls_ = 1;
 
-  const int horizon_ = 10;
+  const int horizon_ = 100;
 
   // vehicle state matrix
   Eigen::MatrixXd matrix_a_;

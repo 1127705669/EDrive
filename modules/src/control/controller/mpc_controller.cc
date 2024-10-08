@@ -65,37 +65,37 @@ void MPCController::LoadControlCalibrationTable(
 }
 
 void MPCController::UpdateState(SimpleMPCDebug *debug) {
-  const auto &com = VehicleStateProvider::Instance()->ComputeCOMPosition(lr_);
-  ComputeLateralErrors(com.x(), com.y(),
-                       VehicleStateProvider::Instance()->heading(),
-                       VehicleStateProvider::Instance()->linear_velocity(),
-                       VehicleStateProvider::Instance()->angular_velocity(),
-                       VehicleStateProvider::Instance()->linear_acceleration(),
-                       trajectory_analyzer_, debug);
+  // const auto &com = VehicleStateProvider::Instance()->ComputeCOMPosition(lr_);
+  // ComputeLateralErrors(com.x(), com.y(),
+  //                      VehicleStateProvider::Instance()->heading(),
+  //                      VehicleStateProvider::Instance()->linear_velocity(),
+  //                      VehicleStateProvider::Instance()->angular_velocity(),
+  //                      VehicleStateProvider::Instance()->linear_acceleration(),
+  //                      trajectory_analyzer_, debug);
 
   // State matrix update;
-  matrix_state_(0, 0) = debug->lateral_error();
-  matrix_state_(1, 0) = debug->lateral_error_rate();
-  matrix_state_(2, 0) = debug->heading_error();
-  matrix_state_(3, 0) = debug->heading_error_rate();
-  matrix_state_(4, 0) = debug->station_error();
-  matrix_state_(5, 0) = debug->speed_error();
+  // matrix_state_(0, 0) = debug->lateral_error();
+  // matrix_state_(1, 0) = debug->lateral_error_rate();
+  // matrix_state_(2, 0) = debug->heading_error();
+  // matrix_state_(3, 0) = debug->heading_error_rate();
+  // matrix_state_(4, 0) = debug->station_error();
+  // matrix_state_(0, 0) = debug->speed_error();
 }
 
 void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
   const double v = std::max(VehicleStateProvider::Instance()->linear_velocity(),
                             minimum_speed_protection_);
-  matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
-  matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
-  matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
-  matrix_a_(3, 3) = matrix_a_coeff_(3, 3) / v;
+  // matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
+  // matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
+  // matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
+  // matrix_a_(3, 3) = matrix_a_coeff_(3, 3) / v;
 
   Matrix matrix_i = Matrix::Identity(matrix_a_.cols(), matrix_a_.cols());
   matrix_ad_ = (matrix_i - ts_ * 0.5 * matrix_a_).inverse() *
                (matrix_i + ts_ * 0.5 * matrix_a_);
 
-  matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
-  matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
+  // matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
+  // matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
   matrix_cd_ = matrix_c_ * debug->ref_heading_rate() * ts_;
 }
 
@@ -212,31 +212,33 @@ Result_state MPCController::ComputeControlCommand(
   if (control_conf_.trajectory_transform_to_com_reverse()) {
     trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
   }
-
+  
   SimpleMPCDebug *debug = cmd->mutable_debug()->mutable_simple_mpc_debug();
   debug->Clear();
 
   ComputeLongitudinalErrors(&trajectory_analyzer_, debug);
+  
+  matrix_state_(0, 0) = debug->speed_error();
 
   // Update state
   UpdateState(debug);
-
+  
   UpdateMatrix(debug);
-
+  
   FeedforwardUpdate(debug);
-
+  
   matrix_q_updated_ = matrix_q_;
   matrix_r_updated_ = matrix_r_;
   steer_angle_feedforwardterm_updated_ = steer_angle_feedforwardterm_;
 
   debug->add_matrix_q_updated(matrix_q_updated_(0, 0));
-  debug->add_matrix_q_updated(matrix_q_updated_(1, 1));
-  debug->add_matrix_q_updated(matrix_q_updated_(2, 2));
-  debug->add_matrix_q_updated(matrix_q_updated_(3, 3));
+  // debug->add_matrix_q_updated(matrix_q_updated_(1, 1));
+  // debug->add_matrix_q_updated(matrix_q_updated_(2, 2));
+  // debug->add_matrix_q_updated(matrix_q_updated_(3, 3));
 
   debug->add_matrix_r_updated(matrix_r_updated_(0, 0));
-  debug->add_matrix_r_updated(matrix_r_updated_(1, 1));
-
+  // debug->add_matrix_r_updated(matrix_r_updated_(1, 1));
+  
   Matrix control_matrix = Matrix::Zero(controls_, 1);
   std::vector<Matrix> control(horizon_, control_matrix);
 
@@ -248,22 +250,21 @@ Result_state MPCController::ComputeControlCommand(
 
   Matrix reference_state = Matrix::Zero(basic_state_size_, 1);
   std::vector<Matrix> reference(horizon_, reference_state);
-
+  
   Matrix lower_bound(controls_, 1);
-  lower_bound << -wheel_single_direction_max_degree_, max_deceleration_;
+  lower_bound << max_deceleration_;
 
   Matrix upper_bound(controls_, 1);
-  upper_bound << wheel_single_direction_max_degree_, max_acceleration_;
-
+  upper_bound << max_acceleration_;
+  
   const double max = std::numeric_limits<double>::max();
   Matrix lower_state_bound(basic_state_size_, 1);
   Matrix upper_state_bound(basic_state_size_, 1);
-
+  
   // lateral_error, lateral_error_rate, heading_error, heading_error_rate
   // station_error, station_error_rate
-  lower_state_bound << -1.0 * max, -1.0 * max, -1.0 * M_PI, -1.0 * max,
-      -1.0 * max, -1.0 * max;
-  upper_state_bound << max, max, M_PI, max, max, max;
+  lower_state_bound << -1.0 * max;
+  upper_state_bound << max;
 
   ros::Time mpc_start_timestamp = ros::Time::now();
   double steer_angle_feedback = 0.0;
@@ -286,36 +287,34 @@ Result_state MPCController::ComputeControlCommand(
   } else {
     EDEBUG << "MPC OSQP problem solved! ";
     control[0](0, 0) = control_cmd.at(0);
-    control[0](1, 0) = control_cmd.at(1);
+    // control[0](1, 0) = control_cmd.at(1);
   }
 
-  steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
-  acc_feedback = control[0](1, 0);
+  // steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
+  acc_feedback = control[0](0, 0);
   for (int i = 0; i < basic_state_size_; ++i) {
     unconstrained_control += control_gain[0](0, i) * matrix_state_(i, 0);
   }
   unconstrained_control += addition_gain[0](0, 0) * v * debug->curvature();
-  if (enable_mpc_feedforward_compensation_) {
-    unconstrained_control_diff =
-        Wheel2SteerPct(control[0](0, 0) - unconstrained_control);
-    if (fabs(unconstrained_control_diff) <= unconstrained_control_diff_limit_) {
-      steer_angle_ff_compensation =
-          Wheel2SteerPct(debug->curvature() *
-                         (control_gain[0](0, 2) *
-                              (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
-                          addition_gain[0](0, 0) * v));
-    } else {
-      control_gain_truncation_ratio = control[0](0, 0) / unconstrained_control;
-      steer_angle_ff_compensation =
-          Wheel2SteerPct(debug->curvature() *
-                         (control_gain[0](0, 2) *
-                              (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
-                          addition_gain[0](0, 0) * v) *
-                         control_gain_truncation_ratio);
-    }
-  } else {
-    steer_angle_ff_compensation = 0.0;
-  }
+  // if (enable_mpc_feedforward_compensation_) {
+  //   unconstrained_control_diff =
+  //       Wheel2SteerPct(control[0](0, 0) - unconstrained_control);
+  //   if (fabs(unconstrained_control_diff) <= unconstrained_control_diff_limit_) {
+  //     steer_angle_ff_compensation =
+  //         Wheel2SteerPct(debug->curvature() *
+  //                        (control_gain[0](0, 2) *calibration_value
+  //   } else {
+  //     control_gain_truncation_ratio = control[0](0, 0) / unconstrained_control;
+  //     steer_angle_ff_compensation =
+  //         Wheel2SteerPct(debug->curvature() *
+  //                        (control_gain[0](0, 2) *
+  //                             (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+  //                         addition_gain[0](0, 0) * v) *
+  //                        control_gain_truncation_ratio);
+  //   }
+  // } else {
+  //   steer_angle_ff_compensation = 0.0;
+  // }
 
   ros::Time mpc_end_timestamp = ros::Time::now();
 
@@ -515,27 +514,29 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   // Matrix init operations.
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
-  matrix_a_(0, 1) = 1.0;
-  matrix_a_(1, 2) = (cf_ + cr_) / mass_;
-  matrix_a_(2, 3) = 1.0;
-  matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
-  matrix_a_(4, 5) = 1.0;
-  matrix_a_(5, 5) = 0.0;
+  matrix_a_(0, 0) = 0.0;
+  // matrix_a_(0, 1) = 1.0;
+  // matrix_a_(1, 2) = (cf_ + cr_) / mass_;
+  // matrix_a_(2, 3) = 1.0;
+  // matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
+  // matrix_a_(4, 5) = 1.0;
+  // matrix_a_(5, 5) = 0.0;
   // TODO(QiL): expand the model to accommodate more combined states.
 
-  matrix_a_coeff_ = Matrix::Zero(basic_state_size_, basic_state_size_);
-  matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
-  matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
-  matrix_a_coeff_(2, 3) = 1.0;
-  matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
-  matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
+  // matrix_a_coeff_ = Matrix::Zero(basic_state_size_, basic_state_size_);
+  // matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
+  // matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
+  // matrix_a_coeff_(2, 3) = 1.0;
+  // matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
+  // matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
 
   matrix_b_ = Matrix::Zero(basic_state_size_, controls_);
   matrix_bd_ = Matrix::Zero(basic_state_size_, controls_);
-  matrix_b_(1, 0) = cf_ / mass_;
-  matrix_b_(3, 0) = lf_ * cf_ / iz_;
-  matrix_b_(4, 1) = 0.0;
-  matrix_b_(5, 1) = -1.0;
+  matrix_b_(0, 0) = -1.0;
+  // matrix_b_(1, 0) = cf_ / mass_;
+  // matrix_b_(3, 0) = lf_ * cf_ / iz_;
+  // matrix_b_(4, 1) = 0.0;
+  // matrix_b_(5, 1) = -1.0;
   matrix_bd_ = matrix_b_ * ts_;
 
   matrix_c_ = Matrix::Zero(basic_state_size_, 1);
@@ -573,7 +574,7 @@ Result_state MPCController::Init(const ControlConf *control_conf) {
   InitializeFilters(control_conf);
   LoadMPCGainScheduler(control_conf->mpc_controller_conf());
   LogInitParameters();
-  EDEBUG << "[MPCController] init done!";
+  EINFO << "[MPCController] init done!";
   return Result_state::State_Ok;
 }
 
@@ -666,9 +667,9 @@ void MPCController::ComputeLongitudinalErrors(
   double one_minus_kappa_lat_error = 1 - reference_point.path_point.kappa *
                                              linear_v * std::sin(heading_error);
 
-  debug->set_station_reference(reference_point.path_point.s);
-  debug->set_station_feedback(s_matched);
-  debug->set_station_error(reference_point.path_point.s - s_matched);
+  // debug->set_station_reference(reference_point.path_point.s);
+  // debug->set_station_feedback(s_matched);
+  // debug->set_station_error(reference_point.path_point.s - s_matched);
   debug->set_speed_reference(reference_point.v);
   debug->set_speed_feedback(lon_speed);
   debug->set_speed_error(reference_point.v - s_dot_matched);
