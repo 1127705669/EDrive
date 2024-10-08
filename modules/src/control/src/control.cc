@@ -68,10 +68,8 @@ void Control::ConvertControlCommandToSimulator(
     const ControlCommand& control_command, 
     ::control::CarlaEgoVehicleControl& simulator_control_command) {
   simulator_control_command.steer = -control_command.steering_target()/100;
-  // simulator_control_command.throttle = control_command.throttle()/100;
-  // simulator_control_command.brake = control_command.brake()/100;
-  // ROS_INFO("%f",simulator_control_command.throttle);
-  simulator_control_command.throttle = 0.4;
+  simulator_control_command.throttle = control_command.throttle()/100;
+  simulator_control_command.brake = control_command.brake()/100;
 }
 
 void Control::OnTimer(const ros::TimerEvent &) {

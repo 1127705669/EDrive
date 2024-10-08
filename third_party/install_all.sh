@@ -31,4 +31,8 @@ echo "Installing protocol buffers..."
 bash install_protobuf.sh
 echo "protocol buffers installation completed."
 
+echo "Installing sumo..."
+bash install_sumo.sh
+echo "sumo installation completed."
+
 echo "All third-party libraries have been successfully installed."

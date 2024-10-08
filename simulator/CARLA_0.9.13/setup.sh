@@ -12,7 +12,7 @@ fi
 
 # Install system dependencies
 sudo apt-get update
-sudo apt-get install -y ros-noetic-derived-object-msgs ros-noetic-ackermann-msgs libffi7 libomp5
+sudo apt-get install -y ros-noetic-derived-object-msgs ros-noetic-ackermann-msgs libffi7 libomp5 libx11-dev libxft-dev libxmu-dev libgl1-mesa-dev libglu1-mesa-dev libfox-1.6-dev libgdal-dev
 
 # Check if the 'carla' conda environment already exists
 if conda env list | grep -q "carla"; then
@@ -44,3 +44,6 @@ cd "$current_dir"
 # Install Python dependencies
 pip install -r requirements.txt
 pip install -r catkin_ws/src/ros-bridge/requirements.txt
+
+# Install the latest available version of SUMO from conda-forge
+conda install -c conda-forge sumo
