@@ -1,4 +1,5 @@
 import rospy
+from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
 from planning.msg import ADCTrajectory  # 确保替换为你的实际包名
 from common.msg import TrajectoryPoint  # 确保替换为你的实际包名
@@ -27,6 +28,8 @@ class ROSNode:
         self.ddpg_model = DDPG(state_dim=150, action_dim=50, max_action=10)
 
         self.trajectory_pub = rospy.Publisher('/EDrive/planning/RLtrajectory', ADCTrajectory, queue_size=10)
+        self.mpc_weight_pub = rospy.Publisher('/EDrive/planning/MpcWeight', Float64, queue_size=10)
+        self.mpc_target_speed_pub = rospy.Publisher('/EDrive/planning/MpcTargetSpeed', Float64, queue_size=10)
 
     def odometry_callback(self, data):
         self.odometry_data.append(data)

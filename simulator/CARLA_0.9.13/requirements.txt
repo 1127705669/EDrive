@@ -6,3 +6,4 @@ carla==0.9.15
 opencv-python
 numpy
 packaging
+lxml
