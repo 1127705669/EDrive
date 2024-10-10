@@ -38,6 +38,10 @@ Result_state Control::Init(){
 
 Result_state Control::CheckInput() {
   AdapterManager::Observe();
+
+  auto Rl_trajectory_adapter = AdapterManager::GetRLPlanning();
+  target_speed_ = Rl_trajectory_adapter->GetLatestObserved();
+
   auto trajectory_adapter = AdapterManager::GetPlanning();
   trajectory_ = trajectory_adapter->GetLatestObserved();
 
@@ -86,6 +90,12 @@ void Control::OnTimer(const ros::TimerEvent &) {
 }
 
 Result_state Control::ProduceControlCommand(ControlCommand *control_command) {
+  for (size_t i = 0; i < trajectory_.trajectory_point.size(); i++)
+  {
+    trajectory_.trajectory_point[i].v = (double)target_speed_.data;
+    EINFO << trajectory_.trajectory_point[i].v;
+  }
+  
   if(Result_state::State_Ok != controller_agent_.ComputeControlCommand(&trajectory_, &localization_, control_command)) {
     EINFO << "controller agent compute control command failed, stopping...";
   }

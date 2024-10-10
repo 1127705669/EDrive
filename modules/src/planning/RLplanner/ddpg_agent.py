@@ -1,70 +1,117 @@
-import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
-import random
+import numpy as np
 from collections import deque
 from models import Actor, Critic
+import random
 
-class DDPG:
-    def __init__(self, state_dim, action_dim, max_action):
-        self.actor = Actor(state_dim, action_dim, max_action).to(torch.device('cpu'))
-        self.actor_target = Actor(state_dim, action_dim, max_action).to(torch.device('cpu'))
-        self.actor_target.load_state_dict(self.actor.state_dict())
-        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=1e-4)
+class DDPGAgent:
+    def __init__(self, state_size, action_size, writer=None):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.actor = Actor(state_size, action_size).to(self.device)
+        self.critic = Critic(state_size, action_size).to(self.device)
+        self.target_actor = Actor(state_size, action_size).to(self.device)
+        self.target_critic = Critic(state_size, action_size).to(self.device)
+        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=0.001)
+        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=0.002)
+        self.memory = deque(maxlen=10000)
+        self.batch_size = 64
+        self.gamma = 0.99
+        self.tau = 0.005
+        self.noise_scale = 0.1
 
-        self.critic = Critic(state_dim, action_dim).to(torch.device('cpu'))
-        self.critic_target = Critic(state_dim, action_dim).to(torch.device('cpu'))
-        self.critic_target.load_state_dict(self.critic.state_dict())
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=1e-3)
+        # 使用传入的 SummaryWriter
+        self.writer = writer
 
-        self.replay_buffer = deque(maxlen=1000000)
-        self.max_action = max_action
+        # 添加模型图到 TensorBoard
+        if self.writer is not None:
+            dummy_input = torch.randn(1, state_size).float().to(self.device)  # 生成一个虚拟输入
+            self.writer.add_graph(self.actor, dummy_input)  # 将 Actor 模型的图添加到 TensorBoard
 
-    def predict_speeds(self, states):
-        states = torch.FloatTensor(states).to(torch.device('cpu'))
-        speeds = self.actor(states).cpu().data.numpy()
-        return speeds.flatten()
+        # 初始化目标网络
+        self.soft_update(self.target_actor, self.actor, 1.0)
+        self.soft_update(self.target_critic, self.critic, 1.0)
 
-    def train(self, iterations, batch_size=64, gamma=0.99, tau=0.001):
-        for _ in range(iterations):
-            if len(self.replay_buffer) < batch_size:
-                continue
+    def act(self, state, step):
+        state = torch.from_numpy(state).float().to(self.device)
+        self.actor.eval()
+        with torch.no_grad():
+            action = self.actor(state).cpu().data.numpy()
+        self.actor.train()
+        # 添加噪声进行探索
+        action += self.noise_scale * np.random.randn(action.shape[0])
+        action = np.clip(action, -1, 1)
 
-            batch = random.sample(self.replay_buffer, batch_size)
-            state, next_state, action, reward, not_done = zip(*batch)
+        # 记录动作数据
+        if self.writer is not None:
+            self.writer.add_scalar('Action/Selected_Action', action[0], step)
 
-            state = torch.FloatTensor(np.array(state)).to(torch.device('cpu')).view(batch_size, -1)
-            next_state = torch.FloatTensor(np.array(next_state)).to(torch.device('cpu')).view(batch_size, -1)
-            action = torch.FloatTensor(np.array(action)).to(torch.device('cpu'))
-            reward = torch.FloatTensor(np.array(reward)).to(torch.device('cpu')).view(batch_size, -1).mean(dim=1, keepdim=True)
-            not_done = torch.FloatTensor(np.array(not_done)).to(torch.device('cpu')).view(batch_size, -1).mean(dim=1, keepdim=True)
+        return action
 
-            next_action = self.actor_target(next_state)
-            target_Q = self.critic_target(next_state, next_action)
-            target_Q = reward + not_done * gamma * target_Q
-            current_Q = self.critic(state, action)
+    def remember(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
 
-            print(f"target_Q shape: {target_Q.shape}, current_Q shape: {current_Q.shape}")
-            print(f"reward shape: {reward.shape}, not_done shape: {not_done.shape}")
+    def learn(self, step):
+        if len(self.memory) < self.batch_size:
+            return
 
-            critic_loss = nn.MSELoss()(current_Q, target_Q)
+        # 随机采样
+        experiences = random.sample(self.memory, self.batch_size)
 
-            self.critic_optimizer.zero_grad()
-            critic_loss.backward()
-            self.critic_optimizer.step()
+        states, actions, rewards, next_states, dones = zip(*experiences)
+        states = torch.tensor(np.vstack(states)).float().to(self.device)
+        actions = torch.tensor(np.vstack(actions)).float().to(self.device)
+        rewards = torch.tensor(np.vstack(rewards)).float().to(self.device)
+        next_states = torch.tensor(np.vstack(next_states)).float().to(self.device)
+        dones = torch.tensor(np.vstack(dones).astype(np.uint8)).float().to(self.device)
 
-            actor_loss = -self.critic(state, self.actor(state)).mean()
+        # 更新 Critic
+        next_actions = self.target_actor(next_states)
+        target_q_values = self.target_critic(next_states, next_actions)
+        expected_q_values = rewards + (self.gamma * target_q_values * (1 - dones))
 
-            self.actor_optimizer.zero_grad()
-            actor_loss.backward()
-            self.actor_optimizer.step()
+        q_values = self.critic(states, actions)
+        critic_loss = torch.mean((q_values - expected_q_values.detach()) ** 2)
 
-            for param, target_param in zip(self.critic.parameters(), self.critic_target.parameters()):
-                target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
+        self.critic_optimizer.zero_grad()
+        critic_loss.backward()
+        self.critic_optimizer.step()
 
-            for param, target_param in zip(self.actor.parameters(), self.actor_target.parameters()):
-                target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
+        # 记录 Critic 损失
+        if self.writer is not None:
+            self.writer.add_scalar('Loss/Critic', critic_loss.item(), step)
 
-    def add_to_replay_buffer(self, transition):
-        self.replay_buffer.append(transition)
+        # 更新 Actor
+        actions_pred = self.actor(states)
+        actor_loss = -self.critic(states, actions_pred).mean()
+
+        self.actor_optimizer.zero_grad()
+        actor_loss.backward()
+        self.actor_optimizer.step()
+
+        # 记录 Actor 损失
+        if self.writer is not None:
+            self.writer.add_scalar('Loss/Actor', actor_loss.item(), step)
+
+        # 记录权重分布
+        if self.writer is not None:
+            for name, param in self.actor.named_parameters():
+                self.writer.add_histogram(f'Actor/{name}', param, step)
+            for name, param in self.critic.named_parameters():
+                self.writer.add_histogram(f'Critic/{name}', param, step)
+
+        # 软更新目标网络
+        self.soft_update(self.target_actor, self.actor, self.tau)
+        self.soft_update(self.target_critic, self.critic, self.tau)
+
+    def soft_update(self, target, source, tau):
+        for target_param, param in zip(target.parameters(), source.parameters()):
+            target_param.data.copy_(target_param.data * (1.0 - tau) + param.data * tau)
+
+    def save_checkpoint(self):
+        torch.save(self.actor.state_dict(), 'actor_checkpoint.pth')
+        torch.save(self.critic.state_dict(), 'critic_checkpoint.pth')
+
+    def load_checkpoint(self):
+        self.actor.load_state_dict(torch.load('actor_checkpoint.pth', map_location=self.device))
+        self.critic.load_state_dict(torch.load('critic_checkpoint.pth', map_location=self.device))

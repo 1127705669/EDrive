@@ -55,7 +55,7 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
         EnableViewerLocalization("/EDrive/viewer/localization/position", config);
         break;
       case AdapterConfig::RL_PLANNING_TRAJECTORY:
-        EnableRLPlanning("/EDrive/planning/RLtrajectory", config);
+        EnableRLPlanning("/EDrive/planning/MpcTargetSpeed", config);
         break;
       case AdapterConfig::PLANNING_TRAJECTORY:
         EnablePlanning("/EDrive/planning/trajectory", config);

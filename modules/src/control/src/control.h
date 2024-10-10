@@ -23,6 +23,8 @@
 
 #include "control/controller/controller_agent.h"
 
+#include <std_msgs/Float64.h>
+
 namespace EDrive {
 namespace control {
 
@@ -58,6 +60,8 @@ class Control : public EDrive::common::EDriveApp {
   ros::Time init_time_;
   ControllerAgent controller_agent_;
   ControlConf control_conf_;
+
+  std_msgs::Float64 target_speed_;
   planning::ADCTrajectory trajectory_;
   nav_msgs::Odometry localization_; 
 

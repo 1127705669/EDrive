@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <std_msgs/Float64.h>
 #include <derived_object_msgs/ObjectArray.h>
 #include <nav_msgs/Odometry.h>
 // #include "control/proto/control_cmd.pb.h"
@@ -33,7 +34,7 @@ namespace adapter {
 
 using ControlCommandAdapter = Adapter<::control::CarlaEgoVehicleControl>;
 using PlanningAdapter = Adapter<::planning::ADCTrajectory>;
-using RLPlanningAdapter = Adapter<::planning::ADCTrajectory>;
+using RLPlanningAdapter = Adapter<std_msgs::Float64>;
 using ViewerAdapter = Adapter<::viewer::VisualizingData>;
 using VehicleAdapter = Adapter<nav_msgs::Odometry>;
 using VehicleLocationAdapter = Adapter<visualization_msgs::Marker>;
