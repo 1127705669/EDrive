@@ -5,14 +5,18 @@ from tf.transformations import euler_from_quaternion
 from torch.utils.tensorboard import SummaryWriter
 
 class Environment:
-    def __init__(self, target_speed=36, writer=None):
+    def __init__(self, max_action, target_speed, writer=None):
         # 初始化强化学习代理
         if writer is None:
             self.writer = SummaryWriter('runs/ddpg_training')  # 如果没有传入 writer，就创建一个默认的
         else:
             self.writer = writer
 
-        self.agent = DDPGAgent(state_size=81, action_size=1, writer=self.writer)
+        self.state_size = 81
+        self.action_size = 1
+        self.max_action = max_action
+
+        self.agent = DDPGAgent(self.state_size, self.action_size, self.max_action, writer=self.writer)
         self.target_speed = target_speed  # 目标速度
         self.state = self.reset()
         self.done = False

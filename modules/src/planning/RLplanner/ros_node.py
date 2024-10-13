@@ -17,8 +17,10 @@ class ROSNode:
 
         rospy.init_node('RL_planner', anonymous=True)
 
+        self.max_action = 12
+
         # 初始化环境，并将 writer 传递给环境和强化学习代理
-        self.env = Environment(target_speed=TARGET_SPEED, writer=self.writer)
+        self.env = Environment(self.max_action, target_speed=TARGET_SPEED, writer=self.writer)
 
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
@@ -64,7 +66,7 @@ def main():
             if step_count % 10 == 0:  # 每10步进行一次学习
                 ros_node.env.agent.learn(step_count)
 
-            ros_node.mpc_target_speed.append(target_speed*10)
+            ros_node.mpc_target_speed.append(target_speed)
         
             publish_message(ros_node)
         rate.sleep()

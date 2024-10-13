@@ -6,31 +6,51 @@ from models import Actor, Critic
 import random
 
 class DDPGAgent:
-    def __init__(self, state_size, action_size, writer=None):
+    def __init__(self, state_size, action_size, max_action, writer=None):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.actor = Actor(state_size, action_size).to(self.device)
+
+        self.actor = Actor(state_size, action_size, max_action).to(self.device)
         self.critic = Critic(state_size, action_size).to(self.device)
-        self.target_actor = Actor(state_size, action_size).to(self.device)
+        
+        self.target_actor = Actor(state_size, action_size, max_action).to(self.device)
         self.target_critic = Critic(state_size, action_size).to(self.device)
+
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=0.001)
         self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=0.002)
-        self.memory = deque(maxlen=10000)
-        self.batch_size = 64
+
+        self.max_action = max_action
+        self.memory = deque(maxlen=100000)
+        self.batch_size = 128
         self.gamma = 0.99
-        self.tau = 0.005
+        self.tau = 0.001
         self.noise_scale = 0.1
 
         # 使用传入的 SummaryWriter
         self.writer = writer
-
-        # 添加模型图到 TensorBoard
-        if self.writer is not None:
-            dummy_input = torch.randn(1, state_size).float().to(self.device)  # 生成一个虚拟输入
-            self.writer.add_graph(self.actor, dummy_input)  # 将 Actor 模型的图添加到 TensorBoard
+        self.add_graphs_to_tensorboard(self.writer, state_size, action_size)
 
         # 初始化目标网络
         self.soft_update(self.target_actor, self.actor, 1.0)
         self.soft_update(self.target_critic, self.critic, 1.0)
+
+    def add_graphs_to_tensorboard(self, writer, state_size, action_size):
+        if writer is not None:
+            # 为actor模型生成虚拟输入并添加图
+            dummy_input_actor = torch.randn(1, state_size).float().to(self.device)
+            writer.add_graph(self.actor, dummy_input_actor, "Actor")
+
+            # 为target_actor模型生成虚拟输入并添加图
+            dummy_input_target_actor = torch.randn(1, state_size).float().to(self.device)
+            writer.add_graph(self.target_actor, dummy_input_target_actor, "Target Actor")
+
+            # 为critic模型生成虚拟输入并添加图
+            # 注意: critic模型需要状态和动作作为输入
+            dummy_state = torch.randn(1, state_size).float().to(self.device)
+            dummy_action = torch.randn(1, action_size).float().to(self.device)
+            writer.add_graph(self.critic, [dummy_state, dummy_action], "Critic")
+
+            # 为target_critic模型生成虚拟输入并添加图
+            writer.add_graph(self.target_critic, [dummy_state, dummy_action], "Target Critic")
 
     def act(self, state, step):
         state = torch.from_numpy(state).float().to(self.device)
@@ -40,7 +60,7 @@ class DDPGAgent:
         self.actor.train()
         # 添加噪声进行探索
         action += self.noise_scale * np.random.randn(action.shape[0])
-        action = np.clip(action, -1, 1)
+        action = np.clip(action, -self.max_action, self.max_action)
 
         # 记录动作数据
         if self.writer is not None:
