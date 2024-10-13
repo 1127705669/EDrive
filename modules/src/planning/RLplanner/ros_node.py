@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from torch.utils.tensorboard import SummaryWriter
 
-TARGET_SPEED = 21.6 / 3.6  # 20 km/h in m/s
+TARGET_SPEED = 6.0
 
 class ROSNode:
     def __init__(self):
