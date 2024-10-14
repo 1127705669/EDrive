@@ -3,6 +3,7 @@ from ddpg_agent import DDPGAgent
 from collections import deque
 from tf.transformations import euler_from_quaternion
 from torch.utils.tensorboard import SummaryWriter
+from vehicle_generator import VehicleGenerator
 
 class Environment:
     def __init__(self, max_action, target_speed, writer=None):
@@ -12,7 +13,9 @@ class Environment:
         else:
             self.writer = writer
 
-        self.state_size = 81
+        self.vehicle_generator = VehicleGenerator()  # 创建车辆生成器实例
+
+        self.state_size = 2
         self.action_size = 1
         self.max_action = max_action
 
@@ -23,10 +26,13 @@ class Environment:
         self.distance = 0
         self.speed = 0
         self.acceleration = 0
+        self.vehicle = None  # 用于存储生成的车辆对象
 
         # 存储传感器原始数据
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
+        self.objects = deque(maxlen=20)
+        self.collision = deque(maxlen=20)
 
     def reset(self):
         # 重置环境到初始状态
@@ -35,15 +41,26 @@ class Environment:
         self.acceleration = 0  # 初始加速度为0
         self.done = False
 
-        # 构造初始状态向量 (20 个速度为 0, 20 个 x 位置为 0, 20 个 y 位置为 0, 20 个加速度为 0, 目标速度为 target_speed)
-        speeds = [0] * 20
-        positions_x = [0] * 20
-        positions_y = [0] * 20
-        accelerations = [0] * 20
-        state = np.array(speeds + positions_x + positions_y + accelerations + [self.target_speed])  # 81 维状态向量
+        self.spawn_vehicle()
+
+        # 构造初始状态向量
+        speeds = 0.0
+
+        state = np.array([speeds] + [self.target_speed])
 
         self.state = state
         return self.state
+    
+    def spawn_vehicle(self):
+        # 生成车辆
+        self.vehicle = self.vehicle_generator.spawn_vehicle(location=(-54.1, 65.0, 1.0), rotation=(0, 90, 0))
+        print(f"Vehicle spawned: {self.vehicle.type_id}")
+
+    def destroy_vehicle(self):
+        # 销毁车辆
+        self.vehicle_generator.destroy_vehicles()
+        print("Vehicle destroyed")
+        self.vehicle = None
 
     def update_data(self, odometry_queue, imu_queue):
         """
@@ -56,9 +73,13 @@ class Environment:
         # 更新内部的odometry_queue和imu_queue，确保与ROSNode中保持同步from torch.utils.tensorboard import SummaryWriter
         self.odometry_queue.clear()
         self.imu_queue.clear()
+        self.objects.clear()
+        self.collision.clear()
 
         self.odometry_queue.extend(odometry_queue)
         self.imu_queue.extend(imu_queue)
+        self.objects.extend(odometry_queue)
+        self.collision.extend(odometry_queue)
 
     def preprocess_data(self,odometry_queue, imu_queue):
         """
@@ -68,15 +89,10 @@ class Environment:
         state (np.array): 预处理后的状态向量
         """
         # 从odometry队列提取速度和位置
-        speeds = [data.twist.twist.linear.x for data in list(odometry_queue)]
-        positions_x = [data.pose.pose.position.x for data in list(odometry_queue)]
-        positions_y = [data.pose.pose.position.y for data in list(odometry_queue)]
-        
-        # 从IMU队列提取加速度
-        accelerations = [data.linear_acceleration.x for data in list(imu_queue)]
+        speeds = odometry_queue[-1].twist.twist.linear.x
 
         # 构造状态向量
-        state = np.array(speeds + positions_x + positions_y + accelerations + [self.target_speed])
+        state = np.array([speeds] + [self.target_speed])
         return state
     
     def compute_next_state(self, delta_t=0.1):
@@ -134,7 +150,7 @@ class Environment:
     def compute_reward(self, current_speed):
         # 计算奖励
         speed_error = np.abs(current_speed - self.target_speed)
-        reward = -speed_error  # 奖励是负的速度误差
+        reward = -speed_error * speed_error  # 奖励是负的速度误差
 
         print(f"reward: {reward}, current_speed: {current_speed}, target_speed: {self.target_speed}")
 
@@ -149,6 +165,11 @@ class Environment:
         reward (float): 当前状态的奖励
         done (bool): 指示是否结束
         """
+
+        print(step_count)
+        if(step_count > 200):
+            print(111111111111111111111111111111111)
+            self.destroy_vehicle()
 
         # 预处理数据以获取当前状态
         current_state = self.preprocess_data(self.odometry_queue, self.imu_queue)

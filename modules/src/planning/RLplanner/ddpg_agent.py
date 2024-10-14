@@ -23,7 +23,7 @@ class DDPGAgent:
         self.batch_size = 128
         self.gamma = 0.99
         self.tau = 0.001
-        self.noise_scale = 0.1
+        self.noise_scale = 0.01
 
         # 使用传入的 SummaryWriter
         self.writer = writer

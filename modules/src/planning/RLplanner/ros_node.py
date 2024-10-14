@@ -24,20 +24,30 @@ class ROSNode:
 
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
+        self.objects = deque(maxlen=20)
+        self.collision = deque(maxlen=20)
         self.mpc_weight = deque(maxlen=20)
         self.mpc_target_speed = deque(maxlen=20)
 
         rospy.Subscriber('/EDrive/localization/position', Odometry, self.odometry_callback)
         rospy.Subscriber("/carla/ego_vehicle/imu", Imu, self.imu_callback)
-
+        rospy.Subscriber('/carla/ego_vehicle/objects', Odometry, self.objects_callback)
+        rospy.Subscriber('/carla/ego_vehicle/collision', Odometry, self.collision_callback)
+        
         self.mpc_weight_pub = rospy.Publisher('/EDrive/planning/MpcWeight', Float64, queue_size=10)
         self.mpc_target_speed_pub = rospy.Publisher('/EDrive/planning/MpcTargetSpeed', Float64, queue_size=10)
-
+    
     def odometry_callback(self, data):
         self.odometry_queue.append(data)
 
     def imu_callback(self, data):
         self.imu_queue.append(data)
+
+    def objects_callback(self, data):
+        self.objects.append(data)
+
+    def collision_callback(self, data):
+        self.collision.append(data)
 
 def main():
     
