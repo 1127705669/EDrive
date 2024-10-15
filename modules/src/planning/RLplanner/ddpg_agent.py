@@ -16,7 +16,7 @@ class DDPGAgent:
         self.target_critic = Critic(state_size, action_size).to(self.device)
 
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=0.001)
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=0.002)
+        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=0.002, weight_decay=0.01)
 
         self.max_action = max_action
         self.memory = deque(maxlen=100000)

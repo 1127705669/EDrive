@@ -9,14 +9,14 @@ class Actor(nn.Module):
         self.fc1 = nn.Linear(state_size, 400)
         self.fc2 = nn.Linear(400, 300)
         self.fc3 = nn.Linear(300, action_size)
-        self.tanh = nn.Tanh()
+        self.sigmoid = nn.Sigmoid()
 
         self.max_action = max_action
 
     def forward(self, state):
         x = F.relu(self.fc1(state))
         x = F.relu(self.fc2(x))
-        x = self.max_action * self.tanh(self.fc3(x))
+        x = self.max_action * self.sigmoid(self.fc3(x))
         return x
 
 class Critic(nn.Module):
