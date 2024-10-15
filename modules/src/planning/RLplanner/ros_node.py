@@ -1,6 +1,8 @@
 import rospy
 from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
+from carla_msgs.msg import CarlaCollisionEvent
+from derived_object_msgs.msg import ObjectArray
 from sensor_msgs.msg import Imu
 from collections import deque
 from environment import Environment
@@ -22,17 +24,20 @@ class ROSNode:
         # 初始化环境，并将 writer 传递给环境和强化学习代理
         self.env = Environment(self.max_action, target_speed=TARGET_SPEED, writer=self.writer)
 
+        # input
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
-        self.objects = deque(maxlen=20)
-        self.collision = deque(maxlen=20)
+        self.objects_queue = deque(maxlen=20)
+        self.collision_queue = deque(maxlen=20)
+
+        # output
         self.mpc_weight = deque(maxlen=20)
         self.mpc_target_speed = deque(maxlen=20)
 
         rospy.Subscriber('/EDrive/localization/position', Odometry, self.odometry_callback)
         rospy.Subscriber("/carla/ego_vehicle/imu", Imu, self.imu_callback)
-        rospy.Subscriber('/carla/ego_vehicle/objects', Odometry, self.objects_callback)
-        rospy.Subscriber('/carla/ego_vehicle/collision', Odometry, self.collision_callback)
+        rospy.Subscriber('/carla/ego_vehicle/objects', ObjectArray, self.objects_callback)
+        rospy.Subscriber('/carla/ego_vehicle/collision', CarlaCollisionEvent, self.collision_callback)
         
         self.mpc_weight_pub = rospy.Publisher('/EDrive/planning/MpcWeight', Float64, queue_size=10)
         self.mpc_target_speed_pub = rospy.Publisher('/EDrive/planning/MpcTargetSpeed', Float64, queue_size=10)
@@ -44,10 +49,10 @@ class ROSNode:
         self.imu_queue.append(data)
 
     def objects_callback(self, data):
-        self.objects.append(data)
+        self.objects_queue.append(data)
 
     def collision_callback(self, data):
-        self.collision.append(data)
+        self.collision_queue.append(data)
 
 def main():
     
@@ -60,7 +65,7 @@ def main():
 
     while not rospy.is_shutdown():
         if len(ros_node.odometry_queue) >= 20 and len(ros_node.imu_queue) >= 20:
-            ros_node.env.update_data(ros_node.odometry_queue, ros_node.imu_queue)
+            ros_node.env.update_data(ros_node.odometry_queue, ros_node.imu_queue, ros_node.objects_queue, ros_node.collision_queue)
 
             # 执行环境的一步，并获取 target_speed
             next_state, reward, done, target_speed = ros_node.env.step(step_count)

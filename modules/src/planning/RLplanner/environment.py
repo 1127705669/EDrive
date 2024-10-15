@@ -31,8 +31,8 @@ class Environment:
         # 存储传感器原始数据
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
-        self.objects = deque(maxlen=20)
-        self.collision = deque(maxlen=20)
+        self.objects_queue = deque(maxlen=20)
+        self.collision_queue = deque(maxlen=20)
 
     def reset(self):
         # 重置环境到初始状态
@@ -41,7 +41,7 @@ class Environment:
         self.acceleration = 0  # 初始加速度为0
         self.done = False
 
-        self.spawn_vehicle()
+        # self.spawn_vehicle()
 
         # 构造初始状态向量
         speeds = 0.0
@@ -62,7 +62,7 @@ class Environment:
         print("Vehicle destroyed")
         self.vehicle = None
 
-    def update_data(self, odometry_queue, imu_queue):
+    def update_data(self, odometry_queue, imu_queue, objects_queue, collision_queue):
         """
         更新环境内部的传感器数据队列。
         
@@ -73,13 +73,13 @@ class Environment:
         # 更新内部的odometry_queue和imu_queue，确保与ROSNode中保持同步from torch.utils.tensorboard import SummaryWriter
         self.odometry_queue.clear()
         self.imu_queue.clear()
-        self.objects.clear()
-        self.collision.clear()
+        self.objects_queue.clear()
+        self.collision_queue.clear()
 
         self.odometry_queue.extend(odometry_queue)
         self.imu_queue.extend(imu_queue)
-        self.objects.extend(odometry_queue)
-        self.collision.extend(odometry_queue)
+        self.objects_queue.extend(objects_queue)
+        self.collision_queue.extend(collision_queue)
 
     def preprocess_data(self,odometry_queue, imu_queue):
         """
@@ -152,7 +152,7 @@ class Environment:
         speed_error = np.abs(current_speed - self.target_speed)
         reward = -speed_error * speed_error  # 奖励是负的速度误差
 
-        print(f"reward: {reward}, current_speed: {current_speed}, target_speed: {self.target_speed}")
+        # print(f"reward: {reward}, current_speed: {current_speed}, target_speed: {self.target_speed}")
 
         return reward
 
@@ -166,10 +166,10 @@ class Environment:
         done (bool): 指示是否结束
         """
 
-        print(step_count)
-        if(step_count > 200):
-            print(111111111111111111111111111111111)
-            self.destroy_vehicle()
+        # print(step_count)
+        # if(step_count > 200):
+        #     print(111111111111111111111111111111111)
+        #     self.destroy_vehicle()
 
         # 预处理数据以获取当前状态
         current_state = self.preprocess_data(self.odometry_queue, self.imu_queue)
