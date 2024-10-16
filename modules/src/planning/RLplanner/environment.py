@@ -15,9 +15,10 @@ class Environment:
 
         self.vehicle_generator = VehicleGenerator()  # 创建车辆生成器实例
 
-        self.state_size = 2
+        self.state_size = 3
         self.action_size = 1
         self.max_action = max_action
+        self.if_collision = False
 
         self.agent = DDPGAgent(self.state_size, self.action_size, self.max_action, writer=self.writer)
         self.target_speed = target_speed  # 目标速度
@@ -34,6 +35,9 @@ class Environment:
         self.objects_queue = deque(maxlen=20)
         self.collision_queue = deque(maxlen=20)
 
+    def collision_detected(self):
+        self.if_collision = True
+
     def reset(self):
         # 重置环境到初始状态
         self.distance = 0  # 从起点到当前位置的距离
@@ -46,7 +50,7 @@ class Environment:
         # 构造初始状态向量
         speeds = 0.0
 
-        state = np.array([speeds] + [self.target_speed])
+        state = np.array([speeds] + [self.target_speed] + [self.if_collision])
 
         self.state = state
         return self.state
@@ -89,10 +93,13 @@ class Environment:
         state (np.array): 预处理后的状态向量
         """
         # 从odometry队列提取速度和位置
-        speeds = odometry_queue[-1].twist.twist.linear.x
+        speed = odometry_queue[-1].twist.twist.linear.x
+
+        if_collision = self.if_collision
 
         # 构造状态向量
-        state = np.array([speeds] + [self.target_speed])
+        state = np.array([speed] + [self.target_speed] + [if_collision])
+        
         return state
     
     def compute_next_state(self, delta_t=0.1):
@@ -149,12 +156,21 @@ class Environment:
     
     def compute_reward(self, current_speed):
         # 计算奖励
+
+        vehicle_reset = False
+
+        if(self.if_collision):
+            reward = -10000
+            self.if_collision = False
+            vehicle_reset = True
+            return reward, vehicle_reset
+
         speed_error = np.abs(current_speed - self.target_speed)
         reward = -speed_error * speed_error  # 奖励是负的速度误差
 
         # print(f"reward: {reward}, current_speed: {current_speed}, target_speed: {self.target_speed}")
 
-        return reward
+        return reward, vehicle_reset
 
     def step(self, step_count):
         """
@@ -178,7 +194,7 @@ class Environment:
         # 使用副本数据预处理生成 next_state
         next_state = self.preprocess_data(odometry_queue_copy, imu_queue_copy)
 
-        reward = self.compute_reward(self.odometry_queue[-1].twist.twist.linear.x)
+        reward, vehicle_reset = self.compute_reward(self.odometry_queue[-1].twist.twist.linear.x)
 
         # 检查是否结束（假设距离达到 10km 时结束）
         self.done = self.distance >= 1000000
@@ -192,7 +208,7 @@ class Environment:
         self.writer.add_scalar('Target_Speed', target_speed, step_count)
         self.writer.add_scalar('Reward', reward, step_count)
 
-        return next_state, reward, self.done, target_speed
+        return next_state, reward, self.done, target_speed, vehicle_reset
 
     def render(self):
         # 可选：提供一种可视化当前环境状态的方式

@@ -61,7 +61,7 @@ class ROSNode:
         self.objects_queue.append(data)
 
     def collision_callback(self, data):
-        self.collision_queue.append(data)
+        self.env.collision_detected()
 
     def clean_roslaunch_processes(self):
         """
@@ -134,6 +134,7 @@ def main():
             roslaunch_running = False
 
         if not roslaunch_running:
+            ros_node.spawn_ego_vehicle()
             continue
 
         # 确保有足够的里程计和 IMU 数据
@@ -141,13 +142,13 @@ def main():
             ros_node.env.update_data(ros_node.odometry_queue, ros_node.imu_queue, ros_node.objects_queue, ros_node.collision_queue)
 
             # 执行环境的一步，并获取 target_speed
-            next_state, reward, done, target_speed = ros_node.env.step(step_count)
+            next_state, reward, done, target_speed, vehicle_reset = ros_node.env.step(step_count)
 
             # 将经验存储到经验回放池中
             ros_node.env.agent.remember(ros_node.env.state, target_speed, reward, next_state, done)
 
-            if done:
-                ros_node.env.reset()
+            if vehicle_reset:
+                ros_node.stop_ego_vehicle()
 
             # 定期学习
             step_count += 1
