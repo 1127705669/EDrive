@@ -166,11 +166,6 @@ class Environment:
         done (bool): 指示是否结束
         """
 
-        # print(step_count)
-        # if(step_count > 200):
-        #     print(111111111111111111111111111111111)
-        #     self.destroy_vehicle()
-
         # 预处理数据以获取当前状态
         current_state = self.preprocess_data(self.odometry_queue, self.imu_queue)
 
