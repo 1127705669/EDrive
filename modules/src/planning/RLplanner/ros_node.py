@@ -13,7 +13,7 @@ import subprocess
 import os
 import time
 
-TARGET_SPEED = 6.0
+TARGET_SPEED = 5.0
 
 class ROSNode:
     def __init__(self):
@@ -50,6 +50,9 @@ class ROSNode:
         
         self.mpc_weight_pub = rospy.Publisher('/EDrive/planning/MpcWeight', Float64, queue_size=10)
         self.mpc_target_speed_pub = rospy.Publisher('/EDrive/planning/MpcTargetSpeed', Float64, queue_size=10)
+
+        # 注册节点关闭时的处理函数
+        rospy.on_shutdown(self.shutdown_handler)
     
     def odometry_callback(self, data):
         self.odometry_queue.append(data)
@@ -114,6 +117,9 @@ class ROSNode:
         # 调用 clean_roslaunch_processes 以确保清理所有相关的残留进程
         self.clean_roslaunch_processes()
 
+    def shutdown_handler(self):
+        print("closing ros node...")
+        self.env.destroy_vehicle()
 
 def main():
     
@@ -139,16 +145,21 @@ def main():
 
         # 确保有足够的里程计和 IMU 数据
         if len(ros_node.odometry_queue) >= 20 and len(ros_node.imu_queue) >= 20:
+
+            if((not roslaunch_running) or (None == ros_node.env.vehicle)):
+                ros_node.env.spawn_vehicle()
+                time.sleep(5)
+                continue
+
             ros_node.env.update_data(ros_node.odometry_queue, ros_node.imu_queue, ros_node.objects_queue, ros_node.collision_queue)
 
             # 执行环境的一步，并获取 target_speed
             next_state, reward, done, target_speed, vehicle_reset = ros_node.env.step(step_count)
 
-            # 将经验存储到经验回放池中
-            ros_node.env.agent.remember(ros_node.env.state, target_speed, reward, next_state, done)
-
             if vehicle_reset:
+                ros_node.env.destroy_vehicle()
                 ros_node.stop_ego_vehicle()
+                time.sleep(2)
 
             # 定期学习
             step_count += 1

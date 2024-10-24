@@ -11,7 +11,10 @@ class VehicleGenerator:
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
         self.client = self.init_carla_client(host, port)
         self.vehicle_type = vehicle_type
-        self.vehicles = []  # 存储车辆的列表（车辆ID）
+        self.vehicle = None  # 存储单个车辆的引用
+
+        # 清理场景中除了 ego_vehicle 的所有车辆
+        self.clean_non_ego_vehicles()
 
     def init_carla_client(self, host, port):
         """
@@ -30,10 +33,29 @@ class VehicleGenerator:
         client.set_timeout(10.0)
         return client
 
+    def clean_non_ego_vehicles(self):
+        """
+        清理场景中除了 ego_vehicle 的所有车辆。
+        """
+        world = self.client.get_world()
+        actors = world.get_actors().filter('vehicle.*')  # 获取所有车辆
+
+        for actor in actors:
+            if 'ego' not in actor.type_id:  # 保留自车（ego_vehicle），其他车辆都销毁
+                try:
+                    actor.destroy()
+                    logging.info(f'Vehicle {actor.id} destroyed successfully')
+                except RuntimeError as e:
+                    logging.error(f'Failed to destroy vehicle {actor.id}: {str(e)}')
+
     def spawn_vehicle(self, location=(0, 0, 0), rotation=(0, 0, 0), color=None):
         """
         Spawn a vehicle at a given location and rotation with an optional color.
         """
+        if self.vehicle:
+            logging.warning('A vehicle is already spawned. Destroying the existing vehicle before spawning a new one.')
+            self.destroy_vehicle()
+
         world = self.client.get_world()
         blueprints = world.get_blueprint_library().filter(self.vehicle_type)
         blueprint = blueprints[0]
@@ -46,30 +68,28 @@ class VehicleGenerator:
 
         spawn_point = carla.Transform(carla.Location(x=location[0], y=location[1], z=location[2]),
                                       carla.Rotation(pitch=rotation[0], yaw=rotation[1], roll=rotation[2]))
-        vehicle = world.spawn_actor(blueprint, spawn_point)
-        if vehicle:
-            self.vehicles.append(vehicle.id)  # 将车辆 ID 添加到列表中
-            logging.info('Spawned vehicle: %s at %s', vehicle.type_id, spawn_point.location)
-            return vehicle
+        
+        self.vehicle = world.try_spawn_actor(blueprint, spawn_point)
+        if self.vehicle is None:
+            logging.error("Failed to spawn vehicle. Please check the spawn point.")
         else:
-            logging.error('Failed to spawn vehicle')
-            return None
+            logging.info(f"Vehicle {self.vehicle.id} spawned successfully at {location}")
 
-    def destroy_vehicles(self):
+        return self.vehicle
+
+    def destroy_vehicle(self):
         """
-        Destroy all vehicles using batch processing.
+        Destroy the currently spawned vehicle.
         """
-        if self.vehicles:
-            commands = [carla.command.DestroyActor(vid) for vid in self.vehicles]
-            responses = self.client.apply_batch_sync(commands, True)
-            for response in responses:
-                if response.error:
-                    logging.error(f'Failed to destroy vehicle {response.actor_id}: {response.error}')
-                else:
-                    logging.info(f'Vehicle {response.actor_id} destroyed successfully')
-            self.vehicles = []  # 清空列表
+        if self.vehicle:
+            try:
+                self.vehicle.destroy()
+                logging.info(f'Vehicle {self.vehicle.id} destroyed successfully')
+                self.vehicle = None
+            except RuntimeError as e:
+                logging.error(f'Failed to destroy vehicle {self.vehicle.id}: {str(e)}')
         else:
-            logging.info('No vehicles to destroy.')
+            logging.info('No vehicle to destroy.')
 
 if __name__ == '__main__':
     vg = VehicleGenerator()
@@ -78,8 +98,10 @@ if __name__ == '__main__':
         import time
         time.sleep(10)  # keep the vehicle for 10 seconds
         if vehicle:
-            vg.destroy_vehicles()
+            vg.destroy_vehicle()
     except KeyboardInterrupt:
-        print('Operation canceled.')
+        print('Operation canceled by user.')
+        vg.destroy_vehicle()
     except Exception as e:
         logging.error('An unexpected error occurred: %s', str(e))
+        vg.destroy_vehicle()
