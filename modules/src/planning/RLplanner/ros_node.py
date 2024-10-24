@@ -173,6 +173,7 @@ def main():
 
 def publish_message(ros_node):
     ros_node.mpc_weight.append(10)
+    ros_node.mpc_target_speed.append(5)
     ros_node.mpc_weight_pub.publish(ros_node.mpc_weight[-1])
     ros_node.mpc_target_speed_pub.publish(ros_node.mpc_target_speed[-1])
 
