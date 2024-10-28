@@ -71,16 +71,26 @@ class DDPGAgent:
             writer.add_graph(self.target_critic, [dummy_state, dummy_action], "Target Critic")
 
     def act(self, state, step):
-        state = torch.from_numpy(state).float().to(self.device)
+        # 将 state 转换为 PyTorch 张量，并添加批次维度
+        state = torch.from_numpy(state).float().unsqueeze(0).to(self.device)  # 添加unsqueeze(0)来添加批次维度
+
+        # 设置网络为评估模式
         self.actor.eval()
+
+        # 禁用梯度计算，因为在评估模式下不需要进行反向传播
         with torch.no_grad():
             action = self.actor(state).cpu().data.numpy()
+
+        # 恢复训练模式
         self.actor.train()
-        # 添加OU噪声进行探索
+
+        # 添加 OU 噪声来进行探索
         action += self.noise()
+
+        # 限制动作在允许的范围内
         action = np.clip(action, -self.max_action, self.max_action)
 
-        # 记录动作数据
+        # 记录动作数据到 TensorBoard，如果配置了的话
         if self.writer is not None:
             self.writer.add_scalar('Action/Selected_Action', action[0], step)
 
