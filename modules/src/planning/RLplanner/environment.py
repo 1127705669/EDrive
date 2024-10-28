@@ -180,6 +180,7 @@ class Environment:
         vehicle_reset = False
 
         if(self.if_collision):
+            print("collision detected!")
             vehicle_reset = True
             self.if_collision = False
 

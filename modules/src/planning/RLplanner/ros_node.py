@@ -22,9 +22,16 @@ class ROSNode:
 
         self.vehicle_generator = VehicleGenerator()
 
+        self.last_vehicle_reset_time = 0
+
         self.process = None
 
-        self.terminate_carla_processes()
+        self.check_carla_processes()
+
+        if(self.process != None):
+            print("found process, reseting...")
+            self.terminate_carla_processes()
+        
         self.vehicle_generator.destroy_vehicle()
 
         self.spawn_ego_vehicle()
@@ -66,30 +73,33 @@ class ROSNode:
         检查是否存在 carla_spawn_objects roslaunch 进程。
         """
         try:
-            # 使用 pgrep 检查是否有正在运行的进程
-            existing_processes = os.popen("pgrep -f 'roslaunch.*carla_spawn_objects.launch'").read().strip()
-            if existing_processes:
-                self.process = existing_processes  # 存储进程 ID
+            # 使用 subprocess 调用 pgrep 检查是否有正在运行的进程
+            completed_process = subprocess.run(
+                ["pgrep", "-f", "roslaunch.*carla_spawn_objects.launch"], 
+                text=True, capture_output=True, check=False
+            )
+
+            if completed_process.stdout:
+                self.process = completed_process.stdout.strip()  # 存储进程 ID
             else:
                 rospy.loginfo("未找到任何 carla_spawn_objects roslaunch 进程。")
                 self.process = None  # 确保清除之前的进程 ID
+
+        except subprocess.CalledProcessError as e:
+            # 如果 pgrep 返回状态非零（未找到进程），则将会捕获这个异常
+            rospy.loginfo("未找到任何 carla_spawn_objects roslaunch 进程。")
+            self.process = None
         except Exception as e:
             rospy.logerr(f"检查 roslaunch 进程时发生错误: {e}")
+            self.process = None
         
     def terminate_carla_processes(self):
-        """
-        终止所有 carla_spawn_objects roslaunch 进程。
-        """
-        if self.process:
-            try:
-                rospy.loginfo("正在终止 carla_spawn_objects roslaunch 进程...")
-                os.system("pkill -f 'roslaunch.*carla_spawn_objects.launch'")
-                rospy.loginfo("所有相关进程已成功终止。")
-                self.process = None  # 清除存储的进程 ID
-            except subprocess.CalledProcessError as e:
-                rospy.loginfo("终止进程操作可能未执行，无相关进程或操作失败。")
-            except Exception as e:
-                rospy.logerr(f"终止 roslaunch 进程时发生错误: {e}")
+        try:
+            rospy.loginfo("正在终止 carla_spawn_objects roslaunch 进程...")
+            # 发送 SIGTERM 信号尝试优雅地终止进程
+            subprocess.run(["pkill", "-f", "roslaunch.*carla_spawn_objects.launch"], check=False)
+        except Exception as e:
+            rospy.logerr(f"终止 roslaunch 进程时发生错误: {e}")
 
     def spawn_ego_vehicle(self):
         """
@@ -146,12 +156,15 @@ def main():
             ros_node.spawn_ego_vehicle()
             continue
 
+        print(if_other_actors)
         if(False == if_other_actors):
             ros_node.vehicle = ros_node.vehicle_generator.spawn_vehicle(location=(-54.1, -30.0, 1.0), rotation=(0, 90, 0))
             continue
 
+        time_durarion = time.time() - ros_node.last_vehicle_reset_time
+
         # 确保有足够的里程计和 IMU 数据
-        if(ros_node.data_ready):
+        if(ros_node.data_ready and time_durarion > 5):
 
             ros_node.env.update_data(ros_node.odometry_queue, ros_node.imu_queue, ros_node.objects_queue, ros_node.collision_queue)
 
@@ -159,7 +172,7 @@ def main():
             next_state, reward, done, target_speed, vehicle_reset, learn_flag = ros_node.env.step()
 
             if vehicle_reset:
-                print(1)
+                ros_node.last_vehicle_reset_time = time.time()
                 ros_node.vehicle_generator.destroy_vehicle()
                 ros_node.terminate_carla_processes()
                 ros_node.odometry_queue_update_flag = False
