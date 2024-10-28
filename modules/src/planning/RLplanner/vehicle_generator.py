@@ -32,14 +32,9 @@ class VehicleGenerator:
 
     def check_non_ego_vehicles_exist(self):
         """
-        Check if there are any vehicles other than the ego vehicle.
+        Check if the ego vehicle exists in the simulator.
         """
-        world = self.client.get_world()
-        actors = world.get_actors().filter('vehicle.*')
-        for actor in actors:
-            if 'ego' not in actor.attributes.get('role_name', ''):
-                return True
-        return False
+        return self.vehicle is not None
 
     def clean_non_ego_vehicles(self):
         """

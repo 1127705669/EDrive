@@ -25,29 +25,16 @@ class ROSNode:
         self.last_vehicle_reset_time = 0
 
         self.process = None
-
-        self.check_carla_processes()
-
-        if(self.process != None):
-            print("found process, reseting...")
-            self.terminate_carla_processes()
-        
-        self.vehicle_generator.destroy_vehicle()
-
-        self.spawn_ego_vehicle()
-        
-        self.vehicle = self.vehicle_generator.spawn_vehicle(location=(-54.1, -30.0, 1.0), rotation=(0, 90, 0))
  
+        self.reset_flag = True
+        self.reset_done = False
+        self.object_generated = False
+
         # input
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
         self.objects_queue = deque(maxlen=20)
         self.collision_queue = deque(maxlen=20)
-
-        self.odometry_queue_update_flag = False
-        self.imu_queue_update_flag = False
-        self.objects_queue_update_flag = False
-        self.data_ready = False
 
         # output
         self.mpc_weight = deque(maxlen=20)
@@ -63,6 +50,28 @@ class ROSNode:
 
         # 注册节点关闭时的处理函数
         rospy.on_shutdown(self.shutdown_handler)
+
+    def reset(self):
+        if self.reset_flag:
+            self.last_vehicle_reset_time = time.time()
+            self.reset_flag = False
+            self.odometry_queue_update_flag = False
+            self.imu_queue_update_flag = False
+            self.objects_queue_update_flag = False
+            self.data_ready = False
+            self.object_generated = False
+            self.vehicle_generator.destroy_vehicle()
+            self.terminate_carla_processes()
+
+        time_durarion = time.time() - self.last_vehicle_reset_time
+
+        if(time_durarion > 2 and not self.object_generated):
+            self.spawn_ego_vehicle()
+            self.vehicle = self.vehicle_generator.spawn_vehicle(location=(-54.1, -30.0, 1.0), rotation=(0, 90, 0))
+            self.object_generated = True
+        
+        if(time_durarion > 5):
+            self.reset_done = True
 
     def check_data_ready(self):
         if self.odometry_queue_update_flag and self.imu_queue_update_flag and self.objects_queue_update_flag:
@@ -149,22 +158,13 @@ def main():
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():
-        ros_node.check_carla_processes()
-        if_other_actors = ros_node.vehicle_generator.check_non_ego_vehicles_exist()
 
-        if(None == ros_node.process):
-            ros_node.spawn_ego_vehicle()
+        if not ros_node.reset_done or ros_node.reset_flag:
+            ros_node.reset()
             continue
-
-        print(if_other_actors)
-        if(False == if_other_actors):
-            ros_node.vehicle = ros_node.vehicle_generator.spawn_vehicle(location=(-54.1, -30.0, 1.0), rotation=(0, 90, 0))
-            continue
-
-        time_durarion = time.time() - ros_node.last_vehicle_reset_time
-
+        
         # 确保有足够的里程计和 IMU 数据
-        if(ros_node.data_ready and time_durarion > 5):
+        if(ros_node.data_ready):
 
             ros_node.env.update_data(ros_node.odometry_queue, ros_node.imu_queue, ros_node.objects_queue, ros_node.collision_queue)
 
@@ -172,13 +172,8 @@ def main():
             next_state, reward, done, target_speed, vehicle_reset, learn_flag = ros_node.env.step()
 
             if vehicle_reset:
-                ros_node.last_vehicle_reset_time = time.time()
-                ros_node.vehicle_generator.destroy_vehicle()
-                ros_node.terminate_carla_processes()
-                ros_node.odometry_queue_update_flag = False
-                ros_node.imu_queue_update_flag = False
-                ros_node.objects_queue_update_flag = False
-                ros_node.data_ready = False
+                ros_node.reset_flag = True
+                ros_node.reset_done = False
             
             if(learn_flag):
                 ros_node.env.learn()
