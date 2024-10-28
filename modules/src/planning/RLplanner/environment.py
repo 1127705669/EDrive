@@ -3,33 +3,27 @@ from ddpg_agent import DDPGAgent
 from collections import deque
 from tf.transformations import euler_from_quaternion
 from torch.utils.tensorboard import SummaryWriter
-from vehicle_generator import VehicleGenerator
 import math
 
 
 class Environment:
-    def __init__(self, max_action, target_speed, writer=None):
-        # 初始化强化学习代理
-        if writer is None:
-            self.writer = SummaryWriter('runs/ddpg_training')  # 如果没有传入 writer，就创建一个默认的
-        else:
-            self.writer = writer
-
-        self.vehicle_generator = VehicleGenerator()  # 创建车辆生成器实例
+    def __init__(self):
+        
+        self.step_count = 0 
+        self.writer = SummaryWriter('runs/ddpg_training')
 
         self.state_size = 3
         self.action_size = 1
-        self.max_action = max_action
+        self.max_action = 12
         self.if_collision = False
         self.distance_to_front_object = 0
 
         self.agent = DDPGAgent(self.state_size, self.action_size, self.max_action, writer=self.writer)
-        self.target_speed = target_speed  # 目标速度
+        self.target_speed = 5
         self.done = False
         self.distance = 0
         self.speed = 0
         self.acceleration = 0
-        self.vehicle = None  # 用于存储生成的车辆对象
         self.yaw = 0
         self.position_x = 0
         self.position_y = 0
@@ -52,8 +46,6 @@ class Environment:
         self.acceleration = 0  # 初始加速度为0
         self.done = False
 
-        self.spawn_vehicle()
-
         # 构造初始状态向量
         speeds = 0.0
 
@@ -61,16 +53,6 @@ class Environment:
 
         self.state = state
         return self.state
-    
-    def spawn_vehicle(self):
-        # 生成车辆
-        self.vehicle = self.vehicle_generator.spawn_vehicle(location=(-54.1, -30.0, 1.0), rotation=(0, 90, 0))
-
-    def destroy_vehicle(self):
-        # 销毁车辆
-        self.vehicle_generator.destroy_vehicle()
-        print("Vehicle destroyed")
-        self.vehicle = None
 
     def update_data(self, odometry_queue, imu_queue, objects_queue, collision_queue):
         """
@@ -106,7 +88,7 @@ class Environment:
         if(self.distance_to_front_object > 15):
             self.distance_to_front_object = 0
 
-        print(self.distance_to_front_object)
+        # print(self.distance_to_front_object)
 
         # 从odometry数据获取航向角
         orientation_q = self.odometry_queue[-1].pose.pose.orientation
@@ -200,8 +182,6 @@ class Environment:
         if(self.if_collision):
             vehicle_reset = True
             self.if_collision = False
-            # self.destroy_vehicle()
-            # return reward, vehicle_reset
 
         # 速度奖励：权重a乘以（当前速度-目标车速）的平方
         speed_reward = -weight_speed * (current_speed - self.target_speed)**2
@@ -215,13 +195,13 @@ class Environment:
 
         total_reward = speed_reward + distance_reward
 
-        print("reward: " + str(total_reward) + ", distance reward: " + str(distance_reward) + ", speed reward: " + str(speed_reward))
+        # print("reward: " + str(total_reward) + ", distance reward: " + str(distance_reward) + ", speed reward: " + str(speed_reward))
 
         # print(f"reward: {reward}, current_speed: {current_speed}, target_speed: {self.target_speed}")
 
         return total_reward, vehicle_reset
 
-    def step(self, step_count):
+    def step(self):
         """
         执行一步环境更新，并获取下一状态和奖励。
         
@@ -235,7 +215,7 @@ class Environment:
         current_state = self.preprocess_data(self.odometry_queue, self.imu_queue, self.distance_to_front_object)
 
         # 使用RL模型基于当前状态做出决策
-        action = self.agent.act(current_state, step_count)  # 动作是目标速度，RL的输出为目标速度
+        action = self.agent.act(current_state, self.step_count)  # 动作是目标速度，RL的输出为目标速度
         target_speed = action[0]  # 取出目标速度
 
         next_state, odometry_queue_copy, imu_queue_copy = self.compute_next_state(delta_t=0.1)
@@ -249,12 +229,22 @@ class Environment:
         self.agent.remember(current_state, target_speed, reward, next_state, self.done)
 
         # 存储当前状态用于 TensorBoard 可视化
-        self.writer.add_scalar('Speed', self.odometry_queue[-1].twist.twist.linear.x, step_count)
-        self.writer.add_scalar('Acceleration', self.acceleration, step_count)
-        self.writer.add_scalar('Target_Speed', target_speed, step_count)
-        self.writer.add_scalar('Reward', reward, step_count)
+        self.writer.add_scalar('Speed', self.odometry_queue[-1].twist.twist.linear.x, self.step_count)
+        self.writer.add_scalar('Acceleration', self.acceleration, self.step_count)
+        self.writer.add_scalar('Target_Speed', target_speed, self.step_count)
+        self.writer.add_scalar('Reward', reward, self.step_count)
 
-        return next_state, reward, self.done, target_speed, vehicle_reset
+        self.step_count += 1
+
+        if self.step_count % 10 == 0:
+            learn_flag = True
+        else:
+            learn_flag = False
+
+        return next_state, reward, self.done, target_speed, vehicle_reset, learn_flag
+    
+    def learn(self):
+        self.agent.learn(self.step_count)
 
     def render(self):
         # 可选：提供一种可视化当前环境状态的方式

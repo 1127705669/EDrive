@@ -13,9 +13,6 @@ class VehicleGenerator:
         self.vehicle_type = vehicle_type
         self.vehicle = None  # 存储单个车辆的引用
 
-        # 清理场景中除了 ego_vehicle 的所有车辆
-        self.clean_non_ego_vehicles()
-
     def init_carla_client(self, host, port):
         """
         Initialize and return a CARLA client connected to a specified server.
@@ -33,15 +30,26 @@ class VehicleGenerator:
         client.set_timeout(10.0)
         return client
 
-    def clean_non_ego_vehicles(self):
+    def check_non_ego_vehicles_exist(self):
         """
-        清理场景中除了 ego_vehicle 的所有车辆。
+        Check if there are any vehicles other than the ego vehicle.
         """
         world = self.client.get_world()
-        actors = world.get_actors().filter('vehicle.*')  # 获取所有车辆
+        actors = world.get_actors().filter('vehicle.*')
+        for actor in actors:
+            if 'ego' not in actor.attributes.get('role_name', ''):
+                return True
+        return False
+
+    def clean_non_ego_vehicles(self):
+        """
+        Remove all vehicles except for the ego vehicle from the scene.
+        """
+        world = self.client.get_world()
+        actors = world.get_actors().filter('vehicle.*')
 
         for actor in actors:
-            if 'ego' not in actor.type_id:  # 保留自车（ego_vehicle），其他车辆都销毁
+            if 'ego' not in actor.attributes.get('role_name', ''):
                 try:
                     actor.destroy()
                     logging.info(f'Vehicle {actor.id} destroyed successfully')
@@ -94,6 +102,8 @@ class VehicleGenerator:
 if __name__ == '__main__':
     vg = VehicleGenerator()
     try:
+        if vg.check_non_ego_vehicles_exist():
+            vg.clean_non_ego_vehicles()
         vehicle = vg.spawn_vehicle(location=(-54.1, 65.0, 1.0), rotation=(0, 90, 0))
         import time
         time.sleep(10)  # keep the vehicle for 10 seconds
@@ -101,7 +111,9 @@ if __name__ == '__main__':
             vg.destroy_vehicle()
     except KeyboardInterrupt:
         print('Operation canceled by user.')
-        vg.destroy_vehicle()
+        if vg.vehicle:
+            vg.destroy_vehicle()
     except Exception as e:
         logging.error('An unexpected error occurred: %s', str(e))
-        vg.destroy_vehicle()
+        if vg.vehicle:
+            vg.destroy_vehicle()
