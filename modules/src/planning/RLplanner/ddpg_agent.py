@@ -5,6 +5,24 @@ from collections import deque
 from models import Actor, Critic
 import random
 
+class OrnsteinUhlenbeckNoise:
+    def __init__(self, size, mu=0.0, theta=0.15, sigma=0.2, dt=1e-1, x0=None):
+        self.mu = mu
+        self.theta = theta
+        self.sigma = sigma
+        self.dt = dt
+        self.size = size
+        self.x0 = x0
+        self.reset()
+
+    def reset(self):
+        self.x_prev = self.x0 if self.x0 is not None else np.zeros(self.size)
+
+    def __call__(self):
+        x = self.x_prev + self.theta * (self.mu - self.x_prev) * self.dt + self.sigma * np.sqrt(self.dt) * np.random.randn(*self.size)
+        self.x_prev = x
+        return x
+
 class DDPGAgent:
     def __init__(self, state_size, action_size, max_action, writer=None):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -20,10 +38,10 @@ class DDPGAgent:
 
         self.max_action = max_action
         self.memory = deque(maxlen=100000)
-        self.batch_size = 128
+        self.batch_size = 256
         self.gamma = 0.99
         self.tau = 0.001
-        self.noise_scale = 0.01
+        self.noise = OrnsteinUhlenbeckNoise(size=(action_size,), mu=0.0, theta=0.15, sigma=0.2)
 
         # 使用传入的 SummaryWriter
         self.writer = writer
@@ -58,8 +76,8 @@ class DDPGAgent:
         with torch.no_grad():
             action = self.actor(state).cpu().data.numpy()
         self.actor.train()
-        # 添加噪声进行探索
-        action += self.noise_scale * np.random.randn(action.shape[0])
+        # 添加OU噪声进行探索
+        action += self.noise()
         action = np.clip(action, -self.max_action, self.max_action)
 
         # 记录动作数据
