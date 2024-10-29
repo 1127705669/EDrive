@@ -1,24 +1,21 @@
 import numpy as np
-from ddpg_agent import DDPGAgent
+import torch
+from sac_agent import SACAgent
 from collections import deque
 from tf.transformations import euler_from_quaternion
 from torch.utils.tensorboard import SummaryWriter
 import math
 
-
 class Environment:
     def __init__(self):
-        
-        self.step_count = 0 
-        self.writer = SummaryWriter('runs/ddpg_training')
-
-        self.state_size = 3
-        self.action_size = 1
+        self.step_count = 0
+        self.writer = SummaryWriter('runs/sac_training')
+        self.state_dim = 2
+        self.action_dim = 1
         self.max_action = 12
-        self.if_collision = False
-        self.distance_to_front_object = 0
+        self.agent = SACAgent(self.state_dim, self.action_dim, [128, 256], self.max_action, self.writer)
 
-        self.agent = DDPGAgent(self.state_size, self.action_size, self.max_action, writer=self.writer)
+        self.distance_to_front_object = 0
         self.target_speed = 5
         self.done = False
         self.distance = 0
@@ -27,10 +24,9 @@ class Environment:
         self.yaw = 0
         self.position_x = 0
         self.position_y = 0
+        self.if_collision = False
 
         self.state = self.reset()
-
-        # 存储传感器原始数据
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
         self.objects_queue = deque(maxlen=20)
@@ -45,14 +41,11 @@ class Environment:
         self.speed = 0  # 当前速度
         self.acceleration = 0  # 初始加速度为0
         self.done = False
+        self.if_collision = False
 
-        # 构造初始状态向量
-        speeds = 0.0
+        state = np.array([self.speed] + [self.target_speed])
 
-        state = np.array([speeds] + [self.target_speed] + [self.distance_to_front_object])
-
-        self.state = state
-        return self.state
+        return state.reshape(1, -1)
 
     def update_data(self, odometry_queue, imu_queue, objects_queue, collision_queue):
         """
@@ -78,15 +71,15 @@ class Environment:
 
         latest_objects = self.objects_queue[-1]
 
-        position = latest_objects.objects[0].pose.position
-        object_x = position.x
-        object_y = position.y
+        # position = latest_objects.objects[0].pose.position
+        # object_x = position.x
+        # object_y = position.y
 
-        # 计算自车与目标车辆的欧几里得距离
-        self.distance_to_front_object = math.sqrt((self.position_x - object_x)**2 + (self.position_y - object_y)**2)
+        # # 计算自车与目标车辆的欧几里得距离
+        # self.distance_to_front_object = math.sqrt((self.position_x - object_x)**2 + (self.position_y - object_y)**2)
 
-        if(self.distance_to_front_object > 15):
-            self.distance_to_front_object = 0
+        # if(self.distance_to_front_object > 15):
+        #     self.distance_to_front_object = 0
 
         # print(self.distance_to_front_object)
 
@@ -110,7 +103,7 @@ class Environment:
         if_collision = self.if_collision
 
         # 构造状态向量
-        state = np.array([speed] + [self.target_speed] + [next_distance])
+        state = np.array([speed] + [self.target_speed])
         
         return state
     
@@ -185,7 +178,8 @@ class Environment:
             self.if_collision = False
 
         # 速度奖励：权重a乘以（当前速度-目标车速）的平方
-        speed_reward = -weight_speed * (current_speed - self.target_speed)**2
+        
+        speed_reward = np.exp(-0.5 * ((current_speed - self.target_speed) ** 2) / (1 ** 2))
 
         # 距离奖励
         if 4 > self.distance_to_front_object or self.distance_to_front_object > distance_threshold:
@@ -194,7 +188,7 @@ class Environment:
             # 在15米到6米之间，奖励逐渐增加，使用一个简单的线性关系
             distance_reward = -weight_distance * (distance_threshold - self.distance_to_front_object)**2
 
-        total_reward = speed_reward + distance_reward
+        total_reward = speed_reward #+ distance_reward
 
         # print("reward: " + str(total_reward) + ", distance reward: " + str(distance_reward) + ", speed reward: " + str(speed_reward))
 
@@ -216,8 +210,10 @@ class Environment:
         current_state = self.preprocess_data(self.odometry_queue, self.imu_queue, self.distance_to_front_object)
 
         # 使用RL模型基于当前状态做出决策
-        action = self.agent.act(current_state, self.step_count)  # 动作是目标速度，RL的输出为目标速度
-        target_speed = action[0]  # 取出目标速度
+        action = self.agent.select_action(current_state, self.step_count)  # 动作是目标速度，RL的输出为目标速度
+        action = action[0]
+
+        print(action)
 
         next_state, odometry_queue_copy, imu_queue_copy = self.compute_next_state(delta_t=0.1)
 
@@ -227,13 +223,12 @@ class Environment:
         self.done = self.distance >= 1000000
 
         # 将经验存储到内存中 (state, action, reward, next_state, done)
-        self.agent.remember(current_state, target_speed, reward, next_state, self.done)
+        self.agent.memory.push(current_state, action, reward, next_state, self.done)
 
         # 存储当前状态用于 TensorBoard 可视化
-        self.writer.add_scalar('Speed', self.odometry_queue[-1].twist.twist.linear.x, self.step_count)
-        self.writer.add_scalar('Acceleration', self.acceleration, self.step_count)
-        self.writer.add_scalar('Target_Speed', target_speed, self.step_count)
-        self.writer.add_scalar('Reward', reward, self.step_count)
+        self.writer.add_scalar('real speed', self.odometry_queue[-1].twist.twist.linear.x, self.step_count)
+        self.writer.add_scalar('real acceleration', self.acceleration, self.step_count)
+        self.writer.add_scalar('reward', reward, self.step_count)
 
         self.step_count += 1
 
@@ -242,10 +237,19 @@ class Environment:
         else:
             learn_flag = False
 
-        return next_state, reward, self.done, target_speed, vehicle_reset, learn_flag
+        return next_state, reward, self.done, action, vehicle_reset, learn_flag
+    
+    def format_data(self, data, dim):
+        """
+        保证数据具有正确的形状，用于存储和处理。
+        参数：
+        data: 要格式化的数据
+        dim: 数据应有的维度
+        """
+        return np.array(data, dtype=np.float32).reshape(1, dim)
     
     def learn(self):
-        self.agent.learn(self.step_count)
+        self.agent.update_parameters(self.step_count)
 
     def render(self):
         # 可选：提供一种可视化当前环境状态的方式

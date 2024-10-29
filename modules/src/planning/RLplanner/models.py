@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.init as init
 
 class MLP(nn.Module):
     def __init__(self, input_dim, hidden_dims, output_dim, activation=nn.LeakyReLU):
@@ -7,10 +8,14 @@ class MLP(nn.Module):
         layers = []
         dims = [input_dim] + hidden_dims
         for i in range(len(dims) - 1):
-            layers.append(nn.Linear(dims[i], dims[i + 1]))
+            linear = nn.Linear(dims[i], dims[i + 1])
+            init.xavier_uniform_(linear.weight)  # 使用Xavier均匀初始化
+            layers.append(linear)
             layers.append(nn.LayerNorm(dims[i + 1]))  # 添加层归一化
             layers.append(activation(negative_slope=0.01))  # LeakyReLU激活函数
-        layers.append(nn.Linear(dims[-1], output_dim))
+        linear = nn.Linear(dims[-1], output_dim)
+        init.xavier_uniform_(linear.weight)  # 初始化输出层
+        layers.append(linear)
         self.model = nn.Sequential(*layers)
 
     def forward(self, x):
