@@ -7,20 +7,23 @@ import numpy as np
 import random
 
 class SACAgent:
-    def __init__(self, state_dim, action_dim, hidden_dims=[256, 256], max_action=12, writer=None, alpha=0.2, buffer_size=1000000, batch_size=128, gamma=0.99, tau=0.005):
+    def __init__(self, state_dim, action_dim, hidden_dims=[128, 256], writer=None, 
+                 alpha=0.005, buffer_size=10000000, batch_size=256, gamma=0.95, tau=0.001):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.actor = Actor(state_dim, action_dim, hidden_dims, max_action).to(self.device)
+        
+        self.actor = Actor(state_dim, action_dim, hidden_dims).to(self.device)
         self.critic = Critic(state_dim, action_dim, hidden_dims).to(self.device)
         self.critic_target = Critic(state_dim, action_dim, hidden_dims).to(self.device)
         self.critic_target.load_state_dict(self.critic.state_dict())
+
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=3e-4)
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=3e-4)
+        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=3e-4, weight_decay=0.01)
+
         self.memory = ReplayBuffer(buffer_size)
         self.batch_size = batch_size
         self.gamma = gamma
         self.tau = tau
         self.alpha = alpha
-        self.max_action = max_action
 
         self.writer = writer
         self.add_graphs_to_tensorboard(self.writer, state_dim, action_dim)
@@ -46,14 +49,14 @@ class SACAgent:
         std = log_std.exp()
 
         if evaluate:
-            action = mean  # 确定性动作（均值）
+            action = torch.tanh(mean)  # 确定性动作（均值），直接应用tanh
         else:
             normal = torch.distributions.Normal(mean, std)
             x_t = normal.rsample()  # 采样
-            action = self.max_action * (torch.tanh(x_t) + 1) / 2  # 使用tanh调整并缩放
-        
+            action = torch.tanh(x_t)  # 直接使用tanh，不进行额外缩放
+
         if self.writer is not None:
-            self.writer.add_scalar('Action/Selected_Action', action[0], step)
+            self.writer.add_scalar('Action/Selected_Action', action[0].item(), step)  # 确保记录的是标量值
 
         return action.cpu().detach().numpy().flatten()
 
@@ -95,7 +98,7 @@ class SACAgent:
         # 更新演员网络
         next_actions, next_log_probs, _ = self.actor.sample(states)
         next_log_probs = next_log_probs.unsqueeze(-1)
-        actor_loss = -(self.critic(states, next_actions)[0] - self.alpha * next_log_probs).mean()  # 使用 self.critic 而不是 self.critic.q1
+        actor_loss = -(self.critic(states, next_actions)[0] - self.alpha * next_log_probs).mean()
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
@@ -115,3 +118,23 @@ class SACAgent:
     def soft_update(self, target, source, tau):
         for target_param, param in zip(target.parameters(), source.parameters()):
             target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
+
+    def save_model(self, filename):
+        """保存模型的状态字典到文件中。"""
+        model_state = {
+            'actor_state_dict': self.actor.state_dict(),
+            'critic_state_dict': self.critic.state_dict(),
+            'actor_optimizer_state_dict': self.actor_optimizer.state_dict(),
+            'critic_optimizer_state_dict': self.critic_optimizer.state_dict(),
+        }
+        torch.save(model_state, filename)
+        print(f"Model saved to {filename}")
+
+    def load_model(self, filename):
+        """从文件中加载模型的状态字典。"""
+        model_state = torch.load(filename, map_location=self.device)
+        self.actor.load_state_dict(model_state['actor_state_dict'])
+        self.critic.load_state_dict(model_state['critic_state_dict'])
+        self.actor_optimizer.load_state_dict(model_state['actor_optimizer_state_dict'])
+        self.critic_optimizer.load_state_dict(model_state['critic_optimizer_state_dict'])
+        print(f"Model loaded from {filename}")

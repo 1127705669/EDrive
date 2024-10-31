@@ -19,7 +19,6 @@ class ROSNode:
         rospy.init_node('RL_planner', anonymous=True)
 
         self.env = Environment()
-
         self.vehicle_generator = VehicleGenerator()
 
         self.last_vehicle_reset_time = 0
@@ -127,18 +126,21 @@ class ROSNode:
     def odometry_callback(self, data):
         if data is not None:
             self.odometry_queue.append(data)
+            self.env.odometry_queue.append(data)
             self.odometry_queue_update_flag = True
             self.check_data_ready()
 
     def imu_callback(self, data):
         if data is not None:
             self.imu_queue.append(data)
+            self.env.imu_queue.append(data)
             self.imu_queue_update_flag = True
             self.check_data_ready()
 
     def objects_callback(self, data):
         if data is not None:
             self.objects_queue.append(data)
+            self.env.objects_queue.append(data)
             self.objects_queue_update_flag = True
             self.check_data_ready()
         
@@ -165,18 +167,16 @@ def main():
         
         # 确保有足够的里程计和 IMU 数据
         if(ros_node.data_ready):
-
-            ros_node.env.update_data(ros_node.odometry_queue, ros_node.imu_queue, ros_node.objects_queue, ros_node.collision_queue)
-
             # 执行环境的一步，并获取 target_speed
-            next_state, reward, done, target_speed, vehicle_reset, learn_flag = ros_node.env.step()
+            done, target_speed, vehicle_reset = ros_node.env.step()
 
             if vehicle_reset:
                 ros_node.reset_flag = True
                 ros_node.reset_done = False
-            
-            if(learn_flag):
-                ros_node.env.learn()
+
+            if done:
+                ros_node.env.agent.save_model('sac_model')
+                ros_node.shutdown_handler()
 
             ros_node.mpc_target_speed.append(target_speed)
         
