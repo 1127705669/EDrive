@@ -15,11 +15,11 @@ class TD3Agent:
 
         self.actor = Actor(state_dim, action_dim, fc1_dim, fc2_dim).to(self.device)
         self.target_actor = copy.deepcopy(self.actor)
-        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=3e-4)
+        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=1e-4)
 
         self.critic = Critic(state_dim, action_dim, fc1_dim, fc2_dim).to(self.device)
         self.target_critic = copy.deepcopy(self.critic)
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=3e-4, weight_decay=1e-3)
+        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=1e-4)
 
         self.memory = ReplayBuffer(state_dim, action_dim, buffer_capacity)
         self.batch_size = batch_size
@@ -32,7 +32,7 @@ class TD3Agent:
         self.writer = writer
         self.actor_update_flag = 0
 
-        self.noise = OrnsteinUhlenbeckNoise(dim=(action_dim,), mu=0.0, theta=0.01, sigma=0.01, dt=0.1)
+        self.noise = OrnsteinUhlenbeckNoise(dim=(action_dim,), mu=0.0, theta=0.0, sigma=0.0, dt=0.1)
 
         self.soft_update(self.target_actor, self.actor, tau=1.0)
         self.soft_update(self.target_critic, self.critic, tau=1.0)
@@ -62,7 +62,7 @@ class TD3Agent:
         action = np.clip(action, -1.0, 1.0)
 
         # 记录动作数据到 TensorBoard，如果配置了的话
-        self.writer.add_scalar('Action/Selected_Action', action[0], step)
+        self.writer.add_scalar('Action/Selected_Action', action, step)
 
         return action
 
@@ -106,7 +106,7 @@ class TD3Agent:
 
         # 更新Actor每两个训练步骤更新一次
         self.actor_update_flag += 1
-        if self.actor_update_flag == 3:
+        if self.actor_update_flag == 2:
             self.actor_update_flag = 0
 
             # Compute actor losse

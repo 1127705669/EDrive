@@ -33,7 +33,6 @@ class ROSNode:
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
         self.objects_queue = deque(maxlen=20)
-        self.collision_queue = deque(maxlen=20)
 
         # output
         self.mpc_weight = deque(maxlen=20)
@@ -47,7 +46,6 @@ class ROSNode:
         self.mpc_weight_pub = rospy.Publisher('/EDrive/planning/MpcWeight', Float64, queue_size=10)
         self.mpc_target_speed_pub = rospy.Publisher('/EDrive/planning/MpcTargetSpeed', Float64, queue_size=10)
 
-        # 注册节点关闭时的处理函数
         rospy.on_shutdown(self.shutdown_handler)
 
     def reset(self):
@@ -77,24 +75,18 @@ class ROSNode:
             self.data_ready = True
 
     def check_carla_processes(self):
-        """
-        检查是否存在 carla_spawn_objects roslaunch 进程。
-        """
         try:
-            # 使用 subprocess 调用 pgrep 检查是否有正在运行的进程
             completed_process = subprocess.run(
                 ["pgrep", "-f", "roslaunch.*carla_spawn_objects.launch"], 
                 text=True, capture_output=True, check=False
             )
 
             if completed_process.stdout:
-                self.process = completed_process.stdout.strip()  # 存储进程 ID
+                self.process = completed_process.stdout.strip()
             else:
-                rospy.loginfo("未找到任何 carla_spawn_objects roslaunch 进程。")
-                self.process = None  # 确保清除之前的进程 ID
+                self.process = None
 
         except subprocess.CalledProcessError as e:
-            # 如果 pgrep 返回状态非零（未找到进程），则将会捕获这个异常
             rospy.loginfo("未找到任何 carla_spawn_objects roslaunch 进程。")
             self.process = None
         except Exception as e:
@@ -104,18 +96,13 @@ class ROSNode:
     def terminate_carla_processes(self):
         try:
             rospy.loginfo("正在终止 carla_spawn_objects roslaunch 进程...")
-            # 发送 SIGTERM 信号尝试优雅地终止进程
             subprocess.run(["pkill", "-f", "roslaunch.*carla_spawn_objects.launch"], check=False)
         except Exception as e:
             rospy.logerr(f"终止 roslaunch 进程时发生错误: {e}")
 
     def spawn_ego_vehicle(self):
-        """
-        调用 roslaunch 启动 carla_spawn_objects.launch 来生成 ego_vehicle。
-        """
         try:
             command = ["roslaunch", "carla_spawn_objects", "carla_spawn_objects.launch"]
-            # 使用 subprocess.Popen 启动命令，非阻塞
             self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             rospy.loginfo("正在生成新的 ego_vehicle...")
@@ -156,7 +143,6 @@ def main():
     
     ros_node = ROSNode()
 
-    # 100 Hz, running every 10 ms
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():
@@ -165,21 +151,15 @@ def main():
             ros_node.reset()
             continue
         
-        # 确保有足够的里程计和 IMU 数据
         if(ros_node.data_ready):
-            # 执行环境的一步，并获取 target_speed
-            done, target_speed, vehicle_reset = ros_node.env.step()
+            done, target_speed = ros_node.env.step()
 
-            if vehicle_reset:
+            if done:
                 ros_node.reset_flag = True
                 ros_node.reset_done = False
 
-            if done:
-                ros_node.env.agent.save_model('sac_model')
-                ros_node.shutdown_handler()
-
             ros_node.mpc_target_speed.append(target_speed)
-        
+
             publish_message(ros_node)
         rate.sleep()
 

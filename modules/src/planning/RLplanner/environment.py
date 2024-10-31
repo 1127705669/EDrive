@@ -13,11 +13,10 @@ class Environment:
         self.writer = SummaryWriter('runs/sac_training')
         self.state_dim = 2
         self.action_dim = 1
-        self.max_action = 12
+        self.max_action = 10
         self.agent = TD3Agent(self.state_dim, self.action_dim, self.writer)
 
         self.target_speed = 5
-        self.done = False
 
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
@@ -37,7 +36,6 @@ class Environment:
 
         distance_to_front_object = 0
         
-        # 从odometry数据获取航向角
         orientation_q = self.odometry_queue[-1].pose.pose.orientation
         orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
         _, _, yaw = euler_from_quaternion(orientation_list)
@@ -49,24 +47,18 @@ class Environment:
         return state
     
     def compute_next_state(self, yaw, distance_to_front_object, current_acceleration, current_speed, delta_t=0.1):
-        next_speed = current_speed + current_acceleration * delta_t/2
+        next_speed = current_speed + current_acceleration * delta_t
 
         next_state = self.preprocess_data(next_speed, self.target_speed)
 
         return next_state
     
     def compute_reward(self, current_speed):
-        vehicle_reset = False
-        if(self.if_collision):
-            print("collision detected!")
-            vehicle_reset = True
-            self.reset()
-        
         speed_reward = -((current_speed - self.target_speed) ** 2)
 
         total_reward = speed_reward
 
-        return total_reward, vehicle_reset
+        return total_reward
 
     def step(self):
         yaw, distance_to_front_object, current_speed, current_acceleration = self.update_data()
@@ -77,15 +69,17 @@ class Environment:
 
         next_state = self.compute_next_state(yaw, distance_to_front_object, current_acceleration, current_speed)
 
-        reward, vehicle_reset = self.compute_reward(current_speed)
+        reward = self.compute_reward(current_speed)
 
-        # 检查是否结束（假设距离达到 10km 时结束）
-        done_bool = float(self.step_count >300000)
+        if(self.if_collision):
+            print("collision detected!")
+            done_bool = True
+            self.reset()
+        else:
+            done_bool = False
 
-        # 将经验存储到内存中 (state, action, next_state, reward, done_bool)
         self.agent.memory.add(state, action, next_state, reward, done_bool)
 
-        # 存储当前状态用于 TensorBoard 可视化
         self.visualize_data(current_speed, current_acceleration, reward)
 
         self.step_count += 1
@@ -95,7 +89,7 @@ class Environment:
 
         scaled_action = (action + 1) * 0.5 * self.max_action
 
-        return done_bool, scaled_action, vehicle_reset
+        return done_bool, scaled_action
     
     def learn(self):
         self.agent.train(self.step_count)
