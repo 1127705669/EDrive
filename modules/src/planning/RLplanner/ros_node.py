@@ -64,7 +64,7 @@ class ROSNode:
 
         if(time_durarion > 2 and not self.object_generated):
             self.spawn_ego_vehicle()
-            # self.vehicle = self.vehicle_generator.spawn_vehicle(location=(-54.1, -30.0, 1.0), rotation=(0, 90, 0))
+            self.vehicle = self.vehicle_generator.spawn_vehicle(location=(-54.6, -30.0, 1.0), rotation=(0, 90, 0))
             self.object_generated = True
         
         if(time_durarion > 5):
