@@ -6,12 +6,13 @@ from collections import deque
 from tf.transformations import euler_from_quaternion
 from torch.utils.tensorboard import SummaryWriter
 import math
+import time
 
 class Environment:
     def __init__(self):
         self.step_count = 0
         self.writer = SummaryWriter('runs/td3')
-        self.state_dim = 3
+        self.state_dim = 85
         self.action_dim = 1
         self.max_action = 10
         self.agent = TD3Agent(self.state_dim, self.action_dim, self.writer)
@@ -22,77 +23,213 @@ class Environment:
         self.imu_queue = deque(maxlen=20)
         self.objects_queue = deque(maxlen=20)
 
+        self.init_position_recored = False
+        self.ego_posotion_x = 0
+        self.ego_posotion_y = 0
+
+        self.is_left = False
+
         self.reset()
 
     def collision_detected(self):
         self.if_collision = True
+        self.last_coliision = self.if_collision
 
     def reset(self):
         self.if_collision = False
+        self.last_coliision = self.if_collision
+        self.init_position_recored = False
+        self.is_left = False
+
 
     def update_data(self):
-        current_speed =  self.odometry_queue[-1].twist.twist.linear.x
-        current_acceleration = self.imu_queue[-1].linear_acceleration.x
+        position_x = self.odometry_queue[-1].pose.pose.position.x
+        position_y = self.odometry_queue[-1].pose.pose.position.y
 
-        position_ego = self.odometry_queue[-1].pose.pose.position
-        position_object = self.objects_queue[-1].objects[0].pose.position
+        yaw = euler_from_quaternion([
+            self.odometry_queue[-1].pose.pose.orientation.x,
+            self.odometry_queue[-1].pose.pose.orientation.y,
+            self.odometry_queue[-1].pose.pose.orientation.z,
+            self.odometry_queue[-1].pose.pose.orientation.w
+        ])[-1]
 
-        # Calculate the Euclidean distance
-        distance_to_front_object = math.sqrt((position_ego.x - position_object.x)**2 + (position_ego.y - position_object.y)**2)
+        speed = self.odometry_queue[-1].twist.twist.linear.x
+        ego_speed_x = self.odometry_queue[-1].twist.twist.linear.x * np.cos(yaw)
+        ego_speed_y = self.odometry_queue[-1].twist.twist.linear.x * np.sin(yaw)
+        acceleration = self.imu_queue[-1].linear_acceleration.x
 
-        if(distance_to_front_object > 15):
-            distance_to_front_object = 0
+        ego_vehicle = {
+            'position_x': position_x,
+            'position_y': position_y,
+            'yaw': yaw,
+            'speed': speed,
+            'acceleration': acceleration
+        }
+
+        objects = []
+        for obj in self.objects_queue[-1].objects:
+            absolute_position_x = obj.pose.position.x
+            absolute_position_y = obj.pose.position.y
+            absolute_yaw = euler_from_quaternion([
+                obj.pose.orientation.x,
+                obj.pose.orientation.y,
+                obj.pose.orientation.z,
+                obj.pose.orientation.w
+            ])[-1]
+            obj_speed_x = obj.twist.linear.x * np.cos(absolute_yaw)
+            obj_speed_y = obj.twist.linear.x * np.sin(absolute_yaw)
+
+            # 使用旋转矩阵将目标车辆的位置转换到自车坐标系
+            rotation_matrix_ego = np.array([[np.cos(-yaw), -np.sin(-yaw)],
+                                            [np.sin(-yaw), np.cos(-yaw)]])
+
+            # 计算目标车辆相对于自车的绝对位置
+            dx = absolute_position_x - position_x
+            dy = absolute_position_y - position_y
+
+            relative_position = rotation_matrix_ego @ np.array([dx, dy])
+            relative_position_x, relative_position_y = relative_position
+
+            # 计算速度差值
+            speed_dx = obj_speed_x - ego_speed_x
+            speed_dy = obj_speed_y - ego_speed_y
+
+            # 将速度差值转换到自车坐标系
+            relative_velocity = rotation_matrix_ego @ np.array([speed_dx, speed_dy])
+            relative_speed_x, relative_speed_y = relative_velocity
+
+            # 计算相对航向角
+            relative_theta = absolute_yaw - yaw
+            relative_theta = (relative_theta + np.pi) % (2 * np.pi) - np.pi
+
+            objects.append({
+                'absolute_position_x': absolute_position_x,
+                'absolute_position_y': absolute_position_y,
+                'absolute_yaw': absolute_yaw,
+                'absolute_speed_x': obj_speed_x,
+                'absolute_speed_y': obj_speed_y,
+                'relative_position_x': relative_position_x,
+                'relative_position_y': relative_position_y,
+                'relative_speed_x': relative_speed_x,
+                'relative_speed_y': relative_speed_y,
+                'relative_theta': relative_theta,
+            })
+
+            # 打印调试信息
+            # print(f"ego yaw : ({yaw})")
+            # print(f"Object {obj.id}:")
+            # print(f"Relative Position: ({relative_position_x}, {relative_position_y})")
+            # print(f"Relative Speed: ({relative_speed_x}, {relative_speed_y})")
+            # print(f"Relative Heading: {relative_theta}")
+            # print(f"yaw compare: ({yaw}, {absolute_yaw})")
+
+        return ego_vehicle, objects
+
+
+    def preprocess_data(self, ego_vehicle, objects, target_speed):
+        # Extract ego vehicle data
+        ego_x = ego_vehicle['position_x']
+        ego_y = ego_vehicle['position_y']
+        ego_theta = ego_vehicle['yaw']
+        ego_speed = ego_vehicle['speed']
         
-        orientation_q = self.odometry_queue[-1].pose.pose.orientation
-        orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
-        _, _, yaw = euler_from_quaternion(orientation_list)
+        # Create a list to hold all object data
+        objects_data = []
+        for obj in objects:
+            x = obj['relative_position_x']
+            y = obj['relative_position_y']
+            theta = obj['relative_theta']
+            speed_x = obj['relative_speed_x']
+            speed_y = obj['relative_speed_y']
+            objects_data.extend([x, y, theta, speed_x, speed_y])
+        
+        # Combine all data into a single state array
+        state = np.array([ego_x, ego_y, ego_theta, ego_speed, target_speed] + objects_data)
 
-        return yaw, distance_to_front_object, current_speed, current_acceleration
-
-    def preprocess_data(self, speed, target_speed, distance_to_front_object):
-        state = np.array([speed] + [target_speed] + [distance_to_front_object])
         return state
-    
-    def compute_next_state(self, yaw, distance_to_front_object, current_acceleration, current_speed, delta_t=0.1):
-        next_speed = current_speed + current_acceleration * delta_t
 
-        next_distance_to_front_object = distance_to_front_object - (current_speed + current_acceleration * delta_t/2) * delta_t
+    def compute_next_state(self, ego_vehicle, objects, delta_t=0.1):
+        # Update the speed of the ego vehicle
+        next_speed = ego_vehicle['speed'] + ego_vehicle['acceleration'] * delta_t
 
-        next_state = self.preprocess_data(next_speed, self.target_speed, next_distance_to_front_object)
+        # Update the position of the ego vehicle
+        next_x = ego_vehicle['position_x'] + (ego_vehicle['speed'] + ego_vehicle['acceleration']*delta_t/2) * np.cos(ego_vehicle['yaw']) * delta_t
+        next_y = ego_vehicle['position_y'] + (ego_vehicle['speed'] + ego_vehicle['acceleration']*delta_t/2) * np.sin(ego_vehicle['yaw']) * delta_t
+
+        # Recreate the ego vehicle state dictionary
+        next_ego_vehicle = {
+            'position_x': next_x,
+            'position_y': next_y,
+            'yaw': ego_vehicle['yaw'],
+            'speed': next_speed,
+        }
+
+        # Update the state of each object
+        next_objects = []
+        for obj in objects:
+            next_x = obj['relative_position_x'] + obj['relative_speed_x'] * np.cos(obj['relative_theta']) * delta_t
+            next_y = obj['relative_position_y'] + obj['relative_speed_y'] * np.sin(obj['relative_theta']) * delta_t
+            next_objects.append({
+                'relative_position_x': next_x,
+                'relative_position_y': next_y,
+                'relative_theta': obj['relative_theta'],
+                'relative_speed_x': obj['relative_speed_x'],
+                'relative_speed_y': obj['relative_speed_y']
+            })
+
+        # Generate the new state vector
+        next_state = self.preprocess_data(next_ego_vehicle, next_objects, self.target_speed)
 
         return next_state
     
-    def compute_reward(self, current_speed, distance_to_front_object):
-        if 4 > distance_to_front_object or distance_to_front_object >= 15:
-            distance_reward = 0  # 距离大于15米时奖励为0
+    def compute_reward(self, ego_vehicle, objects):
+        speed_reward = -((ego_vehicle['speed'] - self.target_speed) ** 2)
+
+        if self.if_collision and not self.last_coliision:
+            collision_reward = -100
         else:
-            # 在15米到6米之间，奖励逐渐增加，使用一个简单的线性关系
-            distance_reward = -(15 - distance_to_front_object)**2
-
-        speed_reward = -((current_speed - self.target_speed) ** 2)
-
-        total_reward = speed_reward + distance_reward
+            collision_reward = 0
+        
+        total_reward = speed_reward + collision_reward
 
         return total_reward
 
     def step(self):
-        yaw, distance_to_front_object, current_speed, current_acceleration = self.update_data()
+        ego_vehicle, objects = self.update_data()
 
-        state = self.preprocess_data(current_speed, self.target_speed, distance_to_front_object)
+        if not self.init_position_recored:
+            self.init_position_recored = True
+            self.ego_posotion_x = ego_vehicle['position_x']
+            self.ego_posotion_y = ego_vehicle['position_y']
+            self.last_vehicle_reset_time = time.time()
+
+        time_durarion = time.time() - self.last_vehicle_reset_time
+
+        state = self.preprocess_data(ego_vehicle, objects, self.target_speed)
         action = self.agent.select_action(state, self.step_count)
-        next_state = self.compute_next_state(yaw, distance_to_front_object, current_acceleration, current_speed)
-        reward = self.compute_reward(current_speed, distance_to_front_object)
+        next_state = self.compute_next_state(ego_vehicle, objects)
+        reward = self.compute_reward(ego_vehicle, objects)
 
         if(self.if_collision):
             print("collision detected!")
             done_bool = True
-            self.reset()
         else:
             done_bool = False
 
+        if(time_durarion > 5):
+            distance = math.sqrt((ego_vehicle['position_x'] - self.ego_posotion_x) ** 2 + (ego_vehicle['position_y'] - self.ego_posotion_y) ** 2)
+            if(distance > 2):
+                self.is_left = True
+            
+            if(distance < 1 and self.is_left):
+                done_bool = True
+        
+        if(time_durarion > 120):
+            done_bool = True
+
         self.agent.memory.add(state, action, next_state, reward, done_bool)
 
-        self.visualize_data(current_speed, current_acceleration, reward)
+        self.visualize_data(ego_vehicle, objects, reward)
 
         self.step_count += 1
 
@@ -101,12 +238,15 @@ class Environment:
 
         scaled_action = (action + 1) * 0.5 * self.max_action
 
+        if(done_bool):
+            self.reset()
+
         return done_bool, scaled_action
 
     def learn(self):
         self.agent.train(self.step_count)
 
-    def visualize_data(self, current_speed, current_acceleration, reward):
-        self.writer.add_scalar('real speed', current_speed, self.step_count)
-        self.writer.add_scalar('real acceleration', current_acceleration, self.step_count)
+    def visualize_data(self, ego_vehicle, objects, reward):
+        self.writer.add_scalar('real speed', ego_vehicle['speed'], self.step_count)
+        # self.writer.add_scalar('real acceleration', ego_vehicle['acceleration'], self.step_count)
         self.writer.add_scalar('reward', reward, self.step_count)

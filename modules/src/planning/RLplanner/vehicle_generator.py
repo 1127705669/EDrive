@@ -3,112 +3,269 @@
 import glob
 import os
 import sys
+import time
 import carla
+import argparse
 import logging
+from numpy import random
+import threading
 
-class VehicleGenerator:
-    def __init__(self, host='127.0.0.1', port=2000, vehicle_type='vehicle.tesla.model3'):
-        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-        self.client = self.init_carla_client(host, port)
-        self.vehicle_type = vehicle_type
-        self.vehicle = None  # 存储单个车辆的引用
+class VehicleGenerator():
+    def __init__(self):
+        self.argparser = argparse.ArgumentParser(description=__doc__)
+        self.argparser.add_argument(
+            '--host',
+            metavar='H',
+            default='127.0.0.1',
+            help='IP of the host server (default: 127.0.0.1)')
+        self.argparser.add_argument(
+            '-p', '--port',
+            metavar='P',
+            default=2000,
+            type=int,
+            help='TCP port to listen to (default: 2000)')
+        self.argparser.add_argument(
+            '-n', '--number-of-vehicles',
+            metavar='N',
+            default=16,
+            type=int,
+            help='Number of vehicles (default: 30)')
+        self.argparser.add_argument(
+            '--safe',
+            action='store_true',
+            help='Avoid spawning vehicles prone to accidents')
+        self.argparser.add_argument(
+            '--filterv',
+            metavar='PATTERN',
+            default='vehicle.tesla.*',
+            help='Filter vehicle model (default: "vehicle.tesla.model3")')
+        self.argparser.add_argument(
+            '--generationv',
+            metavar='G',
+            default='All',
+            help='restrict to certain vehicle generation (values: "1","2","All" - default: "All")')
+        self.argparser.add_argument(
+            '--generationw',
+            metavar='G',
+            default='2',
+            help='restrict to certain pedestrian generation (values: "1","2","All" - default: "2")')
+        self.argparser.add_argument(
+            '--tm-port',
+            metavar='P',
+            default=8000,
+            type=int,
+            help='Port to communicate with TM (default: 8000)')
+        self.argparser.add_argument(
+            '--asynch',
+            action='store_true',
+            help='Activate asynchronous mode execution')
+        self.argparser.add_argument(
+            '--hybrid',
+            action='store_true',
+            help='Activate hybrid mode for Traffic Manager')
+        self.argparser.add_argument(
+            '-s', '--seed',
+            metavar='S',
+            type=int,
+            help='Set random device seed and deterministic mode for Traffic Manager')
+        self.argparser.add_argument(
+            '--seedw',
+            metavar='S',
+            default=0,
+            type=int,
+            help='Set the seed for pedestrians module')
+        self.argparser.add_argument(
+            '--car-lights-on',
+            action='store_true',
+            default=False,
+            help='Enable automatic car light management')
+        self.argparser.add_argument(
+            '--hero',
+            action='store_true',
+            default=False,
+            help='Set one of the vehicles as hero')
+        self.argparser.add_argument(
+            '--respawn',
+            action='store_true',
+            default=False,
+            help='Automatically respawn dormant vehicles (only in large maps)')
+        self.argparser.add_argument(
+            '--no-rendering',
+            action='store_true',
+            default=False,
+            help='Activate no rendering mode')
 
-    def init_carla_client(self, host, port):
-        """
-        Initialize and return a CARLA client connected to a specified server.
-        """
+        self.args = self.argparser.parse_args()
+
+        self.vehicles_list = []
+        self.client = self.init_carla_client()
+        self.running = True
+
+        # Start the simulation in a separate thread
+        self.simulation_thread = threading.Thread(target=self.run_simulation)
+        self.simulation_thread.start()
+
+    def init_carla_client(self):
         try:
             sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
                 sys.version_info.major,
                 sys.version_info.minor,
                 'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
         except IndexError:
-            logging.error("CARLA Python API egg file not found.")
             pass
 
-        client = carla.Client(host, port)
+        client = carla.Client(self.args.host, self.args.port)
         client.set_timeout(10.0)
+        self.synchronous_master = False
+        random.seed(self.args.seed if self.args.seed is not None else int(time.time()))
+
         return client
+    
+    def check_existing_vehicles(self):
+        existing_vehicles = self.world.get_actors().filter('vehicle.*')
+        if existing_vehicles:
+            print(f'Found {len(existing_vehicles)} existing vehicles. Destroying them first...')
+            self.client.apply_batch([carla.command.DestroyActor(x.id) for x in existing_vehicles])
+    
+    def get_actor_blueprints(self, world, filter, generation):
+        bps = world.get_blueprint_library().filter(filter)
 
-    def check_non_ego_vehicles_exist(self):
-        """
-        Check if the ego vehicle exists in the simulator.
-        """
-        return self.vehicle is not None
+        if generation.lower() == "all":
+            return bps
 
-    def clean_non_ego_vehicles(self):
-        """
-        Remove all vehicles except for the ego vehicle from the scene.
-        """
-        world = self.client.get_world()
-        actors = world.get_actors().filter('vehicle.*')
+        # If the filter returns only one bp, we assume that this one needed
+        # and therefore, we ignore the generation
+        if len(bps) == 1:
+            return bps
 
-        for actor in actors:
-            if 'ego' not in actor.attributes.get('role_name', ''):
-                try:
-                    actor.destroy()
-                    logging.info(f'Vehicle {actor.id} destroyed successfully')
-                except RuntimeError as e:
-                    logging.error(f'Failed to destroy vehicle {actor.id}: {str(e)}')
-
-    def spawn_vehicle(self, location=(0, 0, 0), rotation=(0, 0, 0), color=None):
-        """
-        Spawn a vehicle at a given location and rotation with an optional color.
-        """
-        if self.vehicle:
-            logging.warning('A vehicle is already spawned. Destroying the existing vehicle before spawning a new one.')
-            self.destroy_vehicle()
-
-        world = self.client.get_world()
-        blueprints = world.get_blueprint_library().filter(self.vehicle_type)
-        blueprint = blueprints[0]
-
-        if blueprint.has_attribute('color'):
-            if color:
-                blueprint.set_attribute('color', color)
+        try:
+            int_generation = int(generation)
+            # Check if generation is in available generations
+            if int_generation in [1, 2, 3]:
+                bps = [x for x in bps if int(x.get_attribute('generation')) == int_generation]
+                return bps
             else:
-                blueprint.set_attribute('color', blueprint.get_attribute('color').recommended_values[0])
+                print("   Warning! Actor Generation is not valid. No actor will be spawned.")
+                return []
+        except:
+            print("   Warning! Actor Generation is not valid. No actor will be spawned.")
+            return []
 
-        spawn_point = carla.Transform(carla.Location(x=location[0], y=location[1], z=location[2]),
-                                      carla.Rotation(pitch=rotation[0], yaw=rotation[1], roll=rotation[2]))
-        
-        self.vehicle = world.try_spawn_actor(blueprint, spawn_point)
-        if self.vehicle is None:
-            logging.error("Failed to spawn vehicle. Please check the spawn point.")
+    def spawn_vehicle(self):
+        self.world = self.client.get_world()
+
+        self.check_existing_vehicles()
+
+        self.traffic_manager = self.client.get_trafficmanager(self.args.tm_port)
+        self.traffic_manager.set_global_distance_to_leading_vehicle(2.5)
+        if self.args.respawn:
+            self.traffic_manager.set_respawn_dormant_vehicles(True)
+        if self.args.hybrid:
+            self.traffic_manager.set_hybrid_physics_mode(True)
+            self.traffic_manager.set_hybrid_physics_radius(70.0)
+        if self.args.seed is not None:
+            self.traffic_manager.set_random_device_seed(self.args.seed)
+
+        settings = self.world.get_settings()
+        if not self.args.asynch:
+            self.traffic_manager.set_synchronous_mode(False)
+            if not settings.synchronous_mode:
+                self.synchronous_master = True
+                settings.synchronous_mode = True
+                settings.fixed_delta_seconds = 0.05
+            else:
+                self.synchronous_master = False
         else:
-            logging.info(f"Vehicle {self.vehicle.id} spawned successfully at {location}")
+            print("You are currently in asynchronous mode. If this is a traffic simulation, \
+            you could experience some issues. If it's not working correctly, switch to synchronous \
+            mode by using traffic_manager.set_synchronous_mode(True)")
 
-        return self.vehicle
+        if self.args.no_rendering:
+            settings.no_rendering_mode = True
+        self.world.apply_settings(settings)
+
+        self.blueprints = self.get_actor_blueprints(self.world, self.args.filterv, self.args.generationv)
+        if not self.blueprints:
+            raise ValueError("Couldn't find any vehicles with the specified filters")
+
+        if self.args.safe:
+            self.blueprints = [x for x in self.blueprints if x.get_attribute('base_type') == 'car']
+
+        self.blueprints = sorted(self.blueprints, key=lambda bp: bp.id)
+
+        spawn_points = self.world.get_map().get_spawn_points()
+        number_of_spawn_points = len(spawn_points)
+
+        if self.args.number_of_vehicles < number_of_spawn_points:
+            random.shuffle(spawn_points)
+        elif self.args.number_of_vehicles > number_of_spawn_points:
+            msg = 'requested %d vehicles, but could only find %d spawn points'
+            logging.warning(msg, self.args.number_of_vehicles, number_of_spawn_points)
+            self.args.number_of_vehicles = number_of_spawn_points
+
+        # @todo cannot import these directly.
+        SpawnActor = carla.command.SpawnActor
+        SetAutopilot = carla.command.SetAutopilot
+        FutureActor = carla.command.FutureActor
+
+        # --------------
+        # Spawn vehicles
+        # --------------
+        batch = []
+        hero = self.args.hero
+        for n, transform in enumerate(spawn_points):
+            if n >= self.args.number_of_vehicles:
+                break
+            blueprint = random.choice(self.blueprints)
+            if blueprint.has_attribute('color'):
+                color = random.choice(blueprint.get_attribute('color').recommended_values)
+                blueprint.set_attribute('color', color)
+            if blueprint.has_attribute('driver_id'):
+                driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
+                blueprint.set_attribute('driver_id', driver_id)
+            if hero:
+                blueprint.set_attribute('role_name', 'hero')
+                hero = False
+            else:
+                blueprint.set_attribute('role_name', 'autopilot')
+
+            # spawn the cars and set their autopilot and light state all together
+            batch.append(SpawnActor(blueprint, transform)
+                .then(SetAutopilot(FutureActor, True, self.traffic_manager.get_port())))
+
+        for response in self.client.apply_batch_sync(batch, self.synchronous_master):
+            if response.error:
+                logging.error(response.error)
+            else:
+                self.vehicles_list.append(response.actor_id)
+
+        # Set automatic vehicle lights update if specified
+        if self.args.car_lights_on:
+            all_vehicle_actors = self.world.get_actors(self.vehicles_list)
+            for actor in all_vehicle_actors:
+                self.traffic_manager.update_vehicle_lights(actor, True)
+
+        print('spawned %d vehicles' % (len(self.vehicles_list)))
+
+        # Example of how to use Traffic Manager parameters
+        self.traffic_manager.global_percentage_speed_difference(30.0)
+
+        self.run_simulation()
+
+
+    def run_simulation(self):
+        while self.running:
+            if not self.args.asynch and self.synchronous_master:
+                self.world.tick()
 
     def destroy_vehicle(self):
-        """
-        Destroy the currently spawned vehicle.
-        """
-        if self.vehicle:
-            try:
-                self.vehicle.destroy()
-                logging.info(f'Vehicle {self.vehicle.id} destroyed successfully')
-                self.vehicle = None
-            except RuntimeError as e:
-                logging.error(f'Failed to destroy vehicle {self.vehicle.id}: {str(e)}')
-        else:
-            logging.info('No vehicle to destroy.')
+        if not self.args.asynch and self.synchronous_master:
+            settings = self.world.get_settings()
+            settings.synchronous_mode = False
+            settings.no_rendering_mode = False
+            settings.fixed_delta_seconds = None
+            self.world.apply_settings(settings)
 
-if __name__ == '__main__':
-    vg = VehicleGenerator()
-    try:
-        if vg.check_non_ego_vehicles_exist():
-            vg.clean_non_ego_vehicles()
-        vehicle = vg.spawn_vehicle(location=(-54.1, 65.0, 1.0), rotation=(0, 90, 0))
-        import time
-        time.sleep(10)  # keep the vehicle for 10 seconds
-        if vehicle:
-            vg.destroy_vehicle()
-    except KeyboardInterrupt:
-        print('Operation canceled by user.')
-        if vg.vehicle:
-            vg.destroy_vehicle()
-    except Exception as e:
-        logging.error('An unexpected error occurred: %s', str(e))
-        if vg.vehicle:
-            vg.destroy_vehicle()
+        print('\ndestroying %d vehicles' % len(self.vehicles_list))
+        self.client.apply_batch([carla.command.DestroyActor(x) for x in self.vehicles_list])
+        self.running = False

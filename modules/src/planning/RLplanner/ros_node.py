@@ -12,6 +12,7 @@ import subprocess
 import os
 import time
 from vehicle_generator import VehicleGenerator
+import threading
 
 class ROSNode:
     def __init__(self):
@@ -64,7 +65,7 @@ class ROSNode:
 
         if(time_durarion > 2 and not self.object_generated):
             self.spawn_ego_vehicle()
-            self.vehicle = self.vehicle_generator.spawn_vehicle(location=(-54.6, -30.0, 1.0), rotation=(0, 90, 0))
+            self.vehicle_generator.spawn_vehicle()
             self.object_generated = True
         
         if(time_durarion > 5):
@@ -128,9 +129,13 @@ class ROSNode:
         if data is not None:
             self.objects_queue.append(data)
             self.env.objects_queue.append(data)
-            self.objects_queue_update_flag = True
+            # Update flag if the number of objects in the array is exactly 16
+            if len(data.objects) == 16:
+                self.objects_queue_update_flag = True
+            else:
+                self.objects_queue_update_flag = False
             self.check_data_ready()
-        
+
     def collision_callback(self, data):
         self.env.collision_detected()
 
@@ -146,7 +151,6 @@ def main():
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():
-
         if not ros_node.reset_done or ros_node.reset_flag:
             ros_node.reset()
             continue
