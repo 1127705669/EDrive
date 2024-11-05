@@ -130,10 +130,13 @@ class ROSNode:
             self.objects_queue.append(data)
             self.env.objects_queue.append(data)
             # Update flag if the number of objects in the array is exactly 16
-            if len(data.objects) == 16:
-                self.objects_queue_update_flag = True
-            else:
-                self.objects_queue_update_flag = False
+            if self.reset_done:
+                if len(data.objects) == 16:
+                    self.objects_queue_update_flag = True
+                else:
+                    self.objects_queue_update_flag = False
+                    self.reset_flag = True
+                    self.reset_done = False
             self.check_data_ready()
 
     def collision_callback(self, data):

@@ -62,15 +62,15 @@ class Environment:
         angular_velocity = self.odometry_queue[-1].twist.twist.angular.z
         angular_acceleration = self.imu_queue[-1].angular_velocity.z
 
-        print('-------------------- Ego Vehicle --------------------')
-        print(f"Position: ({position_x}, {position_y})")
-        print(f"Yaw: {yaw}")
-        print(f"Speed (in x, y components): ({ego_speed_x}, {ego_speed_y})")
-        print(f"Acceleration: {acceleration}")
-        print(f"Acceleration (in x, y components): ({acceleration_x}, {acceleration_y})")
-        print(f"Angular Velocity: {angular_velocity}")
-        print(f"Angular Acceleration: {angular_acceleration}")
-        print('------------------------------------------------------')
+        # print('-------------------- Ego Vehicle --------------------')
+        # print(f"Position: ({position_x}, {position_y})")
+        # print(f"Yaw: {yaw}")
+        # print(f"Speed (in x, y components): ({ego_speed_x}, {ego_speed_y})")
+        # print(f"Acceleration: {acceleration}")
+        # print(f"Acceleration (in x, y components): ({acceleration_x}, {acceleration_y})")
+        # print(f"Angular Velocity: {angular_velocity}")
+        # print(f"Angular Acceleration: {angular_acceleration}")
+        # print('------------------------------------------------------')
 
         ego_vehicle = {
             'position_x': position_x,
@@ -149,18 +149,18 @@ class Environment:
             })
 
             # 打印物体的相关数据
-            print('-------------------- Object --------------------')
-            print(f"Object Position: ({absolute_position_x}, {absolute_position_y})")
-            print(f"Object Yaw: {absolute_yaw}")
-            print(f"Object Speed (in x, y components): ({obj_speed_x}, {obj_speed_y})")
-            print(f"Object Acceleration (in x, y components): ({obj_acceleration_x}, {obj_acceleration_y})")
-            print(f"Object Angular Velocity: {obj_angular_velocity}")
-            print(f"Object Angular Acceleration: {obj_angular_acceleration}")
-            print(f"Relative Position (in x, y components): ({relative_position_x}, {relative_position_y})")
-            print(f"Relative Speed (in x, y components): ({relative_speed_x}, {relative_speed_y})")
-            print(f"Relative Theta: {relative_theta}")
-            print(f"Relative Acceleration (in x, y components): ({relative_acceleration_x}, {relative_acceleration_y})")
-            print('-------------------------------------------------')
+            # print('-------------------- Object --------------------')
+            # print(f"Object Position: ({absolute_position_x}, {absolute_position_y})")
+            # print(f"Object Yaw: {absolute_yaw}")
+            # print(f"Object Speed (in x, y components): ({obj_speed_x}, {obj_speed_y})")
+            # print(f"Object Acceleration (in x, y components): ({obj_acceleration_x}, {obj_acceleration_y})")
+            # print(f"Object Angular Velocity: {obj_angular_velocity}")
+            # print(f"Object Angular Acceleration: {obj_angular_acceleration}")
+            # print(f"Relative Position (in x, y components): ({relative_position_x}, {relative_position_y})")
+            # print(f"Relative Speed (in x, y components): ({relative_speed_x}, {relative_speed_y})")
+            # print(f"Relative Theta: {relative_theta}")
+            # print(f"Relative Acceleration (in x, y components): ({relative_acceleration_x}, {relative_acceleration_y})")
+            # print('-------------------------------------------------')
 
         return ego_vehicle, objects
 
@@ -194,26 +194,32 @@ class Environment:
         # Update the position of the ego vehicle
         next_x = ego_vehicle['position_x'] + (ego_vehicle['speed'] + ego_vehicle['acceleration']*delta_t/2) * np.cos(ego_vehicle['yaw']) * delta_t
         next_y = ego_vehicle['position_y'] + (ego_vehicle['speed'] + ego_vehicle['acceleration']*delta_t/2) * np.sin(ego_vehicle['yaw']) * delta_t
+        
+        next_yaw = ego_vehicle['yaw'] + (ego_vehicle['angular_velocity'] + ego_vehicle['angular_acceleration']*delta_t/2) * delta_t
 
         # Recreate the ego vehicle state dictionary
         next_ego_vehicle = {
             'position_x': next_x,
             'position_y': next_y,
-            'yaw': ego_vehicle['yaw'],
+            'yaw': next_yaw,
             'speed': next_speed,
         }
 
         # Update the state of each object
         next_objects = []
         for obj in objects:
-            next_x = obj['relative_position_x'] + obj['relative_speed_x'] * np.cos(obj['relative_theta']) * delta_t
-            next_y = obj['relative_position_y'] + obj['relative_speed_y'] * np.sin(obj['relative_theta']) * delta_t
+            next_speed_x = obj['relative_speed_x'] + obj['relative_acceleration_x'] * delta_t
+            next_speed_y = obj['relative_speed_y'] + obj['relative_acceleration_y'] * delta_t
+            next_x = obj['relative_position_x'] + (obj['relative_speed_x'] + obj['relative_acceleration_x'] * delta_t/2) * delta_t
+            next_y = obj['relative_position_y'] + (obj['relative_speed_y'] + obj['relative_acceleration_y'] * delta_t/2) * delta_t
+            next_theta = obj['absolute_yaw'] + obj['obj_angular_velocity'] * delta_t
+            relative_theta = next_theta - next_yaw
             next_objects.append({
                 'relative_position_x': next_x,
                 'relative_position_y': next_y,
-                'relative_theta': obj['relative_theta'],
-                'relative_speed_x': obj['relative_speed_x'],
-                'relative_speed_y': obj['relative_speed_y']
+                'relative_theta': relative_theta,
+                'relative_speed_x': next_speed_x,
+                'relative_speed_y': next_speed_y
             })
 
         # Generate the new state vector
