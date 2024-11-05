@@ -57,13 +57,29 @@ class Environment:
         ego_speed_x = self.odometry_queue[-1].twist.twist.linear.x * np.cos(yaw)
         ego_speed_y = self.odometry_queue[-1].twist.twist.linear.x * np.sin(yaw)
         acceleration = self.imu_queue[-1].linear_acceleration.x
+        acceleration_x = self.imu_queue[-1].linear_acceleration.x * np.cos(yaw)
+        acceleration_y = self.imu_queue[-1].linear_acceleration.x * np.sin(yaw)
+        angular_velocity = self.odometry_queue[-1].twist.twist.angular.z
+        angular_acceleration = self.imu_queue[-1].angular_velocity.z
+
+        print('-------------------- Ego Vehicle --------------------')
+        print(f"Position: ({position_x}, {position_y})")
+        print(f"Yaw: {yaw}")
+        print(f"Speed (in x, y components): ({ego_speed_x}, {ego_speed_y})")
+        print(f"Acceleration: {acceleration}")
+        print(f"Acceleration (in x, y components): ({acceleration_x}, {acceleration_y})")
+        print(f"Angular Velocity: {angular_velocity}")
+        print(f"Angular Acceleration: {angular_acceleration}")
+        print('------------------------------------------------------')
 
         ego_vehicle = {
             'position_x': position_x,
             'position_y': position_y,
             'yaw': yaw,
             'speed': speed,
-            'acceleration': acceleration
+            'acceleration': acceleration,
+            'angular_velocity': angular_velocity,
+            'angular_acceleration': angular_acceleration
         }
 
         objects = []
@@ -76,8 +92,13 @@ class Environment:
                 obj.pose.orientation.z,
                 obj.pose.orientation.w
             ])[-1]
-            obj_speed_x = obj.twist.linear.x * np.cos(absolute_yaw)
-            obj_speed_y = obj.twist.linear.x * np.sin(absolute_yaw)
+            obj_speed_x = obj.twist.linear.x
+            obj_speed_y = obj.twist.linear.y
+
+            obj_acceleration_x = obj.accel.linear.x
+            obj_acceleration_y = obj.accel.linear.y
+            obj_angular_velocity = obj.twist.angular.z
+            obj_angular_acceleration = obj.accel.angular.z
 
             # 使用旋转矩阵将目标车辆的位置转换到自车坐标系
             rotation_matrix_ego = np.array([[np.cos(-yaw), -np.sin(-yaw)],
@@ -94,34 +115,52 @@ class Environment:
             speed_dx = obj_speed_x - ego_speed_x
             speed_dy = obj_speed_y - ego_speed_y
 
-            # 将速度差值转换到自车坐标系
             relative_velocity = rotation_matrix_ego @ np.array([speed_dx, speed_dy])
             relative_speed_x, relative_speed_y = relative_velocity
+
+            # 计算相对加速度
+            acceleration_dx = obj_acceleration_x - acceleration_x
+            acceleration_dy = obj_acceleration_y - acceleration_y
+
+            relative_acceleration = rotation_matrix_ego @ np.array([acceleration_dx, acceleration_dy])
+            relative_acceleration_x , relative_acceleration_y = relative_acceleration
 
             # 计算相对航向角
             relative_theta = absolute_yaw - yaw
             relative_theta = (relative_theta + np.pi) % (2 * np.pi) - np.pi
 
             objects.append({
-                'absolute_position_x': absolute_position_x,
-                'absolute_position_y': absolute_position_y,
-                'absolute_yaw': absolute_yaw,
-                'absolute_speed_x': obj_speed_x,
-                'absolute_speed_y': obj_speed_y,
-                'relative_position_x': relative_position_x,
-                'relative_position_y': relative_position_y,
-                'relative_speed_x': relative_speed_x,
-                'relative_speed_y': relative_speed_y,
-                'relative_theta': relative_theta,
+            'absolute_position_x': absolute_position_x,
+            'absolute_position_y': absolute_position_y,
+            'absolute_yaw': absolute_yaw,
+            'absolute_speed_x': obj_speed_x,
+            'absolute_speed_y': obj_speed_y,
+            'relative_position_x': relative_position_x,
+            'relative_position_y': relative_position_y,
+            'relative_speed_x': relative_speed_x,
+            'relative_speed_y': relative_speed_y,
+            'relative_acceleration_x':relative_acceleration_x,
+            'relative_acceleration_y':relative_acceleration_y,
+            'relative_theta': relative_theta,
+            'obj_acceleration_x': obj_acceleration_x,
+            'obj_acceleration_y': obj_acceleration_y,
+            'obj_angular_velocity': obj_angular_velocity,
+            'obj_angular_acceleration': obj_angular_acceleration
             })
 
-            # 打印调试信息
-            # print(f"ego yaw : ({yaw})")
-            # print(f"Object {obj.id}:")
-            # print(f"Relative Position: ({relative_position_x}, {relative_position_y})")
-            # print(f"Relative Speed: ({relative_speed_x}, {relative_speed_y})")
-            # print(f"Relative Heading: {relative_theta}")
-            # print(f"yaw compare: ({yaw}, {absolute_yaw})")
+            # 打印物体的相关数据
+            print('-------------------- Object --------------------')
+            print(f"Object Position: ({absolute_position_x}, {absolute_position_y})")
+            print(f"Object Yaw: {absolute_yaw}")
+            print(f"Object Speed (in x, y components): ({obj_speed_x}, {obj_speed_y})")
+            print(f"Object Acceleration (in x, y components): ({obj_acceleration_x}, {obj_acceleration_y})")
+            print(f"Object Angular Velocity: {obj_angular_velocity}")
+            print(f"Object Angular Acceleration: {obj_angular_acceleration}")
+            print(f"Relative Position (in x, y components): ({relative_position_x}, {relative_position_y})")
+            print(f"Relative Speed (in x, y components): ({relative_speed_x}, {relative_speed_y})")
+            print(f"Relative Theta: {relative_theta}")
+            print(f"Relative Acceleration (in x, y components): ({relative_acceleration_x}, {relative_acceleration_y})")
+            print('-------------------------------------------------')
 
         return ego_vehicle, objects
 
