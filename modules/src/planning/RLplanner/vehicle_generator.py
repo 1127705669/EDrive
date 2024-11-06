@@ -27,7 +27,7 @@ class VehicleGenerator():
         self.argparser.add_argument(
             '-n', '--number-of-vehicles',
             metavar='N',
-            default=16,
+            default=1,
             type=int,
             help='Number of vehicles (default: 30)')
         self.argparser.add_argument(
@@ -150,8 +150,23 @@ class VehicleGenerator():
         except:
             print("   Warning! Actor Generation is not valid. No actor will be spawned.")
             return []
+        
+    def get_spawn_points(self):
+        # 获取地图的所有生成点
+        spawn_points = self.world.get_map().get_spawn_points()
+
+        # 创建一个新的列表，用于保存符合要求的生成点
+        filtered_spawn_points = []
+
+        for point in spawn_points:
+            if -200 <= point.location.x <= -40 and -150 <= point.location.y <= 150:
+                filtered_spawn_points.append(point)
+
+        return filtered_spawn_points
+
 
     def spawn_vehicle(self):
+        self.vehicles_list = []
         self.world = self.client.get_world()
 
         self.check_existing_vehicles()
@@ -193,7 +208,7 @@ class VehicleGenerator():
 
         self.blueprints = sorted(self.blueprints, key=lambda bp: bp.id)
 
-        spawn_points = self.world.get_map().get_spawn_points()
+        spawn_points = self.get_spawn_points()
         number_of_spawn_points = len(spawn_points)
 
         if self.args.number_of_vehicles < number_of_spawn_points:

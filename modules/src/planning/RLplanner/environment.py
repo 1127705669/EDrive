@@ -8,11 +8,12 @@ from torch.utils.tensorboard import SummaryWriter
 import math
 import time
 
+
 class Environment:
     def __init__(self):
         self.step_count = 0
         self.writer = SummaryWriter('runs/td3')
-        self.state_dim = 85
+        self.state_dim = 2
         self.action_dim = 1
         self.max_action = 10
         self.agent = TD3Agent(self.state_dim, self.action_dim, self.writer)
@@ -163,6 +164,10 @@ class Environment:
             # print('-------------------------------------------------')
 
         return ego_vehicle, objects
+    
+
+    def map_value_to_range(self, value, min_input, max_input, min_output, max_output):
+        return (value - min_input) / (max_input - min_input) * (max_output - min_output) + min_output
 
 
     def preprocess_data(self, ego_vehicle, objects, target_speed):
@@ -171,6 +176,9 @@ class Environment:
         ego_y = ego_vehicle['position_y']
         ego_theta = ego_vehicle['yaw']
         ego_speed = ego_vehicle['speed']
+
+        scaled_speed = self.map_value_to_range(ego_speed, 0, 10, -1, 1)
+        target_speed = 0
         
         # Create a list to hold all object data
         objects_data = []
@@ -180,10 +188,40 @@ class Environment:
             theta = obj['relative_theta']
             speed_x = obj['relative_speed_x']
             speed_y = obj['relative_speed_y']
-            objects_data.extend([x, y, theta, speed_x, speed_y])
-        
+
+            if(-10 < y < 10):
+                scaled_relative_position_y = self.map_value_to_range(y, -10, 10, -1, 1)
+            elif(-10 > y):
+                scaled_relative_position_y = -1
+            else:
+                scaled_relative_position_y = 1
+            
+            if(5 < x < 30):
+                scaled_relative_position_x = self.map_value_to_range(x, 0, 30, -1, 1)
+            elif(5 > x):
+                scaled_relative_position_x = -1
+            else:
+                scaled_relative_position_x = 1
+
+            scaled_relative_theta = self.map_value_to_range(theta, -np.pi, np.pi, -1, 1)
+            scaled_relative_speed_x = self.map_value_to_range(speed_x, -15, 5, -1, 1)
+            scaled_relative_speed_y = self.map_value_to_range(speed_y, -5, 5, -1, 1)
+
+            objects_data.extend([scaled_relative_position_x, scaled_relative_position_y, scaled_relative_theta, 
+                                 scaled_relative_speed_x, scaled_relative_speed_y])
+            
+            # Print the scaled values
+            # print(f"scaled_relative_position_x: {scaled_relative_position_x}")
+            # print(f"scaled_relative_position_y: {scaled_relative_position_y}")
+            # print(f"relative_theta: {scaled_relative_theta}")
+            # print(f"scaled_relative_speed_x: {scaled_relative_speed_x}")
+            # print(f"scaled_relative_speed_y: {scaled_relative_speed_y}")
+
         # Combine all data into a single state array
-        state = np.array([ego_x, ego_y, ego_theta, ego_speed, target_speed] + objects_data)
+        # state = np.array([ego_x, ego_y, ego_theta, ego_speed, target_speed] + objects_data)
+        state = np.array([ego_speed, target_speed])
+        # state = np.array([ego_x, ego_y, ego_theta, ego_speed, target_speed])
+        # state = np.array([scaled_speed, target_speed])
 
         return state
 
@@ -214,6 +252,7 @@ class Environment:
             next_y = obj['relative_position_y'] + (obj['relative_speed_y'] + obj['relative_acceleration_y'] * delta_t/2) * delta_t
             next_theta = obj['absolute_yaw'] + obj['obj_angular_velocity'] * delta_t
             relative_theta = next_theta - next_yaw
+            relative_theta = (relative_theta + np.pi) % (2 * np.pi) - np.pi
             next_objects.append({
                 'relative_position_x': next_x,
                 'relative_position_y': next_y,
@@ -228,14 +267,28 @@ class Environment:
         return next_state
     
     def compute_reward(self, ego_vehicle, objects):
-        speed_reward = -((ego_vehicle['speed'] - self.target_speed) ** 2)
+        threshold_y = 1
+        threshold_x = 15
 
-        if self.if_collision and not self.last_coliision:
-            collision_reward = -100
-        else:
-            collision_reward = 0
+        distance_reward = 0
+        speed_reward = -((ego_vehicle['speed'] - self.target_speed) ** 2) / 25
+
+        min_relative_position_x = float('inf')  # 初始化为正无穷大
+        for obj in objects:
+            relative_position_x = obj['relative_position_x']
+            relative_position_y = obj['relative_position_y']
+
+            # 判断是否符合y方向距离小于阈值且x方向距离小于阈值，并且relative_position_x为正
+            if abs(relative_position_y) < threshold_y and relative_position_x > 0 and abs(relative_position_x) < threshold_x:
+                # 找到最小的 relative_position_x
+                min_relative_position_x = min(min_relative_position_x, relative_position_x)
+
+        # # 3. 如果找到了符合条件的最小 relative_position_x，则计算距离惩罚
+        # total_penalty = 0.0
+        if min_relative_position_x != float('inf'):
+            distance_reward = -((7 / abs(min_relative_position_x)) ** 2)
         
-        total_reward = speed_reward + collision_reward
+        total_reward = speed_reward# + distance_reward
 
         return total_reward
 

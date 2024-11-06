@@ -131,7 +131,7 @@ class ROSNode:
             self.env.objects_queue.append(data)
             # Update flag if the number of objects in the array is exactly 16
             if self.reset_done:
-                if len(data.objects) == 16:
+                if len(data.objects) == 1:
                     self.objects_queue_update_flag = True
                 else:
                     self.objects_queue_update_flag = False

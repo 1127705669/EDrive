@@ -14,9 +14,12 @@ class Actor(nn.Module):
         self.ln2 = nn.LayerNorm(fc2_dim)
         self.action = nn.Linear(fc2_dim, action_dim)
 
+        # LeakyReLU with negative slope 0.01
+        self.leaky_relu = nn.LeakyReLU(negative_slope=0.01)
+
     def forward(self, state):
-        x = torch.relu(self.ln1(self.fc1(state)))
-        x = torch.relu(self.ln2(self.fc2(x)))
+        x = self.leaky_relu(self.ln1(self.fc1(state)))
+        x = self.leaky_relu(self.ln2(self.fc2(x)))
         action = torch.tanh(self.action(x))
 
         return action
@@ -40,25 +43,27 @@ class Critic(nn.Module):
         self.ln5 = nn.LayerNorm(fc2_dim)
         self.q2 = nn.Linear(fc2_dim, 1)
 
+        # LeakyReLU with negative slope 0.01
+        self.leaky_relu = nn.LeakyReLU(negative_slope=0.01)
 
     def forward(self, state, action):
         sa = torch.cat([state, action], dim=1)
 
         # Path for Q1
-        x1 = F.relu(self.ln1(self.l1(sa)))
-        x1 = F.relu(self.ln2(self.l2(x1)))
+        x1 = self.leaky_relu(self.ln1(self.l1(sa)))
+        x1 = self.leaky_relu(self.ln2(self.l2(x1)))
         q1 = self.q1(x1)
 
         # Path for Q2
-        x2 = F.relu(self.ln4(self.l4(sa)))
-        x2 = F.relu(self.ln5(self.l5(x2)))
+        x2 = self.leaky_relu(self.ln4(self.l4(sa)))
+        x2 = self.leaky_relu(self.ln5(self.l5(x2)))
         q2 = self.q2(x2)
 
         return q1, q2
 
     def Q1(self, state, action):
         sa = torch.cat([state, action], dim=1)
-        x1 = F.relu(self.ln1(self.l1(sa)))
-        x1 = F.relu(self.ln2(self.l2(x1)))
+        x1 = self.leaky_relu(self.ln1(self.l1(sa)))
+        x1 = self.leaky_relu(self.ln2(self.l2(x1)))
         q1 = self.q1(x1)
         return q1
