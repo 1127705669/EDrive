@@ -27,7 +27,7 @@ class VehicleGenerator():
         self.argparser.add_argument(
             '-n', '--number-of-vehicles',
             metavar='N',
-            default=1,
+            default=16,
             type=int,
             help='Number of vehicles (default: 30)')
         self.argparser.add_argument(
@@ -284,3 +284,5 @@ class VehicleGenerator():
         print('\ndestroying %d vehicles' % len(self.vehicles_list))
         self.client.apply_batch([carla.command.DestroyActor(x) for x in self.vehicles_list])
         self.running = False
+
+        time.sleep(0.5)

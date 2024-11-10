@@ -58,8 +58,8 @@ class ROSNode:
             self.objects_queue_update_flag = False
             self.data_ready = False
             self.object_generated = False
-            self.vehicle_generator.destroy_vehicle()
             self.terminate_carla_processes()
+            self.vehicle_generator.destroy_vehicle()
 
         time_durarion = time.time() - self.last_vehicle_reset_time
 
@@ -101,6 +101,8 @@ class ROSNode:
         except Exception as e:
             rospy.logerr(f"终止 roslaunch 进程时发生错误: {e}")
 
+        time.sleep(0.5)
+
     def spawn_ego_vehicle(self):
         try:
             command = ["roslaunch", "carla_spawn_objects", "carla_spawn_objects.launch"]
@@ -110,6 +112,8 @@ class ROSNode:
 
         except Exception as e:
             rospy.logerr(f"生成 ego_vehicle 时发生错误: {e}")
+
+        time.sleep(0.5)
 
     def odometry_callback(self, data):
         if data is not None:
@@ -131,7 +135,7 @@ class ROSNode:
             self.env.objects_queue.append(data)
             # Update flag if the number of objects in the array is exactly 16
             if self.reset_done:
-                if len(data.objects) == 1:
+                if len(data.objects) == 16:
                     self.objects_queue_update_flag = True
                 else:
                     self.objects_queue_update_flag = False

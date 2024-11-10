@@ -32,7 +32,7 @@ class TD3Agent:
         self.writer = writer
         self.actor_update_flag = 0
 
-        self.noise = OrnsteinUhlenbeckNoise(dim=(action_dim,), mu=0.0, theta=0.0, sigma=0.0, dt=0.1)
+        self.noise = OrnsteinUhlenbeckNoise(dim=(action_dim,), mu=0.0, theta=0.01, sigma=0.01, dt=0.1)
 
         self.soft_update(self.target_actor, self.actor, tau=1.0)
         self.soft_update(self.target_critic, self.critic, tau=1.0)
