@@ -13,13 +13,25 @@ import os
 import time
 from vehicle_generator import VehicleGenerator
 import threading
+import argparse
 
 class ROSNode:
     def __init__(self):
+        self.tarining_mode = True
+        self.argparser = argparse.ArgumentParser(description="Description of your program")
+        self.argparser.add_argument(
+            '--notrain',
+            action='store_true',
+            help='Disable training mode (default: enable training)'
+        )
+        self.args = self.argparser.parse_args()
+		
+        if self.args.notrain:
+            self.tarining_mode = False
 
         rospy.init_node('RL_planner', anonymous=True)
 
-        self.env = Environment()
+        self.env = Environment(self.tarining_mode)
         self.vehicle_generator = VehicleGenerator()
 
         self.last_vehicle_reset_time = 0
@@ -113,7 +125,7 @@ class ROSNode:
         except Exception as e:
             rospy.logerr(f"生成 ego_vehicle 时发生错误: {e}")
 
-        time.sleep(0.5)
+        time.sleep(1.0)
 
     def odometry_callback(self, data):
         if data is not None:
@@ -135,7 +147,7 @@ class ROSNode:
             self.env.objects_queue.append(data)
             # Update flag if the number of objects in the array is exactly 16
             if self.reset_done:
-                if len(data.objects) == 16:
+                if len(data.objects) > 0:
                     self.objects_queue_update_flag = True
                 else:
                     self.objects_queue_update_flag = False
@@ -148,6 +160,8 @@ class ROSNode:
 
     def shutdown_handler(self):
         print("closing ros node...")
+        if(self.tarining_mode):
+            self.env.agent.save_models()
         self.vehicle_generator.destroy_vehicle()
         self.terminate_carla_processes()
 

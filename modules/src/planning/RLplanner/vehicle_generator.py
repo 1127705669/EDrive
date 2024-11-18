@@ -12,90 +12,23 @@ import threading
 
 class VehicleGenerator():
     def __init__(self):
-        self.argparser = argparse.ArgumentParser(description=__doc__)
-        self.argparser.add_argument(
-            '--host',
-            metavar='H',
-            default='127.0.0.1',
-            help='IP of the host server (default: 127.0.0.1)')
-        self.argparser.add_argument(
-            '-p', '--port',
-            metavar='P',
-            default=2000,
-            type=int,
-            help='TCP port to listen to (default: 2000)')
-        self.argparser.add_argument(
-            '-n', '--number-of-vehicles',
-            metavar='N',
-            default=16,
-            type=int,
-            help='Number of vehicles (default: 30)')
-        self.argparser.add_argument(
-            '--safe',
-            action='store_true',
-            help='Avoid spawning vehicles prone to accidents')
-        self.argparser.add_argument(
-            '--filterv',
-            metavar='PATTERN',
-            default='vehicle.tesla.*',
-            help='Filter vehicle model (default: "vehicle.tesla.model3")')
-        self.argparser.add_argument(
-            '--generationv',
-            metavar='G',
-            default='All',
-            help='restrict to certain vehicle generation (values: "1","2","All" - default: "All")')
-        self.argparser.add_argument(
-            '--generationw',
-            metavar='G',
-            default='2',
-            help='restrict to certain pedestrian generation (values: "1","2","All" - default: "2")')
-        self.argparser.add_argument(
-            '--tm-port',
-            metavar='P',
-            default=8000,
-            type=int,
-            help='Port to communicate with TM (default: 8000)')
-        self.argparser.add_argument(
-            '--asynch',
-            action='store_true',
-            help='Activate asynchronous mode execution')
-        self.argparser.add_argument(
-            '--hybrid',
-            action='store_true',
-            help='Activate hybrid mode for Traffic Manager')
-        self.argparser.add_argument(
-            '-s', '--seed',
-            metavar='S',
-            type=int,
-            help='Set random device seed and deterministic mode for Traffic Manager')
-        self.argparser.add_argument(
-            '--seedw',
-            metavar='S',
-            default=0,
-            type=int,
-            help='Set the seed for pedestrians module')
-        self.argparser.add_argument(
-            '--car-lights-on',
-            action='store_true',
-            default=False,
-            help='Enable automatic car light management')
-        self.argparser.add_argument(
-            '--hero',
-            action='store_true',
-            default=False,
-            help='Set one of the vehicles as hero')
-        self.argparser.add_argument(
-            '--respawn',
-            action='store_true',
-            default=False,
-            help='Automatically respawn dormant vehicles (only in large maps)')
-        self.argparser.add_argument(
-            '--no-rendering',
-            action='store_true',
-            default=False,
-            help='Activate no rendering mode')
-
-        self.args = self.argparser.parse_args()
+        self.host = '127.0.0.1'
+        self.port = 2000
+        self.number_of_vehicles = 16
+        self.safe = False
+        self.filterv = 'vehicle.tesla.model3'
+        self.generationv = 'All'
+        self.generationw = '2'
+        self.tm_port = 8000
+        self.asynch = False
+        self.hybrid = False
+        self.seed = None  # None 表示未设置
+        self.seedw = 0
+        self.car_lights_on = False
+        self.hero = False
+        self.respawn = False
+        self.no_rendering = False
+        self.notrain = False
 
         self.vehicles_list = []
         self.client = self.init_carla_client()
@@ -114,15 +47,15 @@ class VehicleGenerator():
         except IndexError:
             pass
 
-        client = carla.Client(self.args.host, self.args.port)
+        client = carla.Client(self.host, self.port)
         client.set_timeout(10.0)
         self.synchronous_master = False
-        random.seed(self.args.seed if self.args.seed is not None else int(time.time()))
+        random.seed(self.seed if self.seed is not None else int(time.time()))
 
         return client
     
     def check_existing_vehicles(self):
-        existing_vehicles = self.world.get_actors().filter('vehicle.*')
+        existing_vehicles = self.world.get_actors().filter('vehicle.tesla.model3')
         if existing_vehicles:
             print(f'Found {len(existing_vehicles)} existing vehicles. Destroying them first...')
             self.client.apply_batch([carla.command.DestroyActor(x.id) for x in existing_vehicles])
@@ -159,7 +92,7 @@ class VehicleGenerator():
         filtered_spawn_points = []
 
         for point in spawn_points:
-            if -200 <= point.location.x <= -40 and -150 <= point.location.y <= 150:
+            if -65 <= point.location.x <= -35 and -100 <= point.location.y <= 50:
                 filtered_spawn_points.append(point)
 
         return filtered_spawn_points
@@ -171,18 +104,18 @@ class VehicleGenerator():
 
         self.check_existing_vehicles()
 
-        self.traffic_manager = self.client.get_trafficmanager(self.args.tm_port)
+        self.traffic_manager = self.client.get_trafficmanager(self.tm_port)
         self.traffic_manager.set_global_distance_to_leading_vehicle(2.5)
-        if self.args.respawn:
+        if self.respawn:
             self.traffic_manager.set_respawn_dormant_vehicles(True)
-        if self.args.hybrid:
+        if self.hybrid:
             self.traffic_manager.set_hybrid_physics_mode(True)
             self.traffic_manager.set_hybrid_physics_radius(70.0)
-        if self.args.seed is not None:
-            self.traffic_manager.set_random_device_seed(self.args.seed)
+        if self.seed is not None:
+            self.traffic_manager.set_random_device_seed(self.seed)
 
         settings = self.world.get_settings()
-        if not self.args.asynch:
+        if not self.asynch:
             self.traffic_manager.set_synchronous_mode(False)
             if not settings.synchronous_mode:
                 self.synchronous_master = True
@@ -195,15 +128,15 @@ class VehicleGenerator():
             you could experience some issues. If it's not working correctly, switch to synchronous \
             mode by using traffic_manager.set_synchronous_mode(True)")
 
-        if self.args.no_rendering:
+        if self.no_rendering:
             settings.no_rendering_mode = True
         self.world.apply_settings(settings)
 
-        self.blueprints = self.get_actor_blueprints(self.world, self.args.filterv, self.args.generationv)
+        self.blueprints = self.get_actor_blueprints(self.world, self.filterv, self.generationv)
         if not self.blueprints:
             raise ValueError("Couldn't find any vehicles with the specified filters")
 
-        if self.args.safe:
+        if self.safe:
             self.blueprints = [x for x in self.blueprints if x.get_attribute('base_type') == 'car']
 
         self.blueprints = sorted(self.blueprints, key=lambda bp: bp.id)
@@ -211,12 +144,12 @@ class VehicleGenerator():
         spawn_points = self.get_spawn_points()
         number_of_spawn_points = len(spawn_points)
 
-        if self.args.number_of_vehicles < number_of_spawn_points:
+        if self.number_of_vehicles < number_of_spawn_points:
             random.shuffle(spawn_points)
-        elif self.args.number_of_vehicles > number_of_spawn_points:
+        elif self.number_of_vehicles > number_of_spawn_points:
             msg = 'requested %d vehicles, but could only find %d spawn points'
-            logging.warning(msg, self.args.number_of_vehicles, number_of_spawn_points)
-            self.args.number_of_vehicles = number_of_spawn_points
+            logging.warning(msg, self.number_of_vehicles, number_of_spawn_points)
+            self.number_of_vehicles = number_of_spawn_points
 
         # @todo cannot import these directly.
         SpawnActor = carla.command.SpawnActor
@@ -227,9 +160,9 @@ class VehicleGenerator():
         # Spawn vehicles
         # --------------
         batch = []
-        hero = self.args.hero
+        hero = self.hero
         for n, transform in enumerate(spawn_points):
-            if n >= self.args.number_of_vehicles:
+            if n >= self.number_of_vehicles:
                 break
             blueprint = random.choice(self.blueprints)
             if blueprint.has_attribute('color'):
@@ -255,7 +188,7 @@ class VehicleGenerator():
                 self.vehicles_list.append(response.actor_id)
 
         # Set automatic vehicle lights update if specified
-        if self.args.car_lights_on:
+        if self.car_lights_on:
             all_vehicle_actors = self.world.get_actors(self.vehicles_list)
             for actor in all_vehicle_actors:
                 self.traffic_manager.update_vehicle_lights(actor, True)
@@ -270,11 +203,11 @@ class VehicleGenerator():
 
     def run_simulation(self):
         while self.running:
-            if not self.args.asynch and self.synchronous_master:
+            if not self.asynch and self.synchronous_master:
                 self.world.tick()
 
     def destroy_vehicle(self):
-        if not self.args.asynch and self.synchronous_master:
+        if not self.asynch and self.synchronous_master:
             settings = self.world.get_settings()
             settings.synchronous_mode = False
             settings.no_rendering_mode = False

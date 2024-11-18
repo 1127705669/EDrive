@@ -9,15 +9,15 @@ import random
 import copy
 
 class TD3Agent:
-    def __init__(self, state_dim, action_dim, writer=None, fc1_dim=256, fc2_dim=256, buffer_capacity=1000000,
+    def __init__(self, state_dim, action_dim, writer=None, raining_mode=True, fc1_dim=256, fc2_dim=256, buffer_capacity=1000000,
                  batch_size=256, gamma=0.99, tau=0.005, max_action=1.0, policy_noise = 0.2, noise_clip = 0.5):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        self.actor = Actor(state_dim, action_dim, fc1_dim, fc2_dim).to(self.device)
+        self.actor = Actor(state_dim, action_dim, 128, 64).to(self.device)
         self.target_actor = copy.deepcopy(self.actor)
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=1e-4)
 
-        self.critic = Critic(state_dim, action_dim, fc1_dim, fc2_dim).to(self.device)
+        self.critic = Critic(state_dim, action_dim, 256, 128).to(self.device)
         self.target_critic = copy.deepcopy(self.critic)
         self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=1e-4)
 
