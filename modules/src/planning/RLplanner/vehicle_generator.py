@@ -14,7 +14,7 @@ class VehicleGenerator():
     def __init__(self):
         self.host = '127.0.0.1'
         self.port = 2000
-        self.number_of_vehicles = 16
+        self.number_of_vehicles = 6
         self.safe = False
         self.filterv = 'vehicle.tesla.model3'
         self.generationv = 'All'
@@ -92,7 +92,7 @@ class VehicleGenerator():
         filtered_spawn_points = []
 
         for point in spawn_points:
-            if -65 <= point.location.x <= -35 and -100 <= point.location.y <= 50:
+            if -55 <= point.location.x <= -53 and -100 <= point.location.y <= 50:
                 filtered_spawn_points.append(point)
 
         return filtered_spawn_points

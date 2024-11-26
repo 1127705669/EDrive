@@ -7,10 +7,11 @@ from replay_buffer import ReplayBuffer
 from ou_noise import OrnsteinUhlenbeckNoise
 import random
 import copy
+import os
 
 class TD3Agent:
-    def __init__(self, state_dim, action_dim, writer=None, raining_mode=True, fc1_dim=256, fc2_dim=256, buffer_capacity=1000000,
-                 batch_size=256, gamma=0.99, tau=0.005, max_action=1.0, policy_noise = 0.2, noise_clip = 0.5):
+    def __init__(self, state_dim, action_dim, writer=None, training_mode=True, fc1_dim=256, fc2_dim=256, buffer_capacity=1000000,
+                 batch_size=128, gamma=0.99, tau=0.005, max_action=1.0, policy_noise = 0.1, noise_clip = 0.3, model_dir='model_dir'):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.actor = Actor(state_dim, action_dim, 128, 64).to(self.device)
@@ -19,7 +20,7 @@ class TD3Agent:
 
         self.critic = Critic(state_dim, action_dim, 256, 128).to(self.device)
         self.target_critic = copy.deepcopy(self.critic)
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=1e-4)
+        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=2e-4, weight_decay=1e-4)
 
         self.memory = ReplayBuffer(state_dim, action_dim, buffer_capacity)
         self.batch_size = batch_size
@@ -31,8 +32,16 @@ class TD3Agent:
 
         self.writer = writer
         self.actor_update_flag = 0
+        self.training_mode = training_mode
 
-        self.noise = OrnsteinUhlenbeckNoise(dim=(action_dim,), mu=0.0, theta=0.01, sigma=0.01, dt=0.1)
+        self.noise = OrnsteinUhlenbeckNoise(dim=(action_dim,), mu=0.0, theta=0.50, sigma=0.30, dt=0.1)
+
+        self.model_dir = model_dir
+        if not os.path.exists(self.model_dir):
+            os.makedirs(self.model_dir)
+
+        if not training_mode:
+            self.load_models()
 
         self.soft_update(self.target_actor, self.actor, tau=1.0)
         self.soft_update(self.target_critic, self.critic, tau=1.0)
@@ -41,28 +50,35 @@ class TD3Agent:
         for target_param, param in zip(target.parameters(), source.parameters()):
             target_param.data.copy_(target_param.data * (1.0 - tau) + param.data * tau)
 
-    def select_action(self, state, step):
-        # 将状态转换为PyTorch张量，并添加批次维度
+    def save_models(self):
+        if self.training_mode:
+            torch.save(self.actor.state_dict(), os.path.join(self.model_dir, 'actor.pth'))
+            torch.save(self.critic.state_dict(), os.path.join(self.model_dir, 'critic.pth'))
+            print("Models saved successfully")
+
+    def load_models(self):
+        self.actor.load_state_dict(torch.load(os.path.join(self.model_dir, 'actor.pth'), weights_only=True))
+        self.critic.load_state_dict(torch.load(os.path.join(self.model_dir, 'critic.pth'), weights_only=True))
+        self.target_actor = copy.deepcopy(self.actor)
+        self.target_critic = copy.deepcopy(self.critic)
+        if not self.training_mode:
+            self.actor.eval()  # Set actor to eval mode if not in training mode
+            self.critic.eval()  # Set critic to eval mode if not in training mode
+        print("Models loaded successfully")
+
+    def select_action(self, state):
         state = torch.FloatTensor(state.reshape(1, -1)).to(self.device)
 
-        # 设置网络为评估模式
         self.actor.eval()
 
-        # 禁用梯度计算
         with torch.no_grad():
             action = self.actor(state).cpu().data.numpy().flatten()
 
-        # 恢复训练模式
-        self.actor.train()
+        if self.training_mode:
+            self.actor.train()
+            action += self.noise()
 
-        # 添加噪声来进行探索
-        action += self.noise()
-
-        # 限制动作在允许的范围内
-        action = np.clip(action, -1.0, 1.0)
-
-        # 记录动作数据到 TensorBoard，如果配置了的话
-        self.writer.add_scalar('Action/Selected_Action', action, step)
+        action = np.clip(action, -self.max_action, self.max_action)
 
         return action
 

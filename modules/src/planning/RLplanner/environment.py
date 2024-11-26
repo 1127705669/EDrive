@@ -7,6 +7,8 @@ from tf.transformations import euler_from_quaternion
 from torch.utils.tensorboard import SummaryWriter
 import math
 import time
+from low_pass_filter import LowPassFilter
+import random
 
 
 class Environment:
@@ -14,10 +16,12 @@ class Environment:
         self.training_mode = training_mode
         self.step_count = 0
         self.writer = SummaryWriter('runs/td3')
-        self.state_dim = 3 
+        self.state_dim = 3
         self.action_dim = 1
         self.max_action = 10
+        self.init_speed = 0
         self.agent = TD3Agent(self.state_dim, self.action_dim, self.writer, self.training_mode)
+        self.previous_scaled_speed = 0
 
         self.target_speed = 5
 
@@ -31,6 +35,8 @@ class Environment:
 
         self.is_left = False
 
+        self.speed_lilter = LowPassFilter(alpha=0.2)
+
         self.reset()
 
     def collision_detected(self):
@@ -42,6 +48,7 @@ class Environment:
         # self.last_coliision = self.if_collision
         self.init_position_recored = False
         self.is_left = False
+        self.init_speed = self.map_value_to_range(random.uniform(3, 7), 0, 10, -1, 1)
 
 
     def update_data(self):
@@ -120,9 +127,16 @@ class Environment:
             relative_velocity = rotation_matrix_ego @ np.array([speed_dx, speed_dy])
             relative_speed_x, relative_speed_y = relative_velocity
 
+            obj_speed_to_ego = rotation_matrix_ego @ np.array([obj_speed_x, obj_speed_y])
+            speed_x_to_ego, speed_y_to_ego = obj_speed_to_ego
+            filtered_speed_x_to_ego = self.speed_lilter.update(speed_x_to_ego)
+
             # 计算相对加速度
             acceleration_dx = obj_acceleration_x - acceleration_x
             acceleration_dy = obj_acceleration_y - acceleration_y
+
+            acceleration_to_ego = rotation_matrix_ego @ np.array([obj_acceleration_x, obj_acceleration_y])
+            acceleration_x_to_ego , acceleration_y_to_ego = acceleration_to_ego
 
             relative_acceleration = rotation_matrix_ego @ np.array([acceleration_dx, acceleration_dy])
             relative_acceleration_x , relative_acceleration_y = relative_acceleration
@@ -147,7 +161,11 @@ class Environment:
             'obj_acceleration_x': obj_acceleration_x,
             'obj_acceleration_y': obj_acceleration_y,
             'obj_angular_velocity': obj_angular_velocity,
-            'obj_angular_acceleration': obj_angular_acceleration
+            'obj_angular_acceleration': obj_angular_acceleration,
+            'speed_x_to_ego': speed_x_to_ego,
+            'speed_y_to_ego': speed_y_to_ego,
+            'acceleration_x_to_ego': acceleration_x_to_ego,
+            'acceleration_y_to_ego': acceleration_y_to_ego
             })
 
             # 打印物体的相关数据
@@ -174,38 +192,139 @@ class Environment:
     def preprocess_data(self, ego_vehicle, objects, target_speed, is_current):
         # Extract ego vehicle data
         ego_speed = ego_vehicle['speed']
-        scaled_speed = self.map_value_to_range(ego_speed, 0, 10, -1, 1)
+        scaled_speed = self.map_value_to_range(ego_speed, 0, 10, 0, 1)
+        self.previous_scaled_speed = scaled_speed
         scaled_target_speed = 0
+        self.target_speed = 5
+        min_speed_x_to_ego = 10
         
         # Create a list to hold all object data
         min_scaled_relative_position_x = 1.0
-        min_relative_position_x = float('inf')
+        self.min_relative_position_x = 105
 
         for obj in objects:
             x = obj['relative_position_x']
             y = obj['relative_position_y']
             theta = obj['relative_theta']
-            speed_x = obj['relative_speed_x']
-            
-            if(5 < x < 20):
-                scaled_relative_position_x = self.map_value_to_range(x, 5, 20, -1, 1)
-            elif(5 > x):
-                scaled_relative_position_x = -1
-            else:
-                scaled_relative_position_x = 1
+            speed_x_to_ego = obj['speed_x_to_ego']
 
             scaled_relative_theta = self.map_value_to_range(theta, -np.pi, np.pi, -1, 1)
 
-            if abs(y) < 2 and 5 < x < 20 and abs(theta) < np.pi/2:
+            if abs(y) < 2 and 5 < x < 105 and abs(theta) < np.pi/2:
+                
+
                 # 找到最小的 relative_position_x
-                min_relative_position_x = min(min_relative_position_x, x)
+                self.min_relative_position_x = min(self.min_relative_position_x, x)
+                self.min_relative_position_x = max(self.min_relative_position_x,5)
+                scaled_relative_position_x = self.map_value_to_range(self.min_relative_position_x, 5, 105, 0, 1)
+                if(self.min_relative_position_x < 5):
+                    scaled_relative_position_x = -1
+                elif(self.min_relative_position_x > 105):
+                    scaled_relative_position_x = 1
+                self.distance_factor = 1 / (1 + np.exp(0.8 * (self.min_relative_position_x - 11.0)))
+                
+                min_speed_x_to_ego = min(min_speed_x_to_ego, speed_x_to_ego)
+                
+                # self.distance_factor = ((20 - min_relative_position_x) / 15)
+                # if(self.distance_factor > 1):
+                #     self.distance_factor = 1
+                # if(self.distance_factor < 0):
+                #     self.distance_factor = 0
                 min_scaled_relative_position_x = scaled_relative_position_x
-                scaled_target_speed = self.map_value_to_range(speed_x + ego_speed, -5, 5, -1, 1)
+                
+                # scaled_target_speed = self.distance_factor * (scaled_target_speed - scaled_speed) + scaled_speed
+
+        self.target_speed = (1 - self.distance_factor) * 5 + self.distance_factor * min_speed_x_to_ego
+        scaled_target_speed = self.map_value_to_range(self.target_speed, 0, 10, 0, 1)
+
+        if(is_current):
+            print(self.min_relative_position_x)
 
         # Combine all data into a single state array
         state = np.array([scaled_speed] + [scaled_target_speed] + [min_scaled_relative_position_x])
 
         return state
+    
+    def compute_reward(self, ego_vehicle, objects, state):
+        done_bool = False
+
+        stop_reward = 0
+        speed_diff_reward = 0
+        speed_reward = 0
+        distance_reward = 0
+
+        # for obj in objects:
+        #     x = obj['relative_position_x']
+        #     y = obj['relative_position_y']
+        #     theta = obj['relative_theta']
+
+        #     # 判断是否符合y方向距离小于阈值且x方向距离小于阈值，并且relative_position_x为正
+        #     if abs(y) < 2 and 5 < x < 105 and abs(theta) < np.pi/2:
+        #         min_relative_position_x = min(min_relative_position_x, x)
+
+
+        # previous_speed = self.map_value_to_range(self.previous_scaled_speed, -1, 1, 0, 10)
+        
+        # difusion_reward = - (abs(previous_speed - ego_vehicle['speed']))**2
+
+        # target_speed = self.map_value_to_range(state[1], -1, 1, 0, 10)
+        # init_speed = self.map_value_to_range(self.init_speed, -1, 1, 0, 10)
+
+        self.writer.add_scalar('self.distance_factor', self.distance_factor, self.step_count)
+        self.writer.add_scalar('self.min_relative_position_x', self.min_relative_position_x, self.step_count)
+
+        # init_speed_reward = (1 - self.distance_factor) * (-(abs(ego_vehicle['speed'] - init_speed)**2))
+        # 追踪前车车速的奖励
+        target_speed_reward = (-(abs(ego_vehicle['speed'] - self.target_speed)**2)) / 25
+
+        final_reward = target_speed_reward
+        # if(abs(ego_vehicle['speed'] - self.target_speed) < 0.3):
+        #     final_reward += 0.5
+        # self.writer.add_scalars('Speeds rewards', {'init_speed_reward': init_speed_reward, 'target_speed_reward': target_speed_reward}, self.step_count)
+        self.writer.add_scalar('speed_reward', final_reward, self.step_count)
+
+        # speed_reward = - ((abs(target_speed - ego_vehicle['speed']))**2)/25
+        # if(abs(target_speed - ego_vehicle['speed']) < 0.3):
+        #     speed_reward += 1
+
+        
+        
+        # if(min_relative_position_x != float('inf')):
+        distance_reward = np.exp(-((self.min_relative_position_x - 8) ** 2) / (2 * 2 ** 2)) * (1 - (abs(ego_vehicle['speed'] - self.target_speed)) / 5)
+        if(abs(self.min_relative_position_x -7.5) < 0.5):
+            distance_reward += (1 - (abs(ego_vehicle['speed'] - self.target_speed)) / 5)
+        self.writer.add_scalar('distance_reward', distance_reward, self.step_count)
+        if(self.min_relative_position_x < 6):
+            done_bool = True
+            stop_reward = -1
+
+        self.writer.add_scalar('self.min_relative_position_x', self.min_relative_position_x, self.step_count)
+        # if(5.5 < min_relative_position_x < 7.5):
+        #     stop_reward = -1
+
+        # if(7.5 < min_relative_position_x < 9.5 and ego_vehicle['speed'] < 1):
+        #     if(min_relative_position_x > 8.5):
+        #         stop_reward = 9.5 - min_relative_position_x
+        #     else:
+        #         stop_reward = 1 #- ((min_relative_position_x - 7.5) ** 2) + 1
+
+        # if(min_relative_position_x != float('inf') and relative_speed_min != float('inf')):
+        # print(f"Distance Factor: {self.distance_factor:.2f}, Relative Speed Min: {relative_speed_min:.2f}, Speed Diff Reward: {speed_diff_reward:.2f}, Stop Reward: {stop_reward:.2f}")
+
+        # if(relative_speed_min > -0.2 and 6.5 < min_relative_position_x < 8.5):
+        #     stop_reward = - ((min_relative_position_x - 7.5) ** 2) + 1
+        #     print(stop_reward)
+        
+        # if(min_relative_position_x < 6.5):
+        #     stop_reward = -1
+        #     print(22222222222222222222222222222222)
+
+        # if min_relative_position_x == float('inf'):
+        #     speed_reward = -abs(ego_vehicle['speed'] - target_speed)
+        
+        total_reward = final_reward + distance_reward + stop_reward# + difusion_reward
+
+        return total_reward, done_bool
 
     def compute_next_state(self, ego_vehicle, objects, delta_t=0.1):
         # Update the speed of the ego vehicle
@@ -228,8 +347,8 @@ class Environment:
         # Update the state of each object
         next_objects = []
         for obj in objects:
-            next_speed_x = obj['relative_speed_x'] + obj['relative_acceleration_x'] * delta_t
-            next_speed_y = obj['relative_speed_y'] + obj['relative_acceleration_y'] * delta_t
+            next_speed_x = obj['speed_x_to_ego'] + obj['acceleration_x_to_ego'] * delta_t
+            next_speed_y = obj['speed_y_to_ego'] + obj['acceleration_y_to_ego'] * delta_t
             next_x = obj['relative_position_x'] + (obj['relative_speed_x'] + obj['relative_acceleration_x'] * delta_t/2) * delta_t
             next_y = obj['relative_position_y'] + (obj['relative_speed_y'] + obj['relative_acceleration_y'] * delta_t/2) * delta_t
             next_theta = obj['absolute_yaw'] + obj['obj_angular_velocity'] * delta_t
@@ -239,71 +358,14 @@ class Environment:
                 'relative_position_x': next_x,
                 'relative_position_y': next_y,
                 'relative_theta': relative_theta,
-                'relative_speed_x': next_speed_x,
-                'relative_speed_y': next_speed_y
+                'speed_x_to_ego': next_speed_x,
+                'speed_y_to_ego': next_speed_y
             })
 
         # Generate the new state vector
         next_state = self.preprocess_data(next_ego_vehicle, next_objects, self.target_speed, is_current=False)
 
         return next_state
-    
-    def compute_reward(self, ego_vehicle, objects):
-        done_bool = False
-
-        distance_factor = 0
-        stop_reward = 0
-        speed_diff_reward = 0
-        speed_reward = 0
-
-        min_relative_position_x = float('inf')
-        relative_speed_min = float('inf')
-
-        for obj in objects:
-            x = obj['relative_position_x']
-            y = obj['relative_position_y']
-            theta = obj['relative_theta']
-            speed_x = obj['relative_speed_x']
-
-            # 判断是否符合y方向距离小于阈值且x方向距离小于阈值，并且relative_position_x为正
-            if abs(y) < 2 and 5 < x < 20 and abs(theta) < np.pi/2:
-                min_relative_position_x = min(min_relative_position_x, x)
-                relative_speed_min = min(relative_speed_min, speed_x)
-                # distance_factor = 1 * np.exp(-((min_relative_position_x - 8)**2) / (2 * 6**2))
-        
-        if(min_relative_position_x != float('inf') and relative_speed_min != float('inf')):
-            distance_factor = self.map_value_to_range(min_relative_position_x, 20, 8, 0, 1)
-            if(distance_factor > 1):
-                distance_factor = 1
-            if(distance_factor < 0):
-                distance_factor = 0
-
-            distance_reward = (1 - (abs(relative_speed_min) / 5))**2
-
-            speed_diff_reward = distance_factor * distance_reward
-
-        if(min_relative_position_x < 5.5):
-            done_bool = True
-
-        if(5.5 < min_relative_position_x < 8.5):
-            stop_reward = - ((min_relative_position_x - 7.5) ** 2) + 1
-
-        # print(f"Distance Factor: {distance_factor:.2f}, Relative Speed Min: {relative_speed_min:.2f}, Speed Diff Reward: {speed_diff_reward:.2f}, Stop Reward: {stop_reward:.2f}")
-
-        # if(relative_speed_min > -0.2 and 6.5 < min_relative_position_x < 8.5):
-        #     stop_reward = - ((min_relative_position_x - 7.5) ** 2) + 1
-        #     print(stop_reward)
-        
-        # if(min_relative_position_x < 6.5):
-        #     stop_reward = -1
-        #     print(22222222222222222222222222222222)
-
-        if min_relative_position_x == float('inf'):
-            speed_reward = -((ego_vehicle['speed'] - 5) ** 2) / 25
-        
-        total_reward = speed_reward + speed_diff_reward + stop_reward
-
-        return total_reward, done_bool
 
     def step(self):
         ego_vehicle, objects = self.update_data()
@@ -317,9 +379,12 @@ class Environment:
         time_durarion = time.time() - self.last_vehicle_reset_time
 
         state = self.preprocess_data(ego_vehicle, objects, self.target_speed, is_current=True)
-        action = self.agent.select_action(state, self.step_count)
+        action = self.agent.select_action(state)
         next_state = self.compute_next_state(ego_vehicle, objects)
-        reward, done_bool = self.compute_reward(ego_vehicle, objects)
+        reward, done_bool = self.compute_reward(ego_vehicle, objects, state)
+
+        self.writer.add_scalars('Speeds', {'real_speed': state[0], 'target_speed': state[1]}, self.step_count)
+        self.writer.add_scalar('scaled relative position_x', state[2], self.step_count)
 
         # if(self.if_collision and self.is_left):
         #     print("collision detected!")
@@ -342,7 +407,7 @@ class Environment:
 
         self.step_count += 1
 
-        if self.step_count % 10 == 0:
+        if self.step_count % 10 == 0 and self.training_mode:
             self.learn()
 
         scaled_action = (action + 1) * 0.5 * self.max_action
