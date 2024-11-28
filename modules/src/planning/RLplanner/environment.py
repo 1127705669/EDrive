@@ -9,7 +9,8 @@ import math
 import time
 from low_pass_filter import LowPassFilter
 import random
-
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 class Environment:
     def __init__(self, training_mode=True):
@@ -24,6 +25,7 @@ class Environment:
         self.previous_scaled_speed = 0
 
         self.target_speed = 5
+        self.distance_factor = 0
 
         self.odometry_queue = deque(maxlen=20)
         self.imu_queue = deque(maxlen=20)
@@ -37,7 +39,59 @@ class Environment:
 
         self.speed_lilter = LowPassFilter(alpha=0.2)
 
+        self.min_relative_position_x = 0
+        self.step_counts_array = []
+        self.speeds_array = []
+        self.accelerations_array = []
+        self.relative_position_x_array = []
+        self.lead_vehicle_speeds_array = []
+
+        self.speeds_array_lilter = LowPassFilter(alpha=0.2)
+        self.accelerations_array_lilter = LowPassFilter(alpha=0.2)
+        self.relative_position_x_array_lilter = LowPassFilter(alpha=0.2)
+        self.lead_vehicle_speeds_array_lilter = LowPassFilter(alpha=0.2)
+
+        self.min_speed_x_to_ego = 10
+
         self.reset()
+
+    def smooth_data(self, data, window_size):
+        """ 使用滑动平均平滑数据 """
+        window = np.ones(int(window_size))/float(window_size)
+        return np.convolve(data, window, 'same')
+    
+    def plot_speed_and_acceleration(self):
+        
+        plt.figure(figsize=(18, 6))  # 调整大小以适应三个图
+
+        # 第一个图形：速度
+        plt.subplot(1, 3, 2)  # 修改为 1 行 3 列的第 1 个
+        plt.plot(self.step_counts_array, self.speeds_array, label='Ego Vehicle Speed', color='blue')
+        # if(self.min_speed_x_to_ego < 7):
+        plt.plot(self.step_counts_array, self.lead_vehicle_speeds_array, label='Lead Vehicle Speed', color='red')
+        plt.xlabel('Time [s]')
+        plt.ylabel('Speed [m/s]')
+        plt.grid(True)
+        plt.legend()
+
+        # 第二个图形：加速度
+        plt.subplot(1, 3, 3)  # 修改为 1 行 3 列的第 2 个
+        plt.plot(self.step_counts_array, self.accelerations_array, label='Ego Vehicle Acceleration', color='blue')
+        plt.xlabel('Time [s]')
+        plt.ylabel('Acceleration [$\mathrm{m/s}^2$]')
+        plt.grid(True)
+        plt.legend()
+
+        # 第三个图形：相对位置
+        plt.subplot(1, 3, 1)  # 修改为 1 行 3 列的第 3 个
+        plt.plot(self.step_counts_array, self.relative_position_x_array, label='Relative Position', color='blue')
+        plt.xlabel('Time [s]')
+        plt.ylabel('Relative Position [m]')
+        plt.grid(True)
+        plt.legend()
+
+        plt.tight_layout()
+        plt.show()
 
     def collision_detected(self):
         self.if_collision = True
@@ -196,7 +250,7 @@ class Environment:
         self.previous_scaled_speed = scaled_speed
         scaled_target_speed = 0
         self.target_speed = 5
-        min_speed_x_to_ego = 10
+        self.min_speed_x_to_ego = 10
         
         # Create a list to hold all object data
         min_scaled_relative_position_x = 1.0
@@ -223,7 +277,7 @@ class Environment:
                     scaled_relative_position_x = 1
                 self.distance_factor = 1 / (1 + np.exp(0.8 * (self.min_relative_position_x - 11.0)))
                 
-                min_speed_x_to_ego = min(min_speed_x_to_ego, speed_x_to_ego)
+                self.min_speed_x_to_ego = min(self.min_speed_x_to_ego, speed_x_to_ego)
                 
                 # self.distance_factor = ((20 - min_relative_position_x) / 15)
                 # if(self.distance_factor > 1):
@@ -234,7 +288,7 @@ class Environment:
                 
                 # scaled_target_speed = self.distance_factor * (scaled_target_speed - scaled_speed) + scaled_speed
 
-        self.target_speed = (1 - self.distance_factor) * 5 + self.distance_factor * min_speed_x_to_ego
+        self.target_speed = (1 - self.distance_factor) * 5 + self.distance_factor * self.min_speed_x_to_ego
         scaled_target_speed = self.map_value_to_range(self.target_speed, 0, 10, 0, 1)
 
         if(is_current):
@@ -379,9 +433,18 @@ class Environment:
         time_durarion = time.time() - self.last_vehicle_reset_time
 
         state = self.preprocess_data(ego_vehicle, objects, self.target_speed, is_current=True)
+
+        self.step_counts_array.append(self.step_count * 0.1)
+        self.speeds_array.append(self.speeds_array_lilter.update(ego_vehicle['speed']))
+        self.accelerations_array.append(self.accelerations_array_lilter.update(ego_vehicle['acceleration']))
+        self.relative_position_x_array.append(self.relative_position_x_array_lilter.update(self.min_relative_position_x - 5))
+        if(self.min_speed_x_to_ego > 8):
+            self.min_speed_x_to_ego = 0
+        self.lead_vehicle_speeds_array.append(self.lead_vehicle_speeds_array_lilter.update(self.min_speed_x_to_ego))
+
         action = self.agent.select_action(state)
-        next_state = self.compute_next_state(ego_vehicle, objects)
         reward, done_bool = self.compute_reward(ego_vehicle, objects, state)
+        next_state = self.compute_next_state(ego_vehicle, objects)
 
         self.writer.add_scalars('Speeds', {'real_speed': state[0], 'target_speed': state[1]}, self.step_count)
         self.writer.add_scalar('scaled relative position_x', state[2], self.step_count)

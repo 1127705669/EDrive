@@ -160,6 +160,7 @@ class ROSNode:
 
     def shutdown_handler(self):
         print("closing ros node...")
+        self.env.plot_speed_and_acceleration()
         if(self.tarining_mode):
             self.env.agent.save_models()
         self.vehicle_generator.destroy_vehicle()

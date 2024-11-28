@@ -14,7 +14,7 @@ class VehicleGenerator():
     def __init__(self):
         self.host = '127.0.0.1'
         self.port = 2000
-        self.number_of_vehicles = 6
+        self.number_of_vehicles = 2
         self.safe = False
         self.filterv = 'vehicle.tesla.model3'
         self.generationv = 'All'
